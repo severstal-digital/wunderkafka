@@ -1,0 +1,15 @@
+{
+  "entities": [
+    {
+      "id": 2109,
+      "schemaMetadataId": 1693,
+      "name": "test_signals:k",
+      "description": "test_signals:k",
+      "version": 1,
+      "schemaText": "{\"type\": \"record\", \"name\": \"SignalsTestKey\", \"fields\": [{\"name\": \"ts\", \"type\": \"long\"}], \"namespace\": \"com.localhost\"}",
+      "timestamp": 1632253632722,
+      "stateId": 5,
+      "mergeInfo": null
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "entities": [
+    {
+      "id": 2108,
+      "schemaMetadataId": 1692,
+      "name": "test_signals",
+      "description": "test_signals",
+      "version": 1,
+      "schemaText": "{\"type\": \"record\", \"name\": \"SignalsTest\", \"fields\": [{\"name\": \"source\", \"type\": \"string\"}, {\"name\": \"type\", \"type\": \"string\"}, {\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"string\"}, {\"name\": \"ts\", \"type\": \"long\"}]}",
+      "timestamp": 1632134826446,
+      "stateId": 5,
+      "mergeInfo": null
+    }
+  ]
+}
