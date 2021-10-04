@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from wunderkafka import AvroModelProducer, ProducerConfig, ClouderaSRConfig, SecurityProtocol
+from wunderkafka import AvroModelProducer, ProducerConfig, SRConfig, SecurityProtocol
 from wunderkafka.time import now
 
 BROKERS_ADDRESSES = 'kafka-broker-01.my_domain.com'
@@ -21,7 +21,7 @@ if __name__ == '__main__':
         sasl_kerberos_kinit_cmd='kinit my_user@my_real.com -k -t my_user.keytab',
     )
 
-    sr_config = ClouderaSRConfig(
+    sr_config = SRConfig(
         url=SCHEMA_REGISTRY_URL,
         sasl_username='my_user@my_real.com',
     )

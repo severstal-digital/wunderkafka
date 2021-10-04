@@ -10,10 +10,10 @@ All moving parts should be interchangeable in terms of schema, header and serial
 import datetime
 from typing import Any, List, Union, Optional
 
-from loguru import logger
 from confluent_kafka import Message
 
 from wunderkafka.types import HeaderParser
+from wunderkafka.logger import logger
 from wunderkafka.serdes.abc import AbstractDeserializer
 from wunderkafka.structures import SchemaMeta, SchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer

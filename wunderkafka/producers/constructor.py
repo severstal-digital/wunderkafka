@@ -9,9 +9,8 @@ All moving parts should be interchangeable in terms of schema, header and serial
 
 from typing import Any, Dict, Tuple, Optional
 
-from loguru import logger
-
 from wunderkafka.types import MsgKey, MsgValue, TopicName, HeaderPacker, DeliveryCallback, MessageDescription
+from wunderkafka.logger import logger
 from wunderkafka.callbacks import error_callback
 from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 from wunderkafka.structures import SRMeta, SchemaDescription

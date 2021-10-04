@@ -6,8 +6,9 @@ import datetime
 import subprocess
 from typing import Set, Optional
 
-from loguru import logger
 from dateutil import parser
+
+from wunderkafka.logger import logger
 
 # ToDo (tribunsky.kir): move it to platform as it is linux implementation
 

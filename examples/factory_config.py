@@ -3,11 +3,11 @@ from functools import partial
 
 from pydantic import validator, AnyHttpUrl, Field
 from wunderkafka.time import now
-from wunderkafka import ClouderaSRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
+from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
 
 
 # If you are the fan of 12 factors, you may want to config via env variables
-class OverridenSRConfig(ClouderaSRConfig):
+class OverridenSRConfig(SRConfig):
     url: AnyHttpUrl = Field(env='SCHEMA_REGISTRY_URL')
 
     @validator('sasl_username')

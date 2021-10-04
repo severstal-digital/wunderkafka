@@ -5,10 +5,10 @@ from typing import Any, Dict, Tuple, Optional
 from threading import Thread
 from dataclasses import dataclass
 
-from loguru import logger
 from confluent_kafka import libversion
 
 from wunderkafka.time import ts2dt
+from wunderkafka.logger import logger
 from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.config.generated import enums
 from wunderkafka.hotfixes.watchdog.types import Watchdog
