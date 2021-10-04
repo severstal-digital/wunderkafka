@@ -7,11 +7,11 @@ from requests_kerberos import HTTPKerberosAuth
 
 from wunderkafka.logger import logger
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
-from wunderkafka.config.schema_registry import ClouderaSRConfig
+from wunderkafka.config.schema_registry import SRConfig
 
 
 class KerberizableHTTPClient(AbstractHTTPClient):
-    def __init__(self, config: ClouderaSRConfig, *, save_replay: bool = False) -> None:
+    def __init__(self, config: SRConfig, *, save_replay: bool = False) -> None:
         s = requests.Session()
         if config.sasl_username is not None:
             s.auth = HTTPKerberosAuth(

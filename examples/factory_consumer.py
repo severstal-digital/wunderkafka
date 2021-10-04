@@ -12,14 +12,12 @@ from wunderkafka.serdes.avro.headers import AvroClouderaConfluent
 
 def MyAvroConsumer(
     config: Optional[OverridenConfig] = None,
-    sr_config: Optional[OverridenSRConfig] = None,
 ) -> HighLevelDeserializingConsumer:
     config = config or OverridenConfig()
-    sr_config = sr_config or OverridenSRConfig()
     config, watchdog = check_watchdog(config)
     return HighLevelDeserializingConsumer(
         consumer=BytesConsumer(config, watchdog),
-        schema_registry=ClouderaSRClient(KerberizableHTTPClient(sr_config), SimpleCache()),
+        schema_registry=ClouderaSRClient(KerberizableHTTPClient(config.sr), SimpleCache()),
         headers_handler=AvroClouderaConfluent(),
         deserializer=FastAvroDeserializer(),
     )

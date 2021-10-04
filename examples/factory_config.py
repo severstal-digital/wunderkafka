@@ -26,6 +26,7 @@ class OverridenConfig(ConsumerConfig):
     bootstrap_servers: str = Field(env='BOOTSTRAP_SERVER')
     security_protocol: SecurityProtocol = SecurityProtocol.sasl_ssl
     sasl_kerberos_kinit_cmd: str = ''
+    sr: SRConfig = OverridenSRConfig()
 
     @validator('sasl_kerberos_kinit_cmd')
     def format_keytab(cls, v) -> str:
@@ -36,4 +37,4 @@ class OverridenConfig(ConsumerConfig):
 
 
 # After this you can partial your own Producer/Consumer, something like...
-MyConsumer = partial(AvroConsumer, config=OverridenConfig(), sr_config=OverridenConfig())
+MyConsumer = partial(AvroConsumer, config=OverridenConfig())

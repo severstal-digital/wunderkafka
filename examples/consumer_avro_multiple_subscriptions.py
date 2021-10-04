@@ -13,14 +13,10 @@ if __name__ == '__main__':
         bootstrap_servers=BROKERS_ADDRESSES,
         security_protocol=SecurityProtocol.sasl_ssl,
         sasl_kerberos_kinit_cmd='kinit my_user@my_real.com -k -t my_user.keytab',
+        sr=SRConfig(url=SCHEMA_REGISTRY_URL, sasl_username='my_user@my_real.com'),
     )
 
-    sr_config = SRConfig(
-        url=SCHEMA_REGISTRY_URL,
-        sasl_username='my_user@my_real.com',
-    )
-
-    c = AvroConsumer(config, sr_config)
+    c = AvroConsumer(config)
     c.subscribe([
         TopicSubscription('my_topic1', with_timedelta=datetime.timedelta(minutes=10)),
         TopicSubscription('my_topic2', from_beginning=True),

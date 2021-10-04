@@ -4,6 +4,7 @@ from typing import Any, Dict, Union, Mapping, TypeVar, Optional
 
 from wunderkafka.config.generated.fields import COMMON_FIELDS, CONSUMER_FIELDS, PRODUCER_FIELDS
 from wunderkafka.config.generated.models import RDConsumerConfig, RDProducerConfig
+from wunderkafka.config.schema_registry import SRConfig
 
 CONF_CONSUMER_FIELDS = MappingProxyType({
     field_name.replace('.', '_'): field_name for field_name in (*COMMON_FIELDS, *CONSUMER_FIELDS)
@@ -30,9 +31,14 @@ def remap_properties(
     return new_dct
 
 
+# I don't like mixing SR config and librdkafka config,
+# but it's more handful for producer w/o schema (no need to nest config for librdkafka)
 class ConsumerConfig(RDConsumerConfig):
+    sr: Optional[SRConfig]
+
     def dict(self, **kwargs: Any) -> Dict[str, ConfigValues]:
         dct = super().dict(**kwargs)
+        dct.pop('sr')
         return remap_properties(dct, CONF_CONSUMER_FIELDS)
 
     # class Config:
@@ -40,8 +46,11 @@ class ConsumerConfig(RDConsumerConfig):
 
 
 class ProducerConfig(RDProducerConfig):
+    sr: Optional[SRConfig]
+
     def dict(self, **kwargs: Any) -> Dict[str, ConfigValues]:
         dct = super().dict(**kwargs)
+        dct.pop('sr')
         return remap_properties(dct, CONF_PRODUCER_FIELDS)
 
     # class Config:

@@ -19,14 +19,11 @@ if __name__ == '__main__':
         bootstrap_servers=BROKERS_ADDRESSES,
         security_protocol=SecurityProtocol.sasl_ssl,
         sasl_kerberos_kinit_cmd='kinit my_user@my_real.com -k -t my_user.keytab',
+        sr=SRConfig(url=SCHEMA_REGISTRY_URL, sasl_username='my_user@my_real.com'),
     )
 
-    sr_config = SRConfig(
-        url=SCHEMA_REGISTRY_URL,
-        sasl_username='my_user@my_real.com',
-    )
     topic = 'test_test_test'
 
     # No key, that's just an example
-    producer = AvroModelProducer({topic: SomeEvent}, config, sr_config)
+    producer = AvroModelProducer({topic: SomeEvent}, config)
     producer.send_message(topic, SomeEvent(), blocking=True)
