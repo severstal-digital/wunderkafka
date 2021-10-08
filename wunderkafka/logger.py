@@ -1,4 +1,4 @@
 import logging
 
 logger = logging.getLogger('wunderkafka')
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.WARNING)

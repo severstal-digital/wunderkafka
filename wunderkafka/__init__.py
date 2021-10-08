@@ -25,3 +25,5 @@ from wunderkafka.config.generated.enums import (
 )
 from wunderkafka.config.schema_registry import SRConfig
 from wunderkafka.consumers.subscription import TopicSubscription
+from wunderkafka.protocols import AnyConsumer, AnyProducer
+
