@@ -63,7 +63,12 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         offsets: Optional[List[TopicPartition]] = None,
         asynchronous: bool = True,
     ) -> Optional[List[TopicPartition]]:
-        return self.consumer.commit(message, offsets, asynchronous)
+        if message is None and offsets is not None:
+            return self.consumer.commit(offsets=offsets, asynchronous=asynchronous)
+        if message is not None and offsets is None:
+            return self.consumer.commit(message=message, asynchronous=asynchronous)
+        # Default behavior
+        return self.consumer.commit(message=message, offsets=offsets, asynchronous=asynchronous)
 
     def consume(
         self,

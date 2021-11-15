@@ -5,19 +5,22 @@ from typing_extensions import Protocol
 from confluent_kafka import Message, TopicPartition
 
 from wunderkafka import TopicSubscription
-from wunderkafka.types import MsgValue, MsgKey, DeliveryCallback
 
 
 # ToDo (tribunsky.kir): subject to change. It's not obvious how to merge together
 #                       python-kafka/confluent-kafka and out own API, so currently
 #                       it's just API of (de)serializing producer/consumer with the nested 'real' producer/consumer.
+from wunderkafka.types import MsgValue, MsgKey, DeliveryCallback
 
 
 class AnyConsumer(Protocol):
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        ...
+
     def commit(
         self,
-        message: Optional[Message],
+        message: Optional[Message] = None,
         offsets: Optional[List[TopicPartition]] = None,
         asynchronous: bool = True,
     ) -> Optional[List[TopicPartition]]:
@@ -46,6 +49,10 @@ class AnyConsumer(Protocol):
 
 
 class AnyProducer(Protocol):
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        ...
+
     def send_message(
             self,
             topic: str,
@@ -62,5 +69,5 @@ class AnyProducer(Protocol):
     def set_target_topic(self, topic: str, value: Any, key: Any = None, *, lazy: bool = False) -> None:
         """Make producer aware how it should work with specific topic."""
 
-    def flush(self, timeout: float) -> int:
+    def flush(self, timeout: Optional[float] = None) -> int:
         """Just overlap nested 'real' producer's flush."""

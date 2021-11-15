@@ -65,7 +65,9 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
             else:
                 self.set_target_topic(topic, description, lazy=lazy)
 
-    def flush(self, timeout: float) -> int:   # noqa: D102  # docstring inherited from superclass.
+    def flush(self, timeout: Optional[float] = None) -> int:   # noqa: D102  # docstring inherited from superclass.
+        if timeout is None:
+            return self._producer.flush()
         return self._producer.flush(timeout)
 
     def set_target_topic(  # noqa: D102  # docstring inherited from superclass.
