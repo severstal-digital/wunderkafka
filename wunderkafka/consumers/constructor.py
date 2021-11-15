@@ -10,7 +10,7 @@ All moving parts should be interchangeable in terms of schema, header and serial
 import datetime
 from typing import Any, List, Union, Optional
 
-from confluent_kafka import Message
+from confluent_kafka import Message, TopicPartition
 
 from wunderkafka.types import HeaderParser
 from wunderkafka.logger import logger
@@ -56,6 +56,14 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         self.consumer.subscribe(
             topics, from_beginning=from_beginning, offset=offset, ts=ts, with_timedelta=with_timedelta,
         )
+
+    def commit(  # noqa: D102,WPS211  # docstring inherited from superclass.
+        self,
+        message: Optional[Message] = None,
+        offsets: Optional[List[TopicPartition]] = None,
+        asynchronous: bool = True,
+    ) -> Optional[List[TopicPartition]]:
+        return self.consumer.commit(message, offsets, asynchronous)
 
     def consume(
         self,

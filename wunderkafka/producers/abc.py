@@ -17,7 +17,6 @@ from wunderkafka.types import MsgKey, MsgValue, DeliveryCallback
 class AbstractProducer(Producer):
     """Extension point for the original Producer API."""
 
-    # FixMe (tribunsky.kir): add reference to original produce()
     def send_message(  # noqa: WPS211  # ToDo (tribunsky.kir): rethink API?
         self,
         topic: str,
@@ -55,7 +54,6 @@ class AbstractProducer(Producer):
 class AbstractSerializingProducer(ABC):
     """High-level interface for extended producer."""
 
-    # FixMe (tribunsky.kir): add reference to original produce()
     @abstractmethod
     def send_message(  # noqa: WPS211  # overlaps API from AbstractProducer, maybe should be mixin.
         self,
@@ -71,7 +69,7 @@ class AbstractSerializingProducer(ABC):
         """
         Encode and send message to Kafka.
 
-        This method overlaps original producers' method and will use the nested producer.
+        This method overlaps AbstractProducer's method and intended to use produce() of real nested producer.
 
         :param topic:           Target topic against which we are working for this call.
         :param value:           Message's value object to be encoded and sent.
@@ -100,4 +98,15 @@ class AbstractSerializingProducer(ABC):
         :param lazy:            If True, do not register schema in registry during __init__,
                                 or before the first attempt to send message for a given topic.
                                 Otherwise, register schema immediately.
+        """
+
+    @abstractmethod
+    def flush(self, timeout: float) -> int:
+        """
+        Wait for all messages in the Producer queue to be delivered.
+
+        This method overlaps original producers' method and will use the nested producer.
+
+        :param timeout:         Maximum time to block.
+        :return:                Number of messages still in queue.
         """

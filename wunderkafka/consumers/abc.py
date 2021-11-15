@@ -9,7 +9,7 @@ import datetime
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union, Optional
 
-from confluent_kafka import Message, Consumer
+from confluent_kafka import Message, Consumer, TopicPartition
 
 from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
@@ -63,6 +63,28 @@ class AbstractConsumer(Consumer):
 
 class AbstractDeserializingConsumer(ABC):
     """High-level interface for extended consumer."""
+
+    @abstractmethod
+    def commit(
+        self,
+        message: Optional[Message] = None,
+        offsets: Optional[List[TopicPartition]] = None,
+        asynchronous: bool = True,
+    ) -> Optional[List[TopicPartition]]:
+        """
+        Commit a message or a list of offsets.
+
+        This method overlaps original consumer's method and will use the nested consumer.
+
+        :param message:         Commit offset (+1), extracted from Message object itself.
+        :param offsets:         Commit exactly TopicPartition data.
+        :param asynchronous:    If True, do not block execution, otherwise - wait until commit fail or success.
+
+        :raises KafkaException: If all commits failed.
+
+        :return:                On asynchronous call returns None immediately.
+                                Committed offsets on synchronous call, if succeed.
+        """
 
     @abstractmethod
     def subscribe(  # noqa: WPS211  # ToDo (tribunsky.kir): reconsider API of 'how'
