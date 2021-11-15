@@ -38,7 +38,7 @@ def choose_offset(
         start = datetime.datetime.now() - with_timedelta
         ts = start.timestamp() * 1000
     if ts is not None:
-        return Timestamp(ts)
+        return Timestamp(int(ts))
     return None
 
 
