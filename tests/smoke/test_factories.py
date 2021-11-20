@@ -2,13 +2,7 @@ import sys
 
 import pytest
 
-from wunderkafka.factories import (
-    AvroConsumer,
-    AvroProducer,
-    ConsumerConfig,
-    ProducerConfig,
-    AvroModelProducer,
-)
+from wunderkafka.factories import AvroConsumer, AvroProducer, ConsumerConfig, ProducerConfig, AvroModelProducer
 from wunderkafka.config.schema_registry import SRConfig
 
 

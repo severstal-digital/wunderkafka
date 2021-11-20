@@ -11,6 +11,7 @@ from confluent_kafka import Message
 
 from wunderkafka.config import ConsumerConfig, ProducerConfig
 from wunderkafka.factories import AvroConsumer, AvroProducer, AvroModelProducer
+from wunderkafka.protocols import AnyConsumer, AnyProducer
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.producers.bytes import BytesProducer
 from wunderkafka.config.generated.enums import (
@@ -25,5 +26,3 @@ from wunderkafka.config.generated.enums import (
 )
 from wunderkafka.config.schema_registry import SRConfig
 from wunderkafka.consumers.subscription import TopicSubscription
-from wunderkafka.protocols import AnyConsumer, AnyProducer
-
