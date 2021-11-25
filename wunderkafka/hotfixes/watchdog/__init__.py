@@ -95,7 +95,8 @@ def parse_kinit(kinit_cmd: str) -> Tuple[str, str, str]:
         elif len(normalized) > 2 and normalized != 'kinit':
             parts.append(normalized)
         prev = normalized
-
+    if keytab is None:
+        raise ValueError("Couldn't get keytab: {0} ({1})".format(keytab, kinit_cmd_msg))
     if len(parts) != 1:
         raise ValueError("Couldn't parse {0}".format(kinit_cmd_msg))
     [principal] = parts
