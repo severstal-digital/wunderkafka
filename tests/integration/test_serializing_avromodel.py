@@ -12,11 +12,11 @@ from wunderkafka.producers.constructor import HighLevelSerializingProducer
 
 
 class Signal(BaseModel):
+    ts: int = Field(default_factory=now)
     source: str = 'test'
     type: str = 'string'
     id: str = 'string'
     value: str = 'NA'
-    ts: int = Field(default_factory=now)
 
     class Meta:
         name = 'SignalsTest'
@@ -60,4 +60,4 @@ def test_avro_producer_moving_parts(sr_root, topic, schema_description) -> None:
         assert message.key is None
     else:
         assert message.key == b'\x01\x00\x00\x00\x00\x00\x00\x06\x9d\x00\x00\x00\x01\xcc\xb8\xeb\xa6\x80_'
-    assert message.value == b'\x01\x00\x00\x00\x00\x00\x00\x06\x9c\x00\x00\x00\x01\x08test\x0cstring\x0cstring\x04NA\xcc\xb8\xeb\xa6\x80_'
+    assert message.value == b'\x01\x00\x00\x00\x00\x00\x00\x06\x9c\x00\x00\x00\x01\xcc\xb8\xeb\xa6\x80_\x08test\x0cstring\x0cstring\x04NA'

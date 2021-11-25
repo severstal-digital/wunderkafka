@@ -2,6 +2,9 @@ import json
 from typing import Type
 from dataclasses import is_dataclass
 
+from pydantic import BaseModel
+from pydantic.fields import ModelField
+
 from wunderkafka.compat.types import AvroModel
 
 
@@ -27,4 +30,16 @@ def _get_non_dataclass_model(type_: Type[AvroModel]) -> AvroModel:
 
     for field in ['__slots__', 'klass', 'metadata', 'schema_def']:
         fields.pop(field, None)
-    return type(type_.__name__, (AvroModel,), {**dict(vars(type_)), '__annotations__': fields})
+
+    attributes = {}
+    attributes.update({'__annotations__': fields})
+    meta = vars(type_).get('Meta', None)
+    if meta is not None:
+        attributes.update({'Meta': meta})
+
+    if issubclass(type_, BaseModel):
+        for field in vars(type_).get('__fields__', {}).values():
+            if isinstance(field, ModelField) and field.default is not None:
+                attributes[field.name] = field.default
+
+    return type(type_.__name__, (AvroModel,), attributes)
