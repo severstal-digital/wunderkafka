@@ -1,10 +1,12 @@
 import sys
 import json
+import time
 from typing import Optional
+from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from wunderkafka.compat.types import AvroModel
 from wunderkafka.serdes.avromodel import derive
@@ -34,6 +36,29 @@ class Mixed(BaseModel):
     value: float
     integer: int = 0
     string: str = 'str'
+
+
+# Pydantic allows following of non-default arguments, but dataclasses are not.
+class ImageData(BaseModel):
+    name: str = 'str'
+    image: bytes
+    camera: str
+    ts: float = Field(default_factory=time.time)
+
+
+class OtherImageData(BaseModel):
+    image: bytes
+    camera: str
+    ts: float = Field(default_factory=time.time)
+    name: str = 'str'
+
+
+class TsWithMeta(BaseModel):
+    ts: datetime = Field(default_factory=datetime.now)
+
+    class Meta:
+        namespace = 'com.namespace.my'
+        name = 'MsgKey'
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
@@ -143,5 +168,55 @@ def test_pydantic_defaults() -> None:
                 'name': 'string',
                 'default': 'str'
             },
+        ],
+    }
+
+
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
+def test_pydantic_mixed_defaults() -> None:
+    s1 = derive(ImageData, topic='topic')
+    s2 = derive(OtherImageData, topic='topic')
+    assert json.loads(s1) == {
+        'type': 'record',
+        'name': 'topic_value',
+        'fields': [
+            {
+                'name': 'name',
+                'type': 'string',
+                'default': 'str'
+            },
+            {
+                'name': 'image',
+                'type': 'bytes',
+            },
+            {
+                'name': 'camera',
+                'type': 'string',
+            },
+            {
+                'name': 'ts',
+                'type': 'double',
+            },
+        ],
+    }
+    assert json.loads(s1) != json.loads(s2)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
+def test_pydantic_with_meta() -> None:
+    schema = derive(TsWithMeta, topic='topic')
+
+    assert json.loads(schema) == {
+        'type': 'record',
+        'namespace': 'com.namespace.my',
+        'name': 'MsgKey',
+        'fields': [
+            {
+                'name': 'ts',
+                'type': {
+                    'logicalType': 'timestamp-millis',
+                    'type': 'long',
+                }
+            }
         ],
     }
