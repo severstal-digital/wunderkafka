@@ -4,7 +4,7 @@ import datetime
 
 import pytest
 
-from wunderkafka.hotfixes.watchdog.krb.ticket import get_datetime, clean_stdout
+from wunderkafka.hotfixes.watchdog.krb.ticket import clean_stdout, get_datetime
 
 STDOUT1 = """
 Ticket cache: FILE:/tmp/krb5cc_1000

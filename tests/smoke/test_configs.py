@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from wunderkafka import BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig, SRConfig
+from wunderkafka import SRConfig, BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
 
 
 @pytest.fixture

@@ -13,9 +13,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
+from configparser import ConfigParser
 
-from setup import VERSION
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
@@ -23,7 +23,9 @@ project = 'Wunderkafka'
 copyright = '2021, Severstal Digital'
 author = 'Kirill Tribunsky'
 
-version = VERSION
+cfg = ConfigParser()
+cfg.read('../setup.cfg')
+version = cfg['metadata']['version']
 
 # -- General configuration ---------------------------------------------------
 

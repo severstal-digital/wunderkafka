@@ -9,9 +9,8 @@ All moving parts should be interchangeable in terms of schema, header and serial
 
 from typing import Any, Dict, Tuple, Optional
 
-from loguru import logger
-
 from wunderkafka.types import MsgKey, MsgValue, TopicName, HeaderPacker, DeliveryCallback, MessageDescription
+from wunderkafka.logger import logger
 from wunderkafka.callbacks import error_callback
 from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 from wunderkafka.structures import SRMeta, SchemaDescription
@@ -65,6 +64,11 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
                 self.set_target_topic(topic, msg_value, msg_key, lazy=lazy)
             else:
                 self.set_target_topic(topic, description, lazy=lazy)
+
+    def flush(self, timeout: Optional[float] = None) -> int:   # noqa: D102  # docstring inherited from superclass.
+        if timeout is None:
+            return self._producer.flush()
+        return self._producer.flush(timeout)
 
     def set_target_topic(  # noqa: D102  # docstring inherited from superclass.
         self,

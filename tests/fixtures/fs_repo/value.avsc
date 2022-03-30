@@ -1,0 +1,16 @@
+{
+ "type": "record",
+ "name": "exampleSchema",
+ "fields": [
+  {
+   "name": "name",
+   "type": "string",
+   "default": ""
+  },
+  {
+   "name": "value",
+   "type": "string",
+   "default": ""
+  }
+ ]
+}

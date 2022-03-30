@@ -5,10 +5,10 @@ from typing import Any, Dict, Tuple, Optional
 from threading import Thread
 from dataclasses import dataclass
 
-from loguru import logger
 from confluent_kafka import libversion
 
 from wunderkafka.time import ts2dt
+from wunderkafka.logger import logger
 from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.config.generated import enums
 from wunderkafka.hotfixes.watchdog.types import Watchdog
@@ -85,18 +85,23 @@ class Borg(object):
 
 def parse_kinit(kinit_cmd: str) -> Tuple[str, str, str]:
     kinit_cmd_msg = 'kinit_cmd: `{0}`'.format(kinit_cmd)
-    parts = [part.strip() for part in kinit_cmd.split() if len(part.strip()) > 2 and part != 'kinit']
-    if len(parts) != 2:
+    parts = []
+    keytab = None
+    prev = None
+    for word in kinit_cmd.split():
+        normalized = word.strip()
+        if prev == '-t':
+            keytab = normalized
+        elif len(normalized) > 2 and normalized != 'kinit':
+            parts.append(normalized)
+        prev = normalized
+    if keytab is None:
+        raise ValueError("Couldn't get keytab: {0} ({1})".format(keytab, kinit_cmd_msg))
+    if len(parts) != 1:
         raise ValueError("Couldn't parse {0}".format(kinit_cmd_msg))
-    principal, keytab = parts
+    [principal] = parts
     delim = '@'
-    x = delim in principal
-    y = delim in keytab
-    if x == y:
-        raise ValueError("Couldn't distinct principal and keytab: {0} ({1})".format(parts, kinit_cmd_msg))
-    if y:
-        keytab, principal = parts
-    user, realm = [w.strip() for w in principal.split(delim)]
+    user, realm = principal.split(delim)
     if not (user and realm):
         raise ValueError("Couldn't parse principal: {0} ({1})".format(principal, kinit_cmd_msg))
     return user, realm, keytab

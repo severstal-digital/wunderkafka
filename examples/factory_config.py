@@ -3,11 +3,11 @@ from functools import partial
 
 from pydantic import validator, AnyHttpUrl, Field
 from wunderkafka.time import now
-from wunderkafka import ClouderaSRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
+from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
 
 
 # If you are the fan of 12 factors, you may want to config via env variables
-class OverridenSRConfig(ClouderaSRConfig):
+class OverridenSRConfig(SRConfig):
     url: AnyHttpUrl = Field(env='SCHEMA_REGISTRY_URL')
 
     @validator('sasl_username')
@@ -26,6 +26,7 @@ class OverridenConfig(ConsumerConfig):
     bootstrap_servers: str = Field(env='BOOTSTRAP_SERVER')
     security_protocol: SecurityProtocol = SecurityProtocol.sasl_ssl
     sasl_kerberos_kinit_cmd: str = ''
+    sr: SRConfig = OverridenSRConfig()
 
     @validator('sasl_kerberos_kinit_cmd')
     def format_keytab(cls, v) -> str:
@@ -36,4 +37,4 @@ class OverridenConfig(ConsumerConfig):
 
 
 # After this you can partial your own Producer/Consumer, something like...
-MyConsumer = partial(AvroConsumer, config=OverridenConfig(), sr_config=OverridenConfig())
+MyConsumer = partial(AvroConsumer, config=OverridenConfig())

@@ -1,5 +1,4 @@
 import datetime
-from loguru import logger
 
 from wunderkafka import BytesConsumer, ConsumerConfig, SecurityProtocol
 
@@ -20,4 +19,4 @@ if __name__ == '__main__':
 
     while True:
         msgs = consumer.batch_poll()
-        logger.info('Consumed: {0}, errors: {1}'.format(len(msgs), len([msg for msg in msgs if msg.error()])))
+        print('Consumed: {0}, errors: {1}'.format(len(msgs), len([msg for msg in msgs if msg.error()])))

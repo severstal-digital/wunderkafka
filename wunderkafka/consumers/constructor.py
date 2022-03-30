@@ -10,10 +10,10 @@ All moving parts should be interchangeable in terms of schema, header and serial
 import datetime
 from typing import Any, List, Union, Optional
 
-from loguru import logger
-from confluent_kafka import Message
+from confluent_kafka import Message, TopicPartition
 
 from wunderkafka.types import HeaderParser
+from wunderkafka.logger import logger
 from wunderkafka.serdes.abc import AbstractDeserializer
 from wunderkafka.structures import SchemaMeta, SchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer
@@ -56,6 +56,19 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         self.consumer.subscribe(
             topics, from_beginning=from_beginning, offset=offset, ts=ts, with_timedelta=with_timedelta,
         )
+
+    def commit(  # noqa: D102,WPS211  # docstring inherited from superclass.
+        self,
+        message: Optional[Message] = None,
+        offsets: Optional[List[TopicPartition]] = None,
+        asynchronous: bool = True,
+    ) -> Optional[List[TopicPartition]]:
+        if message is None and offsets is not None:
+            return self.consumer.commit(offsets=offsets, asynchronous=asynchronous)
+        if message is not None and offsets is None:
+            return self.consumer.commit(message=message, asynchronous=asynchronous)
+        # Default behavior
+        return self.consumer.commit(message=message, offsets=offsets, asynchronous=asynchronous)
 
     def consume(
         self,

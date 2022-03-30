@@ -2,9 +2,9 @@
 
 from typing import List, Optional
 
-from loguru import logger
 from confluent_kafka import Message, KafkaError, TopicPartition
 
+from wunderkafka.logger import logger
 from wunderkafka.structures import Timestamp
 from wunderkafka.consumers.abc import AbstractConsumer
 

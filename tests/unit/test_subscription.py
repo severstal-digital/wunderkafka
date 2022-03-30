@@ -22,7 +22,7 @@ def test_set_ts() -> None:
     now = time.time() * 1000
     res = choose_offset(ts=now)
     assert isinstance(res, Timestamp)
-    assert res.value == now
+    assert res.value == int(now)
 
     with pytest.raises(ValueError):
         choose_offset(ts=now, from_beginning=True)

@@ -8,7 +8,7 @@ from wunderkafka.time import ts2dt
 
 @dataclass(frozen=True)
 class Timestamp(object):
-    value: float
+    value: int
 
     def __str__(self) -> str:
         return '{0}: {1:.2f} ({2})'.format(self.__class__.__name__, self.value, ts2dt(self.value))

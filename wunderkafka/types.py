@@ -1,4 +1,4 @@
-"""this module contains aliases and helper definitions for type hints."""
+"""This module contains aliases and helper definitions for type hints."""
 
 # ToDo (tribunsky.kir): move it to module with structures
 from typing import Any, Tuple, Union, Callable, Optional
