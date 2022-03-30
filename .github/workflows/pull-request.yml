@@ -8,13 +8,13 @@ on:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
+    container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.2
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
 #    - name: Install dependencies
 #      run: |
 #        python -m pip install --upgrade pip
@@ -22,7 +22,7 @@ jobs:
 #    - name: run mypy
 #      run: mypy .
     - name: Install testing dependencies
-      run: python -m pip install pytest
+      run: python -m pip install pytest pydantic~=1.8.2 dataclasses-avroschema~=0.25.2
     - name: run pytest
       run: pytest -s tests/
 
