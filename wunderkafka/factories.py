@@ -74,7 +74,7 @@ class AvroProducer(HighLevelSerializingProducer):
 
         config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config),
+            producer=BytesProducer(config, watchdog),
             schema_registry=ClouderaSRClient(KerberizableHTTPClient(sr), SimpleCache()),
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=FastAvroSerializer(),
@@ -111,7 +111,7 @@ class AvroModelProducer(HighLevelSerializingProducer):
 
         config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config),
+            producer=BytesProducer(config, watchdog),
             schema_registry=ClouderaSRClient(KerberizableHTTPClient(sr), SimpleCache()),
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=AvroModelSerializer(),
