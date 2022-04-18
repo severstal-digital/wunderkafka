@@ -140,6 +140,7 @@ class KerberosRefreshThread(Thread):
             logger.error(exc.output)
             logger.error(exc.stdout)
             logger.error(exc.stderr)
+            logger.error('Command: {0} exit code: {1}'.format(self._refresh_cmd, exc.returncode))
         else:
             duration = int(1000 * (time.perf_counter() - t0))
             logger.info('Refreshed! ({0} ms)'.format(duration))
