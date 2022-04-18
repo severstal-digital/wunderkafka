@@ -110,7 +110,7 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
 
 def get_datetime(string: str) -> Optional[datetime.datetime]:
     try:
-        return parser.parse(string, dayfirst=True)
+        return parser.parse(string)
     except (ValueError, OverflowError):
         logger.warning('Unable to parse {0}'.format(string))
     return None

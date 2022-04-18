@@ -121,9 +121,10 @@ class KerberosRefreshThread(Thread):
         self._next_refresh_ts = 0.0
 
         self.refresh()
-        logger.info("Kerberos thread is started")
+        logger.info("Kerberos thread: initiated")
 
     def run(self) -> None:
+        logger.info("Kerberos thread: started")
         while True:
             if time.time() >= self._next_refresh_ts:
                 self.refresh()
