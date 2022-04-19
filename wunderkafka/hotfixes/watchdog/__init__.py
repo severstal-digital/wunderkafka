@@ -1,7 +1,7 @@
 import os
 import time
 import subprocess
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Tuple, Optional, Set
 from threading import Thread
 from dataclasses import dataclass
 
@@ -15,6 +15,31 @@ from wunderkafka.hotfixes.watchdog.types import Watchdog
 from wunderkafka.hotfixes.watchdog.krb.ticket import get_expiration_ts
 
 REQUIRES_KERBEROS = frozenset([enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext])
+
+
+class NonRepetitiveLogger(object):
+
+    def __init__(self) -> None:
+        self._logged: Set[int] = set()
+
+    def _log(self, message: str, *, info: bool = True) -> None:
+        hashed = hash(message)
+        if hashed in self._logged:
+            return
+        if info:
+            logger.info(message)
+        else:
+            logger.warning(message)
+        self._logged.add(hashed)
+
+    def info(self, message: str) -> None:
+        self._log(message)
+
+    def warning(self, message: str) -> None:
+        self._log(message, info=False)
+
+
+log_once = NonRepetitiveLogger()
 
 
 @dataclass(frozen=True)
@@ -51,12 +76,12 @@ def check_watchdog(
     if config.security_protocol.value not in REQUIRES_KERBEROS:
         return config, watchdog
     if version > (1, 7):
-        logger.info('Watchdog: please check if there are any issues with SASL GSSAPI in the upstream.')
+        log_once.info('Watchdog: please check if there are any issues with SASL GSSAPI in the upstream.')
         return config, watchdog
 
     if version == (1, 7):
         msg = 'rewriting config. For more info, please, check https://github.com/edenhill/librdkafka/issues/3430'
-        logger.warning('Watchdog: {0}'.format(msg))
+        log_once.warning('Watchdog: {0}'.format(msg))
         config.sasl_kerberos_min_time_before_relogin = 86400000
     elif version < (1, 7):
         msg = ' '.join([
@@ -64,7 +89,7 @@ def check_watchdog(
             'Prior to 1.7.0 kinit refresh via librdkafka may cause blocking.',
             'For more info, please, check https://github.com/edenhill/librdkafka/pull/3340',
         ])
-        logger.warning('Watchdog: {0}'.format(msg))
+        log_once.warning('Watchdog: {0}'.format(msg))
         user, realm, keytab = parse_kinit(config.sasl_kerberos_kinit_cmd)
         config.sasl_kerberos_min_time_before_relogin = 0
         watchdog = KrbWatchDog(KinitParams(
