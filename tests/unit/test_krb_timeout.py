@@ -39,10 +39,11 @@ def test_parse_dates():
         assert get_datetime(st) is None
 
     parsable = {
-        '09.04.2021 21:45:41': 9,
+        '09.04.2021 21:45:41': 4,
         '04/15/2021 20:21:58': 15,
         '15.05.2021 11:22:12': 15,
-        '04/09/2021 21:45:41': 4,
+        '04/09/2021 21:45:41': 9,
+        '07/02/21 17:44:03': 2,
     }
     for st, day in parsable.items():
         dt = get_datetime(st)

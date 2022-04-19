@@ -44,6 +44,7 @@ def check_posix() -> None:
         logger.error(exc.output)
         logger.error(exc.stdout)
         logger.error(exc.stderr)
+        logger.error('locale exit code: {0}'.format(exc.returncode))
     else:
         lines = {line.strip() for line in proc.stdout.split(b'\n')}
         if b'POSIX' in lines:
@@ -87,6 +88,7 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
         logger.error(exc.output)
         logger.error(exc.stdout)
         logger.error(exc.stderr)
+        logger.error('klist exit code: {0}'.format(exc.returncode))
         return time.time() + default_timeout
     else:
         expire_dates = []
@@ -108,7 +110,7 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
 
 def get_datetime(string: str) -> Optional[datetime.datetime]:
     try:
-        return parser.parse(string, dayfirst=True)
+        return parser.parse(string)
     except (ValueError, OverflowError):
         logger.warning('Unable to parse {0}'.format(string))
     return None
