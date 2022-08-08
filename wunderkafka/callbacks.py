@@ -43,7 +43,7 @@ def reset_partitions(consumer: AbstractConsumer, partitions: List[TopicPartition
     new_ptns = by_ts + by_offset
     consumer.assign(new_ptns)
     logger.info('{0} assigned to {1}'.format(consumer, new_ptns))
-    consumer.subscription_offset = None
+    consumer.subscription_offsets = None
 
 
 def info_callback(err: Optional[KafkaError], msg: Message) -> None:
