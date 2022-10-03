@@ -6,7 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, BaseSettings, Field
 
 from wunderkafka.compat.types import AvroModel
 from wunderkafka.serdes.avromodel import derive
@@ -25,6 +25,13 @@ class SomeDefaultData(AvroModel):
 
 
 class Metrics(BaseModel):
+    line_speed: Optional[int]
+    defect_detected: Optional[bool] = False
+    model_on: Optional[bool] = False
+    squad_number: int = 0
+
+
+class Metric(BaseSettings):
     line_speed: Optional[int]
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
@@ -219,4 +226,44 @@ def test_pydantic_with_meta() -> None:
                 }
             }
         ],
+    }
+
+
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
+def test_pydantic_base_settings_with_defaults() -> None:
+    schema = derive(Metric, topic='some_topic')
+
+    assert json.loads(schema) == {
+      "type": "record",
+      "name": "some_topic_value",
+      "fields": [
+        {
+          "name": "line_speed",
+          "type": [
+            "long",
+            "null"
+          ]
+        },
+        {
+          "name": "defect_detected",
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": False
+        },
+        {
+          "name": "model_on",
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": False
+        },
+        {
+          "name": "squad_number",
+          "type": "long",
+          "default": 0,
+        }
+      ]
     }

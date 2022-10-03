@@ -46,7 +46,7 @@ def _extract_attributes(type_: Type[AvroModel]) -> Dict[str, Any]:
     fields = vars(type_)['__annotations__']
     for base in type_.mro():
         fields = {**vars(base).get('__annotations__', {}), **fields}
-    for field in ['__slots__', 'klass', 'metadata', 'schema_def']:
+    for field in ['__slots__', 'klass', 'metadata', 'schema_def', '__config__']:
         fields.pop(field, None)
     attributes = {}
     attributes.update({'__annotations__': fields})
