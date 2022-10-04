@@ -44,7 +44,7 @@ class SchemaMeta(object):
         """
         # Confluent
         if self.header.protocol_id == 0:
-            suffix = '-key' if self.is_key else '-value'
+            suffix = '_key' if self.is_key else '_value'
         # Cloudera
         else:
             suffix = ':k' if self.is_key else ''

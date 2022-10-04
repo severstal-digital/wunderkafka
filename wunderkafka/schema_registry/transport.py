@@ -36,10 +36,20 @@ class KerberizableHTTPClient(AbstractHTTPClient):
         self._save_replay = save_replay
 
     # ToDo (tribunsky.kir): make method enum
-    def make_request(self, relative_url: str, method: str = 'GET', body: Any = None, query: Any = None) -> Any:
-        url = "/".join([self._base_url, relative_url.lstrip('/')])
+    def make_request(
+        self,
+        relative_url: str,
+        method: str = 'GET',
+        body: Any = None,
+        query: Any = None,
+    ) -> Any:
+        url = "/".join([self._base_url.rstrip('/'), relative_url.lstrip('/')])
         logger.debug('{0}: {1}'.format(method, url))
         response = self._session.request(method, url, json=body, params=query)
+        # ToDo(aa.perelygin): more informative message when fail
+        if response.status_code >= 400:
+            logger.error(f'HTTPError for url: {url}, more details: {response.content}')
+
         response.raise_for_status()
 
         self._dump(method, relative_url, response)
