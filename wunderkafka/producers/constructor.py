@@ -32,6 +32,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         # ToDo: switch mapping to something like consumer's TopicSubscription?
         mapping: Optional[Dict[TopicName, MessageDescription]] = None,
         *,
+        protocol_id: int = 1,
         lazy: bool = False,
     ) -> None:
         """
@@ -43,6 +44,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         :param serializer:          Message serializer.
         :param store:               Specific store to provide schema text extraction from schema description.
         :param mapping:             Per-topic definition of value and/or key schema descriptions.
+        :param protocol_id:         Protocol id for producer (1 - Cloudera, 0 - Confluent, etc.)
         :param lazy:                If True, defer schema registry publication, otherwise schema will be registered
                                     before the first message sending.
         """
@@ -57,6 +59,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         self._serializer = serializer
         self._producer = producer
         self._header_packer = header_packer
+        self._protocol_id = protocol_id
 
         for topic, description in self._mapping.items():
             if isinstance(description, (tuple, list)):
@@ -95,9 +98,11 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         on_delivery: Optional[DeliveryCallback] = error_callback,
         *args: Any,
         blocking: bool = False,
-        protocol_id: int = 1,
+        protocol_id: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
+        if protocol_id is None:
+            protocol_id = self._protocol_id
         encoded_value = self._encode(topic, value, protocol_id)
         encoded_key = self._encode(topic, key, protocol_id, is_key=True)
 

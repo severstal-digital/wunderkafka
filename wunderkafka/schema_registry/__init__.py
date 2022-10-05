@@ -1,3 +1,4 @@
 from wunderkafka.schema_registry.cache import SimpleCache
-from wunderkafka.schema_registry.client import ClouderaSRClient
+from wunderkafka.schema_registry.cloudera_client import ClouderaSRClient
+from wunderkafka.schema_registry.confluent_client import ConfluentSRClient
 from wunderkafka.schema_registry.transport import KerberizableHTTPClient
