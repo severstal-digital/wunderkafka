@@ -18,8 +18,16 @@ class KerberizableHTTPClient(AbstractHTTPClient):
                 principal=config.sasl_username,
                 mutual_authentication=config.mutual_auth,
             )
-        if config.ssl_ca_location is not None:
+
+        if config.ssl_certificate_location is not None:
+            if config.ssl_key_location is not None:
+                s.cert = (config.ssl_certificate_location, config.ssl_key_location)
+            else:
+                s.cert = config.ssl_certificate_location
+
+        if config.ssl_key_location is not None:
             s.verify = config.ssl_ca_location
+
         accept = ', '.join([
             'application/vnd.schemaregistry.v1+json',
             'application/vnd.schemaregistry+json',
