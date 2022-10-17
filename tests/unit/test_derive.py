@@ -6,7 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import BaseModel, BaseSettings, Field
+from pydantic import Field, BaseModel, BaseSettings
 
 from wunderkafka.compat.types import AvroModel
 from wunderkafka.serdes.avromodel import derive

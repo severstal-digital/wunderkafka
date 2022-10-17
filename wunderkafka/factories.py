@@ -1,6 +1,6 @@
 """This module contains some ready-to-go combinations of the Consumer/Producer."""
 
-from typing import Dict, Optional, Union, Type
+from typing import Dict, Type, Union, Optional
 
 from wunderkafka import ConsumerConfig, ProducerConfig
 from wunderkafka.types import TopicName, MessageDescription
@@ -13,10 +13,11 @@ from wunderkafka.serdes.avro import (
 from wunderkafka.serdes.store import AvroModelRepo, SchemaTextRepo
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.producers.bytes import BytesProducer
-from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient, KerberizableHTTPClient, ConfluentSRClient
+from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient, KerberizableHTTPClient
 from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.schema_registry.clients.confluent import ConfluentSRClient
 
 
 class AvroConsumer(HighLevelDeserializingConsumer):
