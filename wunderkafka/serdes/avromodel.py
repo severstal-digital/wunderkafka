@@ -1,5 +1,5 @@
 import json
-from typing import Type, Dict, Any
+from typing import Any, Dict, Type
 from dataclasses import is_dataclass
 
 from pydantic import BaseModel
