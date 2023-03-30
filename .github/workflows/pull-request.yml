@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        pydantic-version: ['~=1.8.2', '~=1.10.7', '']
+        dataclasses-avroschema-version: ['~=0.25.2', '~=0.36.3', '~=0.40.0', '']
         python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
     container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.5
     steps:
@@ -22,7 +24,7 @@ jobs:
 #    - name: run mypy
 #      run: mypy .
     - name: Install testing dependencies
-      run: python -m pip install pytest pydantic~=1.8.2 dataclasses-avroschema~=0.25.2
+      run: python -m pip install pytest pydantic${{ matrix.pydantic-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
     - name: run pytest
       run: pytest -s tests/
 
