@@ -23,7 +23,7 @@ def derive(model: Type[AvroModel], topic: str, *, is_key: bool = False) -> str:
         fields_map = {field_data['name']: field_data for field_data in model_schema['fields']}
         reordered_fields = [fields_map[attr] for attr in ordering]
         model_schema['fields'] = reordered_fields
-    model_schema.pop('doc')
+    model_schema.pop('doc', None)
     suffix = 'key' if is_key else 'value'
     if hasattr(model, 'Meta') and hasattr(model.Meta, 'name'):
         model_schema['name'] = model.Meta.name
