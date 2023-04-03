@@ -1,10 +1,10 @@
 """This module contains implementation of extended confluent-kafka Consumer's API."""
 
+import time
 import atexit
 import datetime
 from typing import Dict, List, Union, Optional
 
-from wunderkafka.time import now
 from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.errors import ConsumerException
@@ -30,7 +30,7 @@ class BytesConsumer(AbstractConsumer):
         self.subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
 
         self._config = config
-        self._last_poll_ts: int = now()
+        self._last_poll_ts = time.perf_counter()
         self._sasl_watchdog = sasl_watchdog
         # ToDo (tribunsky-kir): make it configurable
         atexit.register(self.close)
@@ -54,7 +54,7 @@ class BytesConsumer(AbstractConsumer):
             self._sasl_watchdog()
 
         # ToDo (tribunsky.kir): naybe it better to use on_lost callback within subscribe()
-        dt = now() - self._last_poll_ts
+        dt = int((time.perf_counter() - self._last_poll_ts) * 1000)
         if dt > self._config.max_poll_interval_ms:
             msg = 'Exceeded max.poll.interval.ms ({0}): {1}'.format(self._config.max_poll_interval_ms, dt)
 
@@ -64,7 +64,7 @@ class BytesConsumer(AbstractConsumer):
             logger.warning(msg)
 
         msgs = self.consume(num_messages=num_messages, timeout=timeout)
-        self._last_poll_ts = now()
+        self._last_poll_ts = time.perf_counter()
         return msgs
 
     # ToDo (tribunsky.kir): do not override original API and wrap it in superclass
