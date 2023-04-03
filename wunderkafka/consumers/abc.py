@@ -50,8 +50,8 @@ class AbstractConsumer(Consumer):
         :param timeout:         The maximum time to block waiting for message.
         :param num_messages:    The maximum number of messages to receive from broker.
                                 Default is 1000000 which was the allowed maximum for librdkafka 1.2.
-        :param raise_on_lost:   If True, raise exception whenever we are to late to call next poll.
-                                Otherwise will do nothing or behave depending on specified callbacks.
+        :param raise_on_lost:   If True, raise exception whenever we are too late to call next poll.
+                                Otherwise, will do nothing or behave depending on specified callbacks.
 
         :return:                A list of Message objects (possibly empty on timeout).
 
