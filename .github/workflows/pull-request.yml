@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        pydantic-version: ['~=1.8.2', '~=1.10.7', '']
+        dataclasses-avroschema-version: ['~=0.25.2', '~=0.36.3', '~=0.40.0', '']
         python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
     container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.5
     steps:
@@ -21,8 +23,20 @@ jobs:
 #        pip install mypy
 #    - name: run mypy
 #      run: mypy .
+    # Looks like there are a lot of new functionality in 0.40.0,
+    # including pydantic and faust, so it is incompatible with the old versions of pydantic
+    # https://github.com/marcosschroh/dataclasses-avroschema/blob/1ee43d389eedbfc8c940903a0341267028707240/pyproject.toml
+    # So for now we just override pydantic with the required one, if dependencies don't resolve simultaneously at all
     - name: Install testing dependencies
-      run: python -m pip install pytest pydantic~=1.8.2 dataclasses-avroschema~=0.25.2
+      run: | 
+        if pip install pytest pydantic${{ matrix.pydantic-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
+            echo "Installed dependencies simultaneously"     
+        else
+            echo "Error resolving dependencies... Installing consequently"
+            python -m pip install pytest 
+            python -m pip install pydantic${{ matrix.pydantic-version }} 
+            python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
+        fi
     - name: run pytest
       run: pytest -s tests/
 
@@ -86,4 +100,4 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
+        repository-url: https://test.pypi.org/legacy/
