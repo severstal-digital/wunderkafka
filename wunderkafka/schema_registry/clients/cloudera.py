@@ -99,8 +99,3 @@ class ClouderaSRClient(AbstractSchemaRegistry):
                     )
             self._cache.set(uid, meta)
         return meta
-
-    # def load_all(self):
-    #     response = self._client.make_request('schemas')
-    #     entities = response['entities']
-    #     logger.info('Got {0} schemas'.format(len(entities)))

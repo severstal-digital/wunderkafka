@@ -41,5 +41,5 @@ def test_set_timedelta() -> None:
 def test_set_offset() -> None:
     target = 12345
     res = choose_offset(offset=target)
-    assert res.value == target
     assert isinstance(res, Offset)
+    assert res.value == target

@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import pytest
 from pydantic import Field, BaseModel
@@ -32,7 +33,7 @@ class DefaultKey(BaseModel):
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 @pytest.mark.parametrize("schema_description", [Signal, (Signal, DefaultKey)])
-def test_avro_producer_moving_parts(sr_root, topic, schema_description) -> None:
+def test_avro_producer_moving_parts(sr_root: Path, topic: str, schema_description) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
     producer = HighLevelSerializingProducer(

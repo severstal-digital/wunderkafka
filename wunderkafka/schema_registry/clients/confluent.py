@@ -1,5 +1,6 @@
 import json
-from typing import Dict, Union, Optional
+from dataclasses import dataclass
+from typing import Dict, Union, Optional, List, Tuple
 
 from requests import HTTPError
 
@@ -8,16 +9,34 @@ from wunderkafka.logger import logger
 from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
 from wunderkafka.schema_registry.cache import SimpleCache
-from wunderkafka.schema_registry.models import RegisteredSchema
 
-RegistrySchema = Dict[str, Union[str, int, Dict[str, Union[str, int]]]]
+
+SchemaReference = Dict[str, Union[str, int]]
+RegistrySchema = Dict[str, Union[str, int, list[SchemaReference]]]
+
+
+@dataclass(frozen=True)
+class RegisteredSchema:
+    schema_id: int
+    schema: dict
+    subject: str
+    version: int
+
+    references: Optional[List[SchemaReference]] = None
+
+    @property
+    def uniq_key(self) -> Tuple[str, int]:
+        return self.subject, self.schema_id
+
+    def as_reference(self) -> SchemaReference:
+        return {'name': self.subject, 'subject': self.subject, 'version': self.version}
 
 
 def _body(
     schema_text: str,
-    references: Optional[dict],
+    references: Optional[List[SchemaReference]],
 ) -> RegistrySchema:
-    body = {
+    body: RegistrySchema = {
         'schema': schema_text,
         'schemaType': 'AVRO',
     }
@@ -69,7 +88,7 @@ class ConfluentSRClient(AbstractSchemaRegistry):
         self,
         subject: str,
         schema_text: str,
-        references: Optional[dict] = None,
+        references: Optional[list[SchemaReference]] = None,
         *,
         normalize_schemas: bool = False
     ) -> int:
@@ -81,7 +100,8 @@ class ConfluentSRClient(AbstractSchemaRegistry):
         )
         return response['id']
 
-    def _choose_schema(self, hdr: ParsedHeader, subject: str):
+    def _choose_schema(self, hdr: ParsedHeader, subject: str) -> str:
+        # https://docs.confluent.io/platform/current/schema-registry/develop/api.html#get--schemas-ids-int-%20id
         try:
             resp = self._client.make_request('schemas/ids/{}'.format(hdr.schema_id), query={'subject': subject})
             return resp['schema']

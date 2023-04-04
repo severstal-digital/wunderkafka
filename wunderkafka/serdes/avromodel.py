@@ -8,9 +8,9 @@ from pydantic.fields import ModelField
 from wunderkafka.compat.types import AvroModel
 
 
-def derive(model: Type[AvroModel], topic: str, *, is_key: bool = False) -> str:
+def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
     if is_dataclass(model):
-        model_schema = model.avro_schema_to_python()
+        model_schema = model.avro_schema_to_python()                                                      # type: ignore
     else:
         # non-dataclasses objects may allow mixing defaults and non-default fields order,
         # so to still reuse dataclasses_avroschema, we extract fields and reorder them to satisfy dataclasses
@@ -32,17 +32,18 @@ def derive(model: Type[AvroModel], topic: str, *, is_key: bool = False) -> str:
     return json.dumps(model_schema)
 
 
-def _construct_model(attrs: Dict[str, Any], type_: Type[AvroModel]) -> AvroModel:
+def _construct_model(attrs: Dict[str, Any], type_: Type[object]) -> AvroModel:
     if issubclass(type_, BaseModel):
         for field in vars(type_).get('__fields__', {}).values():
             if isinstance(field, ModelField) and field.default is not None:
                 attrs[field.name] = field.default
                 tp = attrs['__annotations__'].pop(field.name)
                 attrs['__annotations__'].update({field.name: tp})
-    return type(type_.__name__, (AvroModel,), attrs)
+    # https://docs.python.org/3/library/functions.html?highlight=type#type
+    return type(type_.__name__, (AvroModel,), attrs)                                                      # type: ignore
 
 
-def _extract_attributes(type_: Type[AvroModel]) -> Dict[str, Any]:
+def _extract_attributes(type_: Type[object]) -> Dict[str, Any]:
     fields = vars(type_)['__annotations__']
     for base in type_.mro():
         fields = {**vars(base).get('__annotations__', {}), **fields}

@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from pathlib import Path
 from dataclasses import dataclass
 
 import pytest
@@ -39,7 +40,7 @@ HEADERS = (
 
 
 @pytest.mark.parametrize("header", list(HEADERS))
-def test_consume_moving_parts(sr_root, topic, header) -> None:
+def test_consume_moving_parts(sr_root: Path, topic: str, header: bytes) -> None:
     consumer = HighLevelDeserializingConsumer(
         consumer=TestConsumer([Message(topic, value=SIGNAL_MESSAGE.serialized(header))]),
         schema_registry=ClouderaSRClient(TestHTTPClient(sr_root), SimpleCache()),

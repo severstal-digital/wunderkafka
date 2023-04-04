@@ -47,5 +47,9 @@ def test_fs_repo(
     answer_json: Dict[str, Any]
 ) -> None:
     repo.add(topic, fs_root_dir / value_schema_path, fs_root_dir / key_schema_path)
-    assert repo.get(topic, is_key=True).text == '"long"'
-    assert json.loads(repo.get(topic).text) == answer_json
+    key_schema = repo.get(topic, is_key=True)
+    assert key_schema is not None
+    assert key_schema.text == '"long"'
+    value_schema = repo.get(topic)
+    assert value_schema is not None
+    assert json.loads(value_schema.text) == answer_json

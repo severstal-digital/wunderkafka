@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict, Union, Optional
 
 import requests_kerberos
-from pydantic import AnyHttpUrl, BaseSettings
+from pydantic import BaseSettings
 
 
 class HTTPKerberosMutualAuth(Enum):
@@ -16,7 +16,7 @@ def remap_fields(dct: Dict[str, Any]) -> Dict[str, Any]:
 
 
 class SRConfig(BaseSettings):
-    url: AnyHttpUrl
+    url: str
     ssl_ca_location: Optional[str] = None
     ssl_key_location: Optional[str] = None
     ssl_certificate_location: Optional[str] = None
