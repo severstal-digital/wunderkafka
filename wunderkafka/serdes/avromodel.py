@@ -10,6 +10,7 @@ from wunderkafka.compat.types import AvroModel
 
 def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
     if is_dataclass(model):
+        # https://github.com/python/mypy/issues/14941
         model_schema = model.avro_schema_to_python()                                                      # type: ignore
     else:
         # non-dataclasses objects may allow mixing defaults and non-default fields order,
