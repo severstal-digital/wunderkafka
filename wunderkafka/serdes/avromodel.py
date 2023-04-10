@@ -3,7 +3,7 @@ from typing import Any, Dict, Type
 from dataclasses import is_dataclass
 
 from pydantic import BaseModel
-from pydantic.fields import ModelField
+from pydantic.fields import ModelField, UndefinedType
 
 from wunderkafka.compat.types import AvroModel
 
@@ -35,7 +35,7 @@ def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
 def _construct_model(attrs: Dict[str, Any], type_: Type[object]) -> AvroModel:
     if issubclass(type_, BaseModel):
         for field in vars(type_).get('__fields__', {}).values():
-            if isinstance(field, ModelField) and field.default is not None:
+            if isinstance(field, ModelField) and not isinstance(field.field_info.default, UndefinedType):
                 attrs[field.name] = field.default
                 tp = attrs['__annotations__'].pop(field.name)
                 attrs['__annotations__'].update({field.name: tp})
