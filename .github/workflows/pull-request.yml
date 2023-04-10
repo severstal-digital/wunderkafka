@@ -38,6 +38,8 @@ jobs:
         pip install mypy
     - name: run mypy
       run: mypy --config setup.cfg .
+      # https://github.com/pydantic/pydantic/issues/3528
+      if: matrix.pydantic-version != '~=1.8.2'
 
   version:
     runs-on: ubuntu-latest
