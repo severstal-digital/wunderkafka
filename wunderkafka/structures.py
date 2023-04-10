@@ -55,7 +55,8 @@ class SchemaMeta(object):
 class SRMeta(object):
     """Meta which is retrieved after schema registration."""
     schema_id: int
-    schema_version: int
+    # Confluent has schema_version, but serdes works around schema_id which is unique identifier there.
+    schema_version: Optional[int]
     # Confluent doesn't have metaId
     meta_id: Optional[int] = None
 
@@ -63,7 +64,7 @@ class SRMeta(object):
 @dataclass(frozen=True)
 class SchemaDescription(object):
     """
-    Class to allow extend contract between moving parts of (de)serialization.
+    Class to allow contract extension between moving parts of (de)serialization.
 
     Usually schema is represented by text, but separate class adds abstraction.
     """

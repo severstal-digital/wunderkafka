@@ -60,3 +60,23 @@ def test_handle_hw_meta2() -> None:
 
     with pytest.raises(ValueError):
         pack(hdr.protocol_id, meta=SRMeta(hdr.schema_id, hdr.schema_version, None))
+
+
+def test_handle_confluent() -> None:
+    serialized = b'\x00\x00\x00\x00\x14'
+    hdr = parse(serialized)
+    assert hdr.protocol_id == 0
+    assert hdr.meta_id is None
+    assert hdr.schema_version is None
+    packed = pack(hdr.protocol_id, meta=SRMeta(hdr.schema_id, hdr.schema_version, hdr.meta_id))
+    assert packed == serialized
+
+
+def test_handle_confluent_default_null() -> None:
+    serialized = b'\x00\x00\x00\x00\x15'
+    hdr = parse(serialized)
+    assert hdr.protocol_id == 0
+    assert hdr.meta_id is None
+    assert hdr.schema_version is None
+    packed = pack(hdr.protocol_id, meta=SRMeta(hdr.schema_id, hdr.schema_version, hdr.meta_id))
+    assert packed == serialized

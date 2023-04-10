@@ -43,6 +43,13 @@ class KerberizableHTTPClient(AbstractHTTPClient):
 
         self._save_replay = save_replay
 
+    @property
+    def base_url(self) -> str:
+        return self._base_url
+
+    def close(self) -> None:
+        self._session.close()
+
     # ToDo (tribunsky.kir): make method enum
     def make_request(
         self,

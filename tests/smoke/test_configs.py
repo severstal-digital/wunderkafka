@@ -15,7 +15,10 @@ def test_init_consumer(boostrap_servers: str) -> None:
     print(consumer)
 
     with pytest.raises(AttributeError):
-        consumer.config = ConsumerConfig(group_id='my_other_group', bootstrap_servers=boostrap_servers)
+        consumer.config = ConsumerConfig(                                                                 # type: ignore
+            group_id='my_other_group',
+            bootstrap_servers=boostrap_servers,
+        )
     assert consumer.config == config
 
     consumer.close()

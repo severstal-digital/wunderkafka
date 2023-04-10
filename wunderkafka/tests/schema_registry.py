@@ -16,3 +16,10 @@ class TestHTTPClient(AbstractHTTPClient):
             filename = self._root / method / relative_url / body['description'] / '{0}.json'.format(relative_url)
         with open(filename) as fl:
             return json.load(fl)
+
+    def close(self) -> None:
+        ...
+
+    @property
+    def base_url(self) -> str:
+        return 'http://localhost'
