@@ -1,6 +1,6 @@
 import sys
+from typing import Type, Optional
 from pathlib import Path
-from typing import Optional, Type
 
 import pytest
 from pydantic import BaseModel
