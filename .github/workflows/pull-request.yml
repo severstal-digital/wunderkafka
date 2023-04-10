@@ -17,11 +17,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Install dependencies
-      run: |
-        pip install mypy
-    - name: run mypy
-      run: mypy --config setup.cfg .
     # Looks like there are a lot of new functionality in 0.40.0,
     # including pydantic and faust, so it is incompatible with the old versions of pydantic
     # https://github.com/marcosschroh/dataclasses-avroschema/blob/1ee43d389eedbfc8c940903a0341267028707240/pyproject.toml
@@ -38,6 +33,11 @@ jobs:
         fi
     - name: run pytest
       run: pytest -s tests/
+    - name: Install dependencies
+      run: |
+        pip install mypy
+    - name: run mypy
+      run: mypy --config setup.cfg .
 
   version:
     runs-on: ubuntu-latest
