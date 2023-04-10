@@ -1,7 +1,7 @@
 """This module contains aliases and helper definitions for type hints."""
 
 # ToDo (tribunsky.kir): move it to module with structures
-from typing import Any, Tuple, Union, Callable, Optional
+from typing import Any, Tuple, Union, Callable, Optional, Type
 
 from confluent_kafka import Message, KafkaError
 
@@ -19,7 +19,7 @@ MsgKey = Any
 KeySchemaDescription = SchemaDescription
 ValueSchemaDescription = SchemaDescription
 
-MessageDescription = Union[Tuple[ValueSchemaDescription, KeySchemaDescription], ValueSchemaDescription]
+MessageDescription = Union[str, Tuple[str, str], Type, Tuple[Type, Type]]
 TopicName = str
 
 HowToSubscribe = Optional[Union[Timestamp, Offset]]

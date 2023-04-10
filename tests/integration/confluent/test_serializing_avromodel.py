@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Type
 
 import pytest
 from pydantic import BaseModel
@@ -26,7 +26,7 @@ class EvolvedEvent(Event):
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
-def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_description=Event) -> None:
+def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_description: Type[Event] = Event) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
     producer = HighLevelSerializingProducer(
@@ -51,7 +51,11 @@ def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_de
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
-def test_avro_producer_existing_schema(sr_root_existing, topic: str, schema_description=Event) -> None:
+def test_avro_producer_existing_schema(
+    sr_root_existing: Path,
+    topic: str,
+    schema_description: Type[Event] = Event,
+) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
     producer = HighLevelSerializingProducer(
@@ -76,7 +80,11 @@ def test_avro_producer_existing_schema(sr_root_existing, topic: str, schema_desc
 
 
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
-def test_avro_producer_update_schema(sr_root_update, topic: str, schema_description=EvolvedEvent) -> None:
+def test_avro_producer_update_schema(
+    sr_root_update: Path,
+    topic: str,
+    schema_description: Type[EvolvedEvent] = EvolvedEvent,
+) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
     producer = HighLevelSerializingProducer(

@@ -51,10 +51,12 @@ class SchemaMeta(object):
         return '{0}{1}'.format(self.topic, suffix)
 
 
+# ToDo: (tribunsky.kir): add cross-validation of inveriants on the model itself?
 @dataclass(frozen=True)
 class SRMeta(object):
     """Meta which is retrieved after schema registration."""
-    schema_id: int
+    # Confluent always has schemd_id, but one of cloudera protocols doesn't use it
+    schema_id: Optional[int]
     # Confluent has schema_version, but serdes works around schema_id which is unique identifier there.
     schema_version: Optional[int]
     # Confluent doesn't have metaId
