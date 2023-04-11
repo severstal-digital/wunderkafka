@@ -38,6 +38,14 @@ class Metric(BaseSettings):
     squad_number: int = 0
 
 
+class Event(BaseModel):
+    id: Optional[int]
+    ts: Optional[int] = None
+
+    class Meta:
+        namespace = "any.data"
+
+
 class Mixed(BaseModel):
     text: str
     value: float
@@ -174,6 +182,28 @@ def test_pydantic_defaults() -> None:
                 'type': 'string',
                 'name': 'string',
                 'default': 'str'
+            },
+        ],
+    }
+
+
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
+def test_pydantic_defaults_none() -> None:
+    schema = derive(Event, topic='topic')
+
+    assert json.loads(schema) == {
+        'type': 'record',
+        'name': 'topic_value',
+        'namespace': 'any.data',
+        'fields': [
+            {
+                'type': ['long', 'null'],
+                'name': 'id',
+            },
+            {
+                'type': ['null', 'long'],
+                'name': 'ts',
+                'default': None,
             },
         ],
     }

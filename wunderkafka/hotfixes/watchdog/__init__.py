@@ -171,7 +171,7 @@ class KerberosRefreshThread(Thread):
             duration = int(1000 * (time.perf_counter() - t0))
             logger.info('Refreshed! ({0} ms)'.format(duration))
             self._next_refresh_ts = get_expiration_ts(self._params.user, self._params.realm)
-            logger.debug('Nearest update: {0}'.format(ts2dt(self._next_refresh_ts)))
+            logger.debug('Nearest existing: {0}'.format(ts2dt(self._next_refresh_ts)))
 
 
 class KrbWatchDog(Borg):

@@ -33,7 +33,7 @@ Valid starting     Expires            Service principal
 """
 
 
-def test_parse_dates():
+def test_parse_dates() -> None:
     unparsable = ('None', 'Expires')
     for st in unparsable:
         assert get_datetime(st) is None
@@ -57,7 +57,7 @@ service_user = 'service.user'
 REALM = 'MYDOMAIN.COM'
 
 
-def test_check_stdout_user():
+def test_check_stdout_user() -> None:
     res = clean_stdout(STDOUT1, user, REALM)
     assert len(res) == 1
 
@@ -69,7 +69,7 @@ def test_check_stdout_user():
     #     clean_stdout(STDOUT1, service_user, 'MYDOMAIN.COM@MYDOMAIN.COM')
 
 
-def test_no_tickets():
+def test_no_tickets() -> None:
     with pytest.raises(ValueError):
         clean_stdout(STDOUT2, service_user, REALM)
 
@@ -77,7 +77,7 @@ def test_no_tickets():
         clean_stdout(STDOUT2, user, REALM)
 
 
-def test_service_user():
+def test_service_user() -> None:
     res = clean_stdout(STDOUT3, service_user, REALM)
     assert len(res) == 2
 

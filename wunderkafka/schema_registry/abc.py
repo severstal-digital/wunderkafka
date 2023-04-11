@@ -9,6 +9,13 @@ class AbstractHTTPClient(ABC):
     @abstractmethod
     def make_request(self, relative_url: str, method: str = 'GET', body: Any = None, query: Any = None) -> Any: ...
 
+    @property
+    def base_url(self) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def close(self) -> None: ...
+
 
 class AbstractSchemaRegistry(ABC):
 

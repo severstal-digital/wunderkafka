@@ -14,7 +14,7 @@ BAD_HEADERS = (
 
 
 @pytest.mark.parametrize("bad_header", list(BAD_HEADERS))
-def test_short_message(bad_header) -> None:
+def test_short_message(bad_header: bytes) -> None:
     with pytest.raises(RuntimeError):
         parse(bad_header)
 
@@ -33,7 +33,7 @@ def test_handle_hw_int() -> None:
     assert hdr.schema_id == 61
 
 
-def test_handle_hw_int2():
+def test_handle_hw_int2() -> None:
     serialized = b'\x03\x00\x00\x034'
     hdr = parse(serialized)
     assert hdr.protocol_id == 3
@@ -42,14 +42,14 @@ def test_handle_hw_int2():
     assert packed == serialized
 
 
-def test_handle_hw_meta():
+def test_handle_hw_meta() -> None:
     hdr = parse(b'\x01\x00\x00\x00\x00\x00\x00\x00 \x00\x00\x00\x01')
     assert hdr.protocol_id == 1
     assert hdr.meta_id == 32
     assert hdr.schema_version == 1
 
 
-def test_handle_hw_meta2():
+def test_handle_hw_meta2() -> None:
     serialized = b'\x01\x00\x00\x00\x00\x00\x00\x01\xa8\x00\x00\x00\x01'
     hdr = parse(serialized)
     assert hdr.protocol_id == 1
@@ -60,3 +60,23 @@ def test_handle_hw_meta2():
 
     with pytest.raises(ValueError):
         pack(hdr.protocol_id, meta=SRMeta(hdr.schema_id, hdr.schema_version, None))
+
+
+def test_handle_confluent() -> None:
+    serialized = b'\x00\x00\x00\x00\x14'
+    hdr = parse(serialized)
+    assert hdr.protocol_id == 0
+    assert hdr.meta_id is None
+    assert hdr.schema_version is None
+    packed = pack(hdr.protocol_id, meta=SRMeta(hdr.schema_id, hdr.schema_version, hdr.meta_id))
+    assert packed == serialized
+
+
+def test_handle_confluent_default_null() -> None:
+    serialized = b'\x00\x00\x00\x00\x15'
+    hdr = parse(serialized)
+    assert hdr.protocol_id == 0
+    assert hdr.meta_id is None
+    assert hdr.schema_version is None
+    packed = pack(hdr.protocol_id, meta=SRMeta(hdr.schema_id, hdr.schema_version, hdr.meta_id))
+    assert packed == serialized

@@ -1,128 +1,79 @@
-import json
-from typing import Dict, Union, Optional
+from __future__ import annotations
 
-from requests import HTTPError
+from typing import Optional, Any
+from typing_extensions import Protocol
+from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSchemaRegistryClient, Schema
 
-from wunderkafka.errors import SchemaRegistryLookupException
-from wunderkafka.logger import logger
-from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader
+from wunderkafka.schema_registry import SimpleCache
+from wunderkafka.structures import SRMeta, SchemaMeta
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
-from wunderkafka.schema_registry.cache import SimpleCache
-from wunderkafka.schema_registry.models import RegisteredSchema
-
-RegistrySchema = Dict[str, Union[str, int, Dict[str, Union[str, int]]]]
 
 
-def _body(
-    schema_text: str,
-    references: Optional[dict],
-) -> RegistrySchema:
-    body = {
-        'schema': schema_text,
-        'schemaType': 'AVRO',
-    }
-    if references is not None:
-        body['references'] = references
-    return body
+class ConfluentRestClient(Protocol):
+
+    def get(self, url: str, query: Optional[dict] = None) -> Any:
+        ...
+
+    def post(self, url: str, body: Optional[str], **kwargs: Any) -> Any:
+        ...
+
+    def delete(self, url: str) -> Any:
+        ...
+
+    def put(self, url: str, body: Optional[str] = None) -> Any:
+        ...
+
+    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
+        ...
+
+    def _close(self) -> None:
+        ...
+
+
+class Adapter(object):
+    def __init__(self, http_client: AbstractHTTPClient) -> None:
+        self._client = http_client
+
+    def get(self, url: str, query: Optional[dict] = None) -> Any:
+        return self._client.make_request(url, query=query)
+
+    def post(self, url: str, body: Optional[str], **_: Any) -> Any:
+        return self._client.make_request(url, method='POST', body=body)
+
+    def delete(self, url: str) -> Any:
+        return self._client.make_request(url, method='DELETE')
+
+    def put(self, url: str, body: Optional[str] = None) -> Any:
+        return self._client.make_request(url, method='PUT', body=body)
+
+    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
+        return self._client.make_request(url, method, body=body, query=query)
+
+    def _close(self) -> None:
+        return self._client.close()
+
+
+class SchemaRegistryClient(ConfluentSchemaRegistryClient):
+
+    @classmethod
+    def from_client(cls, http_client: AbstractHTTPClient) -> SchemaRegistryClient:
+        # Minimal initialization as we will override client with our own
+        client = cls({'url': http_client.base_url})
+        client._rest_client = Adapter(http_client)
+        return client
 
 
 class ConfluentSRClient(AbstractSchemaRegistry):
 
-    def __init__(self, http_client: AbstractHTTPClient, cache: Optional[SimpleCache] = None) -> None:
-        self._client = http_client
-        self._cache = SimpleCache() if cache is None else cache
+    def __init__(self, http_client: AbstractHTTPClient, _: Optional[SimpleCache] = None) -> None:
+        self._client = SchemaRegistryClient.from_client(http_client)
 
     def get_schema_text(self, meta: SchemaMeta) -> str:
-        hdr = meta.header
-        schema_text = self._cache.get(hdr)
-        if schema_text is None:
-            logger.debug("Couldn't find header ({0}) in cache, re-requesting...".format(hdr))
-            schema_text = self._choose_schema(hdr, meta.subject)
-            self._cache.set(hdr, schema_text)
-        return schema_text
+        schema = self._client.get_schema(meta.header.schema_id)
+        return schema.schema_str
 
     def register_schema(self, topic: str, schema_text: str, *, is_key: bool = True) -> SRMeta:
-        uid = (topic, schema_text, is_key)
-        meta = self._cache.get(uid)
-        if meta is None:
-            subject = '{0}{1}'.format(topic, '_key' if is_key else '_value')
-
-            subjects = self._client.make_request('subjects/', query={'subjectPrefix': subject})
-            if subject not in subjects:
-                schema = self._register_schema(subject, schema_text)
-            else:
-                # ToDo (aa.perelygin): add check compatibility
-                #  (https://docs.confluent.io/platform/current/schema-registry/develop/api.html#sr-api-compatibility)
-                schema = self._register_new_version(subject, schema_text)
-
-            if isinstance(schema, int):
-                schema = self._get_schema(subject, 'latest')
-
-            meta = SRMeta(
-                schema_version=schema.version,
-                schema_id=schema.schema_id
-            )
-            self._cache.set(uid, meta)
-        return meta
-
-    def _register_schema(
-        self,
-        subject: str,
-        schema_text: str,
-        references: Optional[dict] = None,
-        *,
-        normalize_schemas: bool = False
-    ) -> int:
-        response = self._client.make_request(
-            'subjects/{0}/versions'.format(subject),
-            method='POST',
-            body=_body(schema_text, references),
-            query={'normalize': normalize_schemas}
-        )
-        return response['id']
-
-    def _choose_schema(self, hdr: ParsedHeader, subject: str):
-        try:
-            resp = self._client.make_request('schemas/ids/{}'.format(hdr.schema_id), query={'subject': subject})
-            return resp['schema']
-        except HTTPError:
-            raise SchemaRegistryLookupException("Couldn't find schema for {0}".format(hdr))
-
-    def _get_schema(self, subject: str, version_schema: Union[int, str]) -> RegisteredSchema:
-        response = self._client.make_request('subjects/{0}/versions/{1}'.format(subject, version_schema))
-        schema = json.loads(response['schema'])
-
-        if isinstance(schema, str):
-            ref = None
-        else:
-            ref = schema.get('references')
-            if ref is not None:
-                del schema['ref']
-        schema = RegisteredSchema(
-            schema_id=response['id'],
-            schema=schema,
-            subject=subject,
-            version=response['version'],
-            references=ref
-        )
-        return schema
-
-    def _register_new_version(self, subject: str, schema_text: str) -> int:
-        client_schema = json.loads(schema_text)
-        versions = self._client.make_request('subjects/{0}/versions'.format(subject))
-        latest_schema = None
-        for ver in versions:
-            reg_schema = self._get_schema(subject, ver)
-            if client_schema == reg_schema.schema:
-                return reg_schema
-            latest_schema = reg_schema
-        logger.debug('Schema {} not found'.format(subject))
-
-        ref = None
-        if latest_schema and not latest_schema.references:
-            ref = {
-                'name': latest_schema.subject,
-                'subject': latest_schema.subject,
-                'version': latest_schema.version
-            }
-        return self._register_schema(subject, schema_text, ref)
+        # FixMe (tribunsky.kir): lack of symmetry here - SchemaMeta knows about different vendors, but not vice versa.
+        subject = '{0}{1}'.format(topic, '_key' if is_key else '_value')
+        schema_id = self._client.register_schema(subject, Schema(schema_text, schema_type='AVRO'))
+        return SRMeta(schema_id, schema_version=None)
