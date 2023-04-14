@@ -3,13 +3,15 @@
 import time
 import atexit
 import datetime
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional, Any
 
-from wunderkafka.types import HowToSubscribe
+from confluent_kafka import TopicPartition
+
+from wunderkafka.types import HowToSubscribe, AssignCallback
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.errors import ConsumerException
 from wunderkafka.logger import logger
-from wunderkafka.callbacks import reset_partitions
+from wunderkafka.callbacks import reset_partitions, resubscribe
 from wunderkafka.consumers.abc import Message, AbstractConsumer
 from wunderkafka.consumers.subscription import TopicSubscription
 from wunderkafka.hotfixes.watchdog.types import Watchdog
@@ -27,7 +29,12 @@ class BytesConsumer(AbstractConsumer):
         :param sasl_watchdog:   Callable to handle global state of kerberos auth (see Watchdog).
         """
         super().__init__(config.dict())
+
+        # It is used via regular subscription
         self.subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
+
+        # It is used 'robust' recreation of consumer.
+        self.state: Optional[List[TopicPartition]] = None
 
         self._config = config
         self._last_poll_ts = time.perf_counter()
@@ -92,3 +99,33 @@ class BytesConsumer(AbstractConsumer):
             super().subscribe(topics=list(self.subscription_offsets), on_assign=reset_partitions)
         else:
             super().subscribe(topics=list(subscriptions))
+
+    def resubscribe(
+        self,
+        state: List[TopicPartition],
+        on_assign: Optional[AssignCallback] = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        topics = list(set(tp.topic for tp in state))
+        self.state = state
+        super().subscribe(topics=topics, on_assign=resubscribe)
+
+    # Maybe it should be class method
+    def recreate(self, state: List[TopicPartition]) -> AbstractConsumer:
+        if state:
+            logger.warning('Recreating {0}'.format(self.__class__.__name__))
+            self.close()
+            consumer = BytesConsumer(config=self.config, sasl_watchdog=self._sasl_watchdog)
+            consumer.resubscribe(state)
+            return consumer
+        else:
+            lines = [
+                'Received emtpy state for subscription.',
+                'It may mean that previous recreation attempt not yet finished, so consumer has no real assignment',
+                'or for some reason assignment intentionally left empty.'
+            ]
+            logger.warning(' '.join(lines))
+            logger.warning('For now consumer will just wait for on-assign callback...')
+            self._last_poll_ts = time.perf_counter()
+            return self

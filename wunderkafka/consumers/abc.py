@@ -5,13 +5,15 @@ Module contains interface-like skeletons for consumer.
 - high-level consumer which is able to handle message's schemas
 """
 
+from __future__ import annotations
+
 import datetime
 from abc import ABC, abstractmethod
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional, Any
 
 from confluent_kafka import Message, Consumer, TopicPartition
 
-from wunderkafka.types import HowToSubscribe
+from wunderkafka.types import HowToSubscribe, AssignCallback
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.consumers.subscription import TopicSubscription
 
@@ -22,6 +24,7 @@ class AbstractConsumer(Consumer):
     # Why so: https://github.com/python/mypy/issues/4125
     _config: ConsumerConfig
     subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
+    state: Optional[List[TopicPartition]] = None
 
     @property
     def config(self) -> ConsumerConfig:
@@ -58,6 +61,18 @@ class AbstractConsumer(Consumer):
         ..  # noqa: DAR401
         ..  # noqa: DAR202
         """
+        raise NotImplementedError
+
+    def recreate(self, state: List[TopicPartition]) -> AbstractConsumer:
+        raise NotImplementedError
+
+    def resubscribe(
+        self,
+        state: List[TopicPartition],
+        on_assign: Optional[AssignCallback] = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
         raise NotImplementedError
 
 

@@ -8,11 +8,21 @@ from wunderkafka.consumers.subscription import TopicSubscription
 
 
 class Message(object):
-    def __init__(self, topic: str, value: bytes, key: Optional[bytes] = None, error: Optional[KafkaError] = None):
+    def __init__(
+        self,
+        topic: str,
+        value: bytes,
+        key: Optional[bytes] = None,
+        error: Optional[KafkaError] = None,
+        partition: Optional[int] = 0,
+        offset: Optional[int] = 0,
+    ):
         self._topic = topic
         self._value = value
         self._key = key
         self._error = error
+        self._partition = partition
+        self._offset = offset
 
     def value(self) -> bytes:
         return self._value
@@ -31,6 +41,12 @@ class Message(object):
 
     def error(self) -> Optional[KafkaError]:
         return self._error
+
+    def partition(self) -> Optional[int]:
+        return self._partition
+
+    def offset(self) -> Optional[int]:
+        return self._offset
 
 
 class TestConsumer(BytesConsumer):

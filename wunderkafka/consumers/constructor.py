@@ -10,8 +10,10 @@ All moving parts should be interchangeable in terms of schema, header and serial
 import datetime
 from typing import Any, List, Union, Optional
 
-from confluent_kafka import Message, TopicPartition
+from confluent_kafka import Message, TopicPartition, KafkaError
 
+from wunderkafka.consumers.robust import Tracker
+from wunderkafka.errors import ConsumerException
 from wunderkafka.types import HeaderParser
 from wunderkafka.logger import logger
 from wunderkafka.serdes.abc import AbstractDeserializer
@@ -23,6 +25,14 @@ from wunderkafka.consumers.subscription import TopicSubscription
 
 class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
     """Deserializing pipeline implementation of extended consumer."""
+
+    __slots__ = (
+        'consumer',
+        '_header_parser',
+        '_registry',
+        '_deserializer',
+        '_tracker',
+    )
 
     def __init__(
         self,
@@ -43,6 +53,22 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         self._header_parser = headers_handler
         self._registry = schema_registry
         self._deserializer = deserializer
+
+        self._tracker = Tracker()
+
+    @property
+    def state(self) -> List[TopicPartition]:
+        # Should return only real assignment, which doesn't change while consuming
+        original = self.consumer.assignment()
+        new = []
+        for tp in original:
+            offset = self._tracker.get(tp)
+            if offset is None:
+                new_tp = TopicPartition(topic=tp.topic, partition=tp.partition, offset=tp.offset)
+            else:
+                new_tp = TopicPartition(topic=tp.topic, partition=tp.partition, offset=offset)
+            new.append(new_tp)
+        return new
 
     def subscribe(  # noqa: D102,WPS211  # docstring inherited from superclass.
         self,
@@ -78,6 +104,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         ignore_keys: bool = False,
         raise_on_error: bool = True,
         raise_on_lost: bool = True,
+        robust_timeout: Optional[float] = None,
     ) -> List[Message]:
         """
         Consume as many messages as we can for a given timeout and decode them.
@@ -89,11 +116,35 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         :param raise_on_error:  if True, raise KafkaError form confluent_kafka library to handle in client code.
         :param raise_on_lost:   if True, check on own clocks if max.poll.interval.ms is exceeded. If so, raises
                                 ConsumerException to be handled in client code.
+        :param robust_timeout:  If set, then consumer will try to recover from errors without failing for specified
+                                amount of seconds.
+                                .. warning::
+                                  This parameter is NOT intended to be used with topics where data is not coming
+                                  quite often (e.g. more often than robust timeout). Because without new messages
+                                  we are not sure if everything works under the hood and didn't break irretrievably.
 
         :raises KafkaError:     See https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#confluent_kafka.KafkaError
 
         :return:                A list of Message objects with decoded value() and key() (possibly empty on timeout).
         """
+        self._tracker.check(robust_timeout)
+        try:
+            return self._consume(timeout, num_messages, ignore_keys, raise_on_error, raise_on_lost)
+        except (ConsumerException, KafkaError) as exc:
+            if robust_timeout is None:
+                raise
+            self._tracker.capture(exc)
+            self.consumer = self.consumer.recreate(self.state)
+            return self._consume(timeout, num_messages, ignore_keys, raise_on_error, raise_on_lost)
+
+    def _consume(
+        self,
+        timeout: float,
+        num_messages: int,
+        ignore_keys: bool,
+        raise_on_error: bool,
+        raise_on_lost: bool,
+    ) -> List[Message]:
         msgs = self.consumer.batch_poll(timeout, num_messages, raise_on_lost=raise_on_lost)
         return self._decoded(msgs, ignore_keys=ignore_keys, raise_on_error=raise_on_error)
 
@@ -115,6 +166,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
                 logger.error(kafka_error)
                 if raise_on_error:
                     raise kafka_error
+            else:
+                self._tracker.track(msg)
 
             topic = msg.topic()
             msg.set_value(self._decode(topic, msg.value()))

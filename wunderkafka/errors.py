@@ -20,4 +20,8 @@ class DeserializerException(SerDesException):
 
 
 class SchemaRegistryLookupException(RuntimeError):
-    """Break control flow if there are any problems with schema id handling.."""
+    """Break control flow if there are any problems with schema id handling."""
+
+
+class RobustTimeoutError(TimeoutError):
+    """Break control flow if consumer couldn't recover from broker failure."""

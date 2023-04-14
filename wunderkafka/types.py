@@ -1,9 +1,9 @@
 """This module contains aliases and helper definitions for type hints."""
 
 # ToDo (tribunsky.kir): move it to module with structures
-from typing import Any, Tuple, Union, Callable, Optional, Type
+from typing import Any, Tuple, Union, Callable, Optional, Type, List
 
-from confluent_kafka import Message, KafkaError
+from confluent_kafka import Message, KafkaError, Consumer, TopicPartition
 
 from wunderkafka.structures import Offset, SRMeta, Timestamp, ParsedHeader, SchemaDescription
 
@@ -11,6 +11,7 @@ from wunderkafka.structures import Offset, SRMeta, Timestamp, ParsedHeader, Sche
 HeaderParser = Callable[[bytes], ParsedHeader]
 HeaderPacker = Callable[[int, SRMeta], bytes]
 
+AssignCallback = Callable[[Consumer, List[TopicPartition]], Any]
 DeliveryCallback = Callable[[Optional[KafkaError], Message], None]
 
 MsgValue = Any
