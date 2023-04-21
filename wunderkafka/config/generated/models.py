@@ -26,7 +26,7 @@ class RDKafkaConfig(BaseSettings):
         'sasl',
         'regex',
         'lz4',
-        'sasl_gssapi',
+        # 'sasl_gssapi', (akoshel): confluent-kafka==2.1.0 KafkaError{code=_INVALID_ARG,val=-186,str="Unsupported value "sasl_gssapi" for configuration property "builtin.features": 
         'sasl_plain',
         'sasl_scram',
         'plugins',
