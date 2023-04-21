@@ -1,14 +1,7 @@
 from enum import Enum
 from typing import Any, Dict, Union, Optional
 
-import requests_kerberos
 from pydantic import BaseSettings
-
-
-class HTTPKerberosMutualAuth(Enum):
-    REQUIRED = requests_kerberos.REQUIRED
-    OPTIONAL = requests_kerberos.OPTIONAL
-    DISABLED = requests_kerberos.DISABLED
 
 
 def remap_fields(dct: Dict[str, Any]) -> Dict[str, Any]:
@@ -26,7 +19,7 @@ class SRConfig(BaseSettings):
     sasl_username: Optional[str]
     # ToDo: (tribunsky-kir): I'd prefer to compose the whole HTTP Kerberos stuff as separate subconfig,
     #                        but it entails writing additional logic for sasl username reuse.
-    mutual_auth: Optional[HTTPKerberosMutualAuth] = None
+    mutual_auth: Optional[Any] = None # HTTPKerberosMutualAuth
 
     def dict(self, **kwargs: Any) -> Dict[str, Optional[Union[str, int]]]:
         dct = super().dict(**kwargs)

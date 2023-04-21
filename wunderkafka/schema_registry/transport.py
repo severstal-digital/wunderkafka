@@ -3,7 +3,6 @@ import json
 from typing import Any
 
 import requests
-from requests_kerberos import HTTPKerberosAuth
 
 from wunderkafka.logger import logger
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
@@ -14,6 +13,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
     def __init__(self, config: SRConfig, *, save_replay: bool = False) -> None:
         s = requests.Session()
         if config.sasl_username is not None:
+            from requests_kerberos import HTTPKerberosAuth
             s.auth = HTTPKerberosAuth(
                 principal=config.sasl_username,
                 mutual_authentication=config.mutual_auth,
