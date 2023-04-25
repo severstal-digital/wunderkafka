@@ -10,15 +10,15 @@ All moving parts should be interchangeable in terms of schema, header and serial
 import datetime
 from typing import Any, List, Union, Optional
 
-from confluent_kafka import Message, TopicPartition, KafkaError
+from confluent_kafka import Message, KafkaError, TopicPartition
 
-from wunderkafka.consumers.robust import Tracker
-from wunderkafka.errors import ConsumerException
 from wunderkafka.types import HeaderParser
+from wunderkafka.errors import ConsumerException
 from wunderkafka.logger import logger
 from wunderkafka.serdes.abc import AbstractDeserializer
 from wunderkafka.structures import SchemaMeta, SchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer
+from wunderkafka.consumers.robust import Tracker
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
 from wunderkafka.consumers.subscription import TopicSubscription
 
@@ -62,7 +62,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         original = self.consumer.assignment()
         new = []
         for tp in original:
-            offset = self._tracker.get(tp) or tp.offset
+            offset = self._tracker.get_offset(tp) or tp.offset
             new.append(TopicPartition(topic=tp.topic, partition=tp.partition, offset=offset))
         return new
 

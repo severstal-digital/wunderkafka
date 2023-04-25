@@ -1,8 +1,7 @@
-import copy
 import time
-from typing import Dict, Optional, Union
+from typing import Dict, Tuple, Union, Optional
 
-from confluent_kafka import Message, TopicPartition, KafkaError
+from confluent_kafka import Message, KafkaError, TopicPartition
 
 from wunderkafka.errors import RobustTimeoutError
 from wunderkafka.logger import logger
@@ -12,7 +11,29 @@ TopicName = str
 Partition = int
 
 # ToDo (tribunsky.kir): when python version allows, use MappingProxyType instead (isn't subscriptable in old pythons)
-ConsumerState = Dict[TopicName, Dict[Partition, Offset]]
+ConsumerState = Dict[Tuple[TopicName, Partition], Offset]
+
+
+def prettify(msg: Message) -> str:
+    return '{0} (error: {1}, partition: {2}, offset: {3}, value: {4})'.format(
+        msg, msg.error(), msg.partition(), msg.offset(), msg.value(),
+    )
+
+
+def _validated_meta_info(msg: Message) -> Tuple[TopicName, Partition, Offset]:
+    error = msg.error()
+    if error is not None:
+        raise ValueError("Tracker is not intended to be used with error messages from broker! ({0})".format(error))
+    topic = msg.topic()
+    if topic is None:
+        raise RuntimeError("Couldn't get topic for message: {0}".format(prettify(msg)))
+    partition = msg.partition()
+    if partition is None:
+        raise RuntimeError("Couldn't get partition for message: {0}".format(prettify(msg)))
+    offset = msg.offset()
+    if offset is None:
+        raise RuntimeError("Couldn't get offset for message: {0}".format(prettify(msg)))
+    return topic, partition, offset
 
 
 class Tracker(object):
@@ -23,22 +44,9 @@ class Tracker(object):
         self._first_error_ts: Optional[float] = None
         self._first_error: Optional[Union[KafkaError, Exception]] = None
 
-    @property
-    def state(self) -> ConsumerState:
-        return copy.deepcopy(self._tracker)
-
     def track(self, msg: Message) -> None:
-        assert msg.error() is None
-
-        topic = msg.topic()
-        assert topic is not None
-        partition = msg.partition()
-        assert partition is not None
-        if topic not in self._tracker:
-            self._tracker[topic] = {}
-        offset = msg.offset()
-        assert offset is not None
-        self._tracker[topic][partition] = offset
+        topic, partition, offset = _validated_meta_info(msg)
+        self._tracker[(topic, partition)] = offset
         self._clear_errors()
 
     def _clear_errors(self) -> None:
@@ -54,11 +62,9 @@ class Tracker(object):
             self._first_error = exc
             self._first_error_ts = time.perf_counter()
 
-    def get(self, tp: TopicPartition) -> Optional[Offset]:
-        topic_data = self._tracker.get(tp.topic)
-        if topic_data:
-            return topic_data.get(tp.partition)
-        return None
+    def get_offset(self, tp: TopicPartition) -> Optional[Offset]:
+        composite_key = (tp.topic, tp.partition)
+        return self._tracker.get(composite_key)
 
     def check(self, timeout: Optional[float]) -> None:
         if timeout is None:

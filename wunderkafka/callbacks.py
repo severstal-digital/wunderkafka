@@ -1,6 +1,6 @@
 """This module contains some predefined callbacks to interact with librdkafka."""
 
-from typing import List, Optional, Dict
+from typing import Dict, List, Tuple, Optional
 
 from confluent_kafka import Message, KafkaError, TopicPartition
 
@@ -52,14 +52,10 @@ def resubscribe(consumer: AbstractConsumer, partitions: List[TopicPartition]) ->
             '{0}: re-assigned (using auto.offset.reset={1})'.format(consumer, consumer.config.auto_offset_reset),
         )
         return
-    logger.debug(partitions)
     state = consumer.state
-    dct: Dict[str, Dict[int, int]] = {tp.topic: {} for tp in state}
-    for tp in state:
-        dct[tp.topic][tp.partition] = tp.offset
+    offsets: Dict[Tuple[str, int], int] = {(tp.topic, tp.partition): tp.offset for tp in state}
     for ptn in partitions:
-        ptn.offset = dct[ptn.topic][ptn.partition]
-    logger.debug(partitions)
+        ptn.offset = offsets.get((ptn.topic, ptn.partition), ptn.offset)
     consumer.assign(partitions)
     consumer.state = None
 
