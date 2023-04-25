@@ -14,7 +14,7 @@ class TestHTTPClient(AbstractHTTPClient):
         filename = self._root / method / '{0}.json'.format(relative_url)
         if relative_url == 'schemas':
             filename = self._root / method / relative_url / body['description'] / '{0}.json'.format(relative_url)
-        with open(filename) as fl:
+        with open(str(filename).replace(':', '-')) as fl:
             return json.load(fl)
 
     def close(self) -> None:
