@@ -19,7 +19,7 @@ class Tracker(object):
     __slots__ = ('_tracker', '_first_error_ts', '_first_error')
 
     def __init__(self) -> None:
-        self._tracker: Dict[TopicName, Dict[Partition, Offset]] = {}
+        self._tracker: ConsumerState = {}
         self._first_error_ts: Optional[float] = None
         self._first_error: Optional[Union[KafkaError, Exception]] = None
 
