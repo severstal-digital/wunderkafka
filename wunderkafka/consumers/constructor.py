@@ -62,12 +62,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         original = self.consumer.assignment()
         new = []
         for tp in original:
-            offset = self._tracker.get(tp)
-            if offset is None:
-                new_tp = TopicPartition(topic=tp.topic, partition=tp.partition, offset=tp.offset)
-            else:
-                new_tp = TopicPartition(topic=tp.topic, partition=tp.partition, offset=offset)
-            new.append(new_tp)
+            offset = self._tracker.get(tp) or tp.offset
+            new.append(TopicPartition(topic=tp.topic, partition=tp.partition, offset=offset))
         return new
 
     def subscribe(  # noqa: D102,WPS211  # docstring inherited from superclass.
