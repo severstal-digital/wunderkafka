@@ -7,20 +7,20 @@ from pydantic import Field, BaseModel
 from wunderkafka.serdes.avromodel import derive
 
 if sys.version_info > (3, 7):
-    class Parent(BaseModel):
+    class ParentOptional(BaseModel):
         volume: float = Field(description='...')
         weight: Optional[float] = Field(description='...')
 
-    class Child(Parent):
+    class ChildOptional(ParentOptional):
         ts: int = Field(description='...')
 
 
-    class Grandson(Child):
+    class GrandsonOptional(ChildOptional):
         ...
 
 
     def test_dataclass() -> None:
-        schema = derive(Grandson, topic='test_data_1')
+        schema = derive(GrandsonOptional, topic='test_data_1')
         assert json.loads(schema) == {
             'type': 'record',
             'name': 'test_data_1_value',
