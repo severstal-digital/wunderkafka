@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         pydantic-version: ['~=1.8.2', '~=1.10.7', '']
-        dataclasses-avroschema-version: ['~=0.25.2', '~=0.36.3', '~=0.40.0', '']
+        dataclasses-avroschema-version: ['~=0.25.2', '==0.34.0', '~=0.36.3', '~=0.40.0', '']
         python-version: [ '3.7', '3.8', '3.9', '3.10', '3.11' ]
     container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.5
     steps:
@@ -33,6 +33,8 @@ jobs:
         fi
     - name: run pytest
       run: pytest -s tests/
+      # 3.10 and 3.11 support piped annotations, and dataclasses-avroschema supports it only from 0.34.0
+      if: "!((matrix.dataclasses-avroschema-version == '~=0.25.2' || matrix.pydantic-version == '~=1.8.2') && contains(matrix.python-version, '3.1'))"
     - name: Install dependencies
       run: |
         pip install mypy
