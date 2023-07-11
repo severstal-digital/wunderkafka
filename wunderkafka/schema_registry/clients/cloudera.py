@@ -4,30 +4,51 @@ from wunderkafka.errors import SchemaRegistryLookupException
 from wunderkafka.logger import logger
 from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
+from wunderkafka.serdes.avro.headers import PROTOCOLS
 from wunderkafka.schema_registry.cache import SimpleCache, AlwaysEmptyCache
 
 
-# ToDo (tribunsky.kir): we can cache all schemas at once for every header (key)
-def choose_schema(header: ParsedHeader, versions: Dict[str, List[Dict[str, Optional[Union[int, str]]]]]) -> str:
-    if header.protocol_id == 0:
-        raise NotImplementedError("Didn't check with confluent for now")
-
-    if header.protocol_id == 1:
-        for schema in versions['entities']:
-            if schema['schemaMetadataId'] == header.meta_id and schema['version'] == header.schema_version:
-                # ToDo: use model to describe SchemaRegistry response.
-                txt = schema['schemaText']
-                if isinstance(txt, str):
-                    return txt
-
-    if header.protocol_id in {2, 3}:
-        for schema in versions['entities']:
-            if schema['id'] == header.schema_id:
-                txt = schema['schemaText']
-                if isinstance(txt, str):
-                    return txt
-
-    raise SchemaRegistryLookupException("Couldn't find schema for {0}".format(header))
+def prepare_schemas_for_caching(
+    versions: Dict[str, List[Dict[str, Optional[Union[int, str]]]]],
+) -> Dict[ParsedHeader, str]:
+    schemas_to_header_mapping = {}
+    for schema in versions['entities']:
+        txt = schema['schemaText']
+        if not isinstance(txt, str):
+            raise ValueError('Provided SchemaText is not str: {0}'.format(schema))
+        meta_id = schema['schemaMetadataId']
+        if not isinstance(meta_id, int):
+            raise ValueError('Wrong schemaMetadataId (not int): {0}'.format(schema))
+        schema_version = schema['version']
+        if not isinstance(schema_version, int):
+            raise ValueError('Wrong schema version (not int): {0}'.format(schema))
+        new_header_v1 = ParsedHeader(
+            protocol_id=1,
+            meta_id=meta_id,
+            schema_version=schema_version,
+            schema_id=None,
+            size=PROTOCOLS[1].header_size + 1,
+        )
+        schema_id = schema['id']
+        if not isinstance(schema_id, int):
+            raise ValueError('Wrong schema id (not int): {0}'.format(schema))
+        new_header_v2 = ParsedHeader(
+            protocol_id=2,
+            meta_id=None,
+            schema_version=None,
+            schema_id=schema_id,
+            size=PROTOCOLS[2].header_size + 1,
+        )
+        new_header_v3 = ParsedHeader(
+            protocol_id=3,
+            meta_id=None,
+            schema_version=None,
+            schema_id=schema_id,
+            size=PROTOCOLS[3].header_size + 1,
+        )
+        for new_header in (new_header_v1, new_header_v2, new_header_v3):
+            schemas_to_header_mapping[new_header] = txt
+    return schemas_to_header_mapping
 
 
 class ClouderaSRClient(AbstractSchemaRegistry):
@@ -35,13 +56,15 @@ class ClouderaSRClient(AbstractSchemaRegistry):
     def __init__(self, http_client: AbstractHTTPClient, cache: Optional[SimpleCache] = None) -> None:
         self._client = http_client
         self._cache = AlwaysEmptyCache() if cache is None else cache
+        self._requests_count = 0
+
+    @property
+    def requests_count(self) -> int:
+        return self._requests_count
 
     def _send_request_for_schema(self, meta: SchemaMeta) -> Any:
-        subject = meta.subject
-        versions = self._cache.get(subject)
-        if versions is None:
-            versions = self._client.make_request('schemas/{0}/versions'.format(subject))
-            self._cache.set(subject, versions)
+        versions = self._client.make_request('schemas/{0}/versions'.format(meta.subject))
+        self._requests_count += 1
         return versions
 
     def _create_meta(self, subject: str) -> int:
@@ -67,17 +90,26 @@ class ClouderaSRClient(AbstractSchemaRegistry):
 
     def get_schema_text(self, meta: SchemaMeta) -> str:
         # ToDo (tribunsky.kir): arguably, the best key is BINARY header, not dataclass.
-        hdr = meta.header
-        schema_text = self._cache.get(hdr)
+        # ToDo (tribunsky.kir): ineffective caching. When we get response with list of schemas,
+        #                       we can do better: pre-generate all possible metas and keep texts
+        schema_text = self._cache.get(meta.header)
+        if schema_text is not None:
+            return schema_text
+        logger.debug("Couldn't find header ({0}) in cache, re-requesting...".format(meta.header))
+        versions = self._send_request_for_schema(meta)
+        for hdr, txt in prepare_schemas_for_caching(versions).items():
+            self._cache.set(hdr, txt)
+        schema_text = self._cache.get(meta.header)
         if schema_text is None:
-            logger.debug("Couldn't find header ({0}) in cache, re-requesting...".format(hdr))
-            versions = self._send_request_for_schema(meta)
-            schema_text = choose_schema(hdr, versions)
-            self._cache.set(hdr, schema_text)
+            error_message = "Couldn't find schema for {0}".format(meta.header)
+            logger.error(error_message)
+            for schema in versions['entities']:
+                logger.warning('\tschema: {0}'.format(schema))
+            raise SchemaRegistryLookupException(error_message)
         return schema_text
 
     # ToDo (tribunsky.kir): here and in producers/constructor:
-    #                       - make hypotehtical meta + prop for subject
+    #                       - make hypothetical meta + prop for subject
     #                       - symmetry with get_schema_text
     def register_schema(self, topic: str, schema_text: str, *, is_key: bool = True) -> SRMeta:
         uid = (topic, schema_text, is_key)
@@ -85,7 +117,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
         if meta is None:
             suffix = ':k' if is_key else ''
             subject = '{0}{1}'.format(topic, suffix)
-            # ToDo (tribunsky.kir): three queris is bad. Either we should know protocol id,
+            # ToDo (tribunsky.kir): three queries is bad. Either we should know protocol id,
             #                       e.g. to skip last query (we do not need id always)
             meta_id = self._create_meta(subject)
             schema_version = self._create_schema(subject, schema_text)
