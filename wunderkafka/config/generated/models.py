@@ -1,3 +1,7 @@
+# ToDo (tribunsky.kir): looks like that idea of dynamic import via imp depending on librdkafka
+#                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.
+# mypy: disable-error-code="no-redef"
+
 from wunderkafka import librdkafka
 
 # I am not gonna to generate single type for every single range of conint/confloat.

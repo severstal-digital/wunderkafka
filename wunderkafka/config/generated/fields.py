@@ -1,3 +1,7 @@
+# ToDo (tribunsky.kir): looks like that idea of dynamic import via imp depending on librdkafka
+#                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.
+# mypy: disable-error-code="no-redef,assignment"
+
 from wunderkafka import librdkafka
 
 # Why so: not all configuration parameters of librdkafka may be easily replaced from '_' to '.',

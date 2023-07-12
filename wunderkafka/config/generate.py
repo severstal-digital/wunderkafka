@@ -1,9 +1,9 @@
+import os
 import logging
 import operator
-import os
-from collections import defaultdict
+from typing import Dict, List, Tuple, Union, Optional, NamedTuple
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+from collections import defaultdict
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -82,7 +82,7 @@ class Row(NamedTuple):
         return self.property_default
 
     @property
-    def range(self) -> Union[str, Tuple[int, int]]:
+    def range(self) -> Union[str, Tuple[str, str]]:
         delim = '..'
         if delim not in self.property_range:
             # search for bool
@@ -109,7 +109,7 @@ class Row(NamedTuple):
         if self.type == 'CSV flags':
             return TYPES_MAPPING[self.type]
         if '..' in self.property_range:
-            ge, le = self.range
+            ge, le = self.range                                                                           # type: ignore
             if self.type == 'integer':
                 return 'conint(ge={0}, le={1})'.format(ge, le)
             elif self.type == 'float':
@@ -131,7 +131,7 @@ class Row(NamedTuple):
         if self.property_name == 'builtin.features':
             lines = ["', '.join(["]
             spaces = ' ' * 8
-            for feat in self.default.strip('"').strip("'").split(','):
+            for feat in self.default.strip('"').strip("'").split(','):                                    # type: ignore
                 stripped = feat.strip()
                 if stripped:
                     lines.append("{0}'{1}',".format(spaces, stripped))
@@ -297,7 +297,14 @@ def generate(lines: Dict[Version, Files]) -> Dict[Name, Lines]:
             dct[file_name] = lines[libversion][file_name]
         else:
             logger.warning("Generated files for {0} differs, merging it...".format(file_name))
+            header = '# mypy: disable-error-code="no-redef"'
+            if file_name == 'fields.py':
+                header = '# mypy: disable-error-code="no-redef,assignment"'
             new_lines = [
+                '# ToDo (tribunsky.kir): looks like that idea of dynamic import via imp depending on librdkafka',
+                "#                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.",
+                header,
+                '',
                 'from wunderkafka import librdkafka',
                 '',
             ]
@@ -316,7 +323,7 @@ def generate(lines: Dict[Version, Files]) -> Dict[Name, Lines]:
     return dct
 
 
-def main():
+def main() -> None:
     lines: Dict[Version, Files] = {}
     root_dir = Path(__file__).parent / 'versions'
     for sub_path in os.listdir(root_dir):
@@ -338,7 +345,7 @@ def main():
         write_python(content, 'generated/{0}'.format(file_name))
 
 
-def single():
+def single() -> None:
     grouped = group(parse(read_markdown()))
     models = generate_models(grouped)
     write_python(models, 'models.py')
