@@ -41,9 +41,6 @@ class ConsumerConfig(RDConsumerConfig):
         dct.pop('sr')
         return remap_properties(dct, CONF_CONSUMER_FIELDS)
 
-    # class Config:
-    #     allow_mutation = False
-
 
 class ProducerConfig(RDProducerConfig):
     sr: Optional[SRConfig]
@@ -52,9 +49,6 @@ class ProducerConfig(RDProducerConfig):
         dct = super().dict(**kwargs)
         dct.pop('sr')
         return remap_properties(dct, CONF_PRODUCER_FIELDS)
-
-    # class Config:
-    #     allow_mutation = False
 
 
 RDKafkaConfig = TypeVar('RDKafkaConfig', ConsumerConfig, ProducerConfig)
