@@ -37,7 +37,7 @@ def remap_properties(
 #                       or write more complex generator and class hierarchy (e.g. platform-specific base classes)
 #                       to not monkeypatch config before actually feeding it to librdkafka.
 #                       #TypeSafety!!1
-def sanitize(dct: dict[str, Optional[ConfigValues]]) -> Dict[str, ConfigValues]:
+def sanitize(dct: Dict[str, Optional[ConfigValues]]) -> Dict[str, ConfigValues]:
     # cimpl.KafkaException: KafkaError{
     #   ...
     #   "Configuration property "ssl.ca.certificate.stores" not supported in this build: configuration only valid on Windows"
