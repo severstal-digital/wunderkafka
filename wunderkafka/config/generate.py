@@ -3,7 +3,7 @@ import operator
 import os
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union, Final
+from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging
 
 # mypy cannot into constrained type at the time of on-knee writing of this script
-IGNORE_PYDANTIC_TYPE: Final = '# type: ignore[valid-type]'
+IGNORE_PYDANTIC_TYPE = '# type: ignore[valid-type]'
 
 GROUP_ID = 'group.id'
 
