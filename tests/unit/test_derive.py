@@ -8,7 +8,7 @@ from dataclasses import dataclass
 import pytest
 from pydantic import Field, BaseModel, BaseSettings
 
-from wunderkafka.compat.types import AvroModel
+from dataclasses_avroschema import AvroModel
 from wunderkafka.serdes.avromodel import derive
 
 
@@ -76,7 +76,6 @@ class TsWithMeta(BaseModel):
         name = 'MsgKey'
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_dataclass() -> None:
     schema = derive(SomeData, topic='test_data_1')
     assert json.loads(schema) == {
@@ -95,7 +94,6 @@ def test_dataclass() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_dataclass_defaults() -> None:
     schema = derive(SomeDefaultData, topic='test_data_2')
 
@@ -117,7 +115,6 @@ def test_dataclass_defaults() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_pydantic_with_defaults() -> None:
     schema = derive(Metrics, topic='some_topic')
 
@@ -157,7 +154,6 @@ def test_pydantic_with_defaults() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_pydantic_defaults() -> None:
     schema = derive(Mixed, topic='topic')
 
@@ -187,7 +183,6 @@ def test_pydantic_defaults() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_pydantic_defaults_none() -> None:
     schema = derive(Event, topic='topic')
 
@@ -209,7 +204,6 @@ def test_pydantic_defaults_none() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_pydantic_mixed_defaults() -> None:
     s1 = derive(ImageData, topic='topic')
     s2 = derive(OtherImageData, topic='topic')
@@ -239,7 +233,6 @@ def test_pydantic_mixed_defaults() -> None:
     assert json.loads(s1) != json.loads(s2)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_pydantic_with_meta() -> None:
     schema = derive(TsWithMeta, topic='topic')
 
@@ -259,7 +252,6 @@ def test_pydantic_with_meta() -> None:
     }
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_pydantic_base_settings_with_defaults() -> None:
     schema = derive(Metric, topic='some_topic')
 
