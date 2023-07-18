@@ -52,7 +52,7 @@ What if you don't believe in everything-as-code and want more dynamics? Let's co
 
 .. literalinclude:: ../../examples/producer_avro_model.py
 
-- just like the previous example, but the schema derived from the model itself. :code:`dataclasses` are also supported, thanks to `dataclasses-avroschema <https://pypi.org/project/dataclasses-avroschema/>`_! Unfortunately, it will work only for python 3.7 or later, but previous examples are fully-compatible with 3.6. After all, 3.6 reaches end of life in december 2021.
+- just like the previous example, but the schema derived from the model itself. :code:`dataclasses` are also supported, thanks to `dataclasses-avroschema <https://pypi.org/project/dataclasses-avroschema/>`_!
 
 Conclusion
 ----------

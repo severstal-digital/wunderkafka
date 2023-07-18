@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 import pytest
@@ -58,7 +57,6 @@ def clean_producer(test_producer: TestProducer, sr_root: Path) -> HighLevelSeria
     )
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_avro_producer_moving_parts_value_only(
     clean_producer: HighLevelSerializingProducer,
     test_producer: TestProducer,
@@ -74,7 +72,6 @@ def test_avro_producer_moving_parts_value_only(
     assert message.value == value_answer
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_avro_producer_moving_parts_value_and_key(
     clean_producer: HighLevelSerializingProducer,
     test_producer: TestProducer,

@@ -3,8 +3,7 @@ from pathlib import Path
 
 from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
 from wunderkafka.serdes.abc import AbstractDescriptionStore
-from wunderkafka.compat.types import AvroModel
-from wunderkafka.compat.constants import PY36
+from dataclasses_avroschema import AvroModel
 from wunderkafka.serdes.avromodel import derive
 
 
@@ -35,8 +34,6 @@ class AvroModelRepo(AbstractDescriptionStore):
 
     def __init__(self) -> None:
         super().__init__()
-        if PY36:
-            AvroModel()
 
     # ToDo (tribunsky.kir): change Type[AvroModel] to more general alias + check derivation from python built-ins
     def add(self, topic: TopicName, value: Type[AvroModel], key: Optional[Type[AvroModel]]) -> None:

@@ -6,14 +6,13 @@ from pydantic import Field, BaseModel
 
 from wunderkafka.serdes.avromodel import derive
 
-if sys.version_info > (3, 7):
+if sys.version_info <= (3, 10):
     class ParentOptional(BaseModel):
         volume: float = Field(description='...')
         weight: Optional[float] = Field(description='...')
 
     class ChildOptional(ParentOptional):
         ts: int = Field(description='...')
-
 
     class GrandsonOptional(ChildOptional):
         ...
@@ -40,7 +39,7 @@ if sys.version_info > (3, 7):
             ],
         }
 
-if sys.version_info > (3, 10):
+else:
     class Parent(BaseModel):
         volume: float = Field(description='...')
         weight: float | None = Field(description='...')

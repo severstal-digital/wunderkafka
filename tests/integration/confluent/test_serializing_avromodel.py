@@ -25,7 +25,6 @@ class EvolvedEvent(Event):
     info: Optional[str] = 'test'
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_description: Type[Event] = Event) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
@@ -50,7 +49,6 @@ def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_de
     assert message.value == b'\x00\x00\x00\x00\x14\x02\x00\xcc\xb8\xeb\xa6\x80_'
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_avro_producer_existing_schema(
     sr_root_existing: Path,
     topic: str,
@@ -79,7 +77,6 @@ def test_avro_producer_existing_schema(
     assert message.value == b'\x00\x00\x00\x00\x14\x02\x00\xcc\xb8\xeb\xa6\x80_'
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires >= Python3.7")
 def test_avro_producer_update_schema(
     sr_root_update: Path,
     topic: str,

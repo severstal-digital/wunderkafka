@@ -5,7 +5,7 @@ from dataclasses import is_dataclass
 from pydantic import BaseModel
 from pydantic.fields import ModelField, UndefinedType
 
-from wunderkafka.compat.types import AvroModel
+from dataclasses_avroschema import AvroModel
 
 
 def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
