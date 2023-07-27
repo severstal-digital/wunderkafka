@@ -1,12 +1,11 @@
-import sys
 import json
 import time
 from typing import Optional
 from datetime import datetime
 from dataclasses import dataclass
 
-import pytest
-from pydantic import Field, BaseModel, BaseSettings
+from pydantic import Field, BaseModel
+from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
 from wunderkafka.serdes.avromodel import derive

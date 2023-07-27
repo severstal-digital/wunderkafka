@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Dict, Union, Optional
 
 import requests_kerberos
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class HTTPKerberosMutualAuth(Enum):
