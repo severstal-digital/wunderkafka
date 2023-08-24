@@ -1,5 +1,4 @@
 from wunderkafka import ConsumerConfig, SRConfig, SecurityProtocol, AvroConfluentConsumer
-from wunderkafka.schema_registry import ConfluentSRClient
 
 BROKERS_ADDRESSES = 'kafka-broker-01.my_domain.com'
 SCHEMA_REGISTRY_URL = 'https://schema-registry.my_domain.com'

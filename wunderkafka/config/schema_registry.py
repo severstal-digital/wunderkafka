@@ -23,11 +23,11 @@ class SRConfig(BaseSettings):
     basic_auth_user_info: Optional[str] = None
 
     # ToDo (tribunsky-kir): looks like sasl_username and kerberos over HTTP are cloudera-specific.
-    sasl_username: Optional[str]
+    sasl_username: Optional[str] = None
     # ToDo: (tribunsky-kir): I'd prefer to compose the whole HTTP Kerberos stuff as separate subconfig,
     #                        but it entails writing additional logic for sasl username reuse.
     mutual_auth: Optional[HTTPKerberosMutualAuth] = None
 
     def dict(self, **kwargs: Any) -> Dict[str, Optional[Union[str, int]]]:
-        dct = super().dict(**kwargs)
+        dct = super().model_dump(**kwargs)
         return remap_fields(dct)

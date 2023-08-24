@@ -1,16 +1,17 @@
 import os
 from functools import partial
 
-from pydantic import validator, AnyHttpUrl, Field
+from pydantic import field_validator, AnyHttpUrl, Field
 from wunderkafka.time import now
 from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
 
 
 # If you are the fan of 12 factors, you may want to config via env variables
 class OverridenSRConfig(SRConfig):
-    url: AnyHttpUrl = Field(env='SCHEMA_REGISTRY_URL')
+    url: AnyHttpUrl = Field(alias='SCHEMA_REGISTRY_URL')
 
-    @validator('sasl_username')
+    @field_validator('sasl_username')
+    @classmethod
     def from_env(cls, v) -> str:
         # And to use 'native' kerberos envs
         return '{0}@{1}'.format(os.environ.get('KRB5_USER'), os.environ.get('KRB5_REALM'))
@@ -28,7 +29,8 @@ class OverridenConfig(ConsumerConfig):
     sasl_kerberos_kinit_cmd: str = ''
     sr: SRConfig = OverridenSRConfig()
 
-    @validator('sasl_kerberos_kinit_cmd')
+    @field_validator('sasl_kerberos_kinit_cmd')
+    @classmethod
     def format_keytab(cls, v) -> str:
         if not v:
             return 'kinit {0}@{1} -k -t {0}.keytab'.format(os.environ.get('KRB5_USER'), os.environ.get('KRB5_REALM'))

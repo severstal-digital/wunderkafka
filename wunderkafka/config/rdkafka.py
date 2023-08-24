@@ -53,19 +53,21 @@ def sanitize(dct: Dict[str, ConfigValues]) -> Dict[str, ConfigValues]:
 # I don't like mixing SR config and librdkafka config,
 # but it's more handful for producer w/o schema (no need to nest config for librdkafka)
 class ConsumerConfig(RDConsumerConfig):
-    sr: Optional[SRConfig]
+    # https://docs.pydantic.dev/latest/migration/#required-optional-and-nullable-fields
+    sr: Optional[SRConfig] = None
 
     def dict(self, **kwargs: Any) -> Dict[str, ConfigValues]:
-        dct = super().dict(**kwargs)
+        dct = super().model_dump(**kwargs)
         dct.pop('sr')
         return sanitize(remap_properties(dct, CONF_CONSUMER_FIELDS))
 
 
 class ProducerConfig(RDProducerConfig):
-    sr: Optional[SRConfig]
+    # https://docs.pydantic.dev/latest/migration/#required-optional-and-nullable-fields
+    sr: Optional[SRConfig] = None
 
     def dict(self, **kwargs: Any) -> Dict[str, ConfigValues]:
-        dct = super().dict(**kwargs)
+        dct = super().model_dump(**kwargs)
         dct.pop('sr')
         return sanitize(remap_properties(dct, CONF_PRODUCER_FIELDS))
 

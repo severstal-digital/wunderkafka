@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 from wunderkafka import ProducerConfig, SRConfig, SecurityProtocol, AvroModelConfluentProducer
-from wunderkafka.schema_registry import ConfluentSRClient
 from wunderkafka.time import now
 
 BROKERS_ADDRESSES = 'kafka-broker-01.my_domain.com'
