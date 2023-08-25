@@ -5,8 +5,8 @@ from wunderkafka.logger import logger
 
 
 def exclude_gssapi(builtin_features: str) -> str:
-    features = [feature for feature in builtin_features.split(',') if feature != 'sasl_gssapi']
-    return ','.join(features)
+    features = [feature.strip() for feature in builtin_features.split(',') if feature.strip() != 'sasl_gssapi']
+    return ', '.join(features)
 
 
 def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> str:
