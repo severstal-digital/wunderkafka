@@ -1,14 +1,8 @@
-from enum import Enum
 from typing import Any, Dict, Union, Optional
 
-import requests_kerberos
 from pydantic_settings import BaseSettings
 
-
-class HTTPKerberosMutualAuth(Enum):
-    REQUIRED = requests_kerberos.REQUIRED
-    OPTIONAL = requests_kerberos.OPTIONAL
-    DISABLED = requests_kerberos.DISABLED
+from wunderkafka.config.krb.schema_registry import HTTPKerberosMutualAuth
 
 
 def remap_fields(dct: Dict[str, Any]) -> Dict[str, Any]:

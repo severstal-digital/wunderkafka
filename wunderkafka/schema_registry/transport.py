@@ -3,8 +3,8 @@ import json
 from typing import Any
 
 import requests
-from requests_kerberos import HTTPKerberosAuth
 
+from wunderkafka.config.krb.schema_registry import HTTPKerberosAuth
 from wunderkafka.logger import logger
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
 from wunderkafka.config.schema_registry import SRConfig

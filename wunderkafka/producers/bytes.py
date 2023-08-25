@@ -6,7 +6,7 @@ from typing import Any, Union, Optional
 
 from confluent_kafka import KafkaException
 
-from wunderkafka.krb import challenge_krb_arg
+from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.logger import logger
 from wunderkafka.types import DeliveryCallback
 from wunderkafka.config import ProducerConfig

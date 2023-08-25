@@ -6,9 +6,9 @@ import datetime
 import traceback
 from typing import Dict, List, Union, Optional
 
-from confluent_kafka import KafkaException, KafkaError
+from confluent_kafka import KafkaException
 
-from wunderkafka.krb import challenge_krb_arg
+from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.errors import ConsumerException
