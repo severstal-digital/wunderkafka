@@ -116,7 +116,7 @@ class RDKafkaConfig(BaseSettings):
 
     @property
     def requires_kerberos(self) -> bool:
-        if self.sasl_mechanism != 'GSSAPI':
+        if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
             return False
         has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
         if not has_credentials:
@@ -299,7 +299,7 @@ if librdkafka.__version__ >= (1, 5, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
@@ -485,7 +485,7 @@ if librdkafka.__version__ >= (1, 6, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
@@ -675,7 +675,7 @@ if librdkafka.__version__ >= (1, 7, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
@@ -865,7 +865,7 @@ if librdkafka.__version__ >= (1, 8, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
@@ -1065,7 +1065,7 @@ if librdkafka.__version__ >= (1, 9, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
@@ -1267,7 +1267,7 @@ if librdkafka.__version__ >= (2, 0, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
@@ -1468,7 +1468,7 @@ if librdkafka.__version__ >= (2, 1, 0):
     
         @property
         def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism != 'GSSAPI':
+            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
                 return False
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:

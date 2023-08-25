@@ -240,7 +240,7 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
                 '',
                 '    @property',
                 '    def requires_kerberos(self) -> bool:',
-                "        if self.sasl_mechanism != 'GSSAPI':",
+                "        if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():",
                 '            return False',
                 '        has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None',
                 '        if not has_credentials:',
