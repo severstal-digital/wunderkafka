@@ -3,8 +3,12 @@
 import time
 import atexit
 import datetime
+import traceback
 from typing import Dict, List, Union, Optional
 
+from confluent_kafka import KafkaException, KafkaError
+
+from wunderkafka.krb import challenge_krb_arg
 from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.errors import ConsumerException
@@ -26,7 +30,12 @@ class BytesConsumer(AbstractConsumer):
         :param config:          Pydantic model with librdkafka consumer's configuration.
         :param sasl_watchdog:   Callable to handle global state of kerberos auth (see Watchdog).
         """
-        super().__init__(config.dict())
+        try:
+            super().__init__(config.dict())
+        except KafkaException as exc:
+            logger.error(traceback.format_exc())
+            config.builtin_features = challenge_krb_arg(exc, config)
+            super().__init__(config.dict())
         self.subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
 
         self._config = config

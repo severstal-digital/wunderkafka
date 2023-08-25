@@ -4,11 +4,6 @@ from pydantic import ValidationError
 from wunderkafka import SRConfig, BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
 
 
-@pytest.fixture
-def boostrap_servers() -> str:
-    return 'localhost:9093'
-
-
 def test_init_consumer(boostrap_servers: str) -> None:
     config = ConsumerConfig(group_id='my_group', bootstrap_servers=boostrap_servers)
     consumer = BytesConsumer(config)

@@ -235,6 +235,19 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
         properties += [str(row) for row in sorted(pre, key=operator.attrgetter('name'))]
         properties += [str(row) for row in sorted(uniq, key=operator.attrgetter('name'))]
 
+        if grp == '*':
+            properties += [
+                '',
+                '    @property',
+                '    def requires_kerberos(self) -> bool:',
+                "        if self.sasl_mechanism != 'GSSAPI':",
+                '            return False',
+                '        has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None',
+                '        if not has_credentials:',
+                '            return False',
+                '        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}',
+            ]
+
     return properties
 
 
