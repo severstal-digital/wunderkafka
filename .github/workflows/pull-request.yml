@@ -10,38 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        pydantic-version: ['~=1.9.1', '~=1.10.7', '~=1.0']
-        dataclasses-avroschema-version: ['~=0.25.2', '==0.34.0', '~=0.36.3', '~=0.40.0']
+        pydantic-settings-version: ['~=2.0.0', '']
+        dataclasses-avroschema-version: ['~=0.36.0', '~=0.40.0', '']
         python-version: [ '3.8', '3.9', '3.10', '3.11' ]
     container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.5
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    # Looks like there are a lot of new functionality in 0.40.0,
-    # including pydantic and faust, so it is incompatible with the old versions of pydantic
-    # https://github.com/marcosschroh/dataclasses-avroschema/blob/1ee43d389eedbfc8c940903a0341267028707240/pyproject.toml
-    # So for now we just override pydantic with the required one, if dependencies don't resolve simultaneously at all
     - name: Install testing dependencies
       run: | 
-        if pip install pytest pydantic${{ matrix.pydantic-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
+        if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
             echo "Installed dependencies simultaneously"     
         else
             echo "Error resolving dependencies... Installing consequently"
             python -m pip install pytest 
-            python -m pip install pydantic${{ matrix.pydantic-version }} 
+            python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
             python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
         fi
     - name: run pytest
       run: pytest -s tests/
-      # 3.10 and 3.11 support piped annotations, and dataclasses-avroschema supports it only from 0.34.0
-      if: "!((matrix.dataclasses-avroschema-version == '~=0.25.2' || matrix.pydantic-version == '~=1.8.2') && contains(matrix.python-version, '3.1'))"
     - name: Install dependencies
       run: |
         pip install mypy
     - name: run mypy
       run: mypy --config setup.cfg .
-      # https://github.com/pydantic/pydantic/issues/3528
-      if: matrix.pydantic-version != '~=1.9.1'
 
   version:
     runs-on: ubuntu-latest

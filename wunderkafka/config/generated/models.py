@@ -9,7 +9,8 @@ from wunderkafka import librdkafka
 
 from typing import Callable, Optional
 
-from pydantic import BaseSettings, conint, confloat
+from pydantic import conint, confloat
+from pydantic_settings import BaseSettings
 
 # Enums because we can't rely that client code uses linters.
 # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -180,7 +181,8 @@ if librdkafka.__version__ >= (1, 5, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -355,7 +357,8 @@ if librdkafka.__version__ >= (1, 6, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -532,7 +535,8 @@ if librdkafka.__version__ >= (1, 7, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -712,7 +716,8 @@ if librdkafka.__version__ >= (1, 8, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -892,7 +897,8 @@ if librdkafka.__version__ >= (1, 9, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -1082,7 +1088,8 @@ if librdkafka.__version__ >= (2, 0, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
@@ -1273,7 +1280,8 @@ if librdkafka.__version__ >= (2, 1, 0):
     
     from typing import Callable, Optional
     
-    from pydantic import BaseSettings, conint, confloat
+    from pydantic import conint, confloat
+    from pydantic_settings import BaseSettings
     
     # Enums because we can't rely that client code uses linters.
     # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated

@@ -3,7 +3,8 @@
 
 from typing import Callable, Optional
 
-from pydantic import BaseSettings, conint, confloat
+from pydantic import conint, confloat
+from pydantic_settings import BaseSettings
 
 # Enums because we can't rely that client code uses linters.
 # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated

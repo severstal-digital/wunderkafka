@@ -1,4 +1,3 @@
-import sys
 import json
 import time
 from typing import Optional
@@ -6,10 +5,16 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import Field, BaseModel, BaseSettings
+from pydantic import Field, BaseModel, ValidationError
+from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
 from wunderkafka.serdes.avromodel import derive
+
+# ToDo (tribunsky.kir): review some tests. As pydantic V2 changes it's behaviour, some tests are useless:
+#                       we still can derive correct model, but we will be unable to actually populate it in runtime.
+# ToDo (tribunsky.kir): switch to derivation of dataclasses-avroschema[pydantic], when it start support v2:
+#                       https://github.com/marcosschroh/dataclasses-avroschema/issues/381
 
 
 @dataclass
@@ -36,6 +41,14 @@ class Metric(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
+
+
+class MetricV2(BaseSettings):
+    line_speed: Optional[int]
+    defect_detected: Optional[bool] = False
+    model_on: Optional[bool] = False
+    squad_number: int = 0
+    model_config: str                                                                                     # type: ignore
 
 
 class Event(BaseModel):
@@ -289,3 +302,50 @@ def test_pydantic_base_settings_with_defaults() -> None:
         }
       ]
     }
+
+
+def test_pydantic_base_settings_v2_with_defaults() -> None:
+    schema = derive(MetricV2, topic='some_topic')
+
+    assert json.loads(schema) == {
+      "type": "record",
+      "name": "some_topic_value",
+      "fields": [
+        {
+          "name": "line_speed",
+          "type": [
+            "long",
+            "null"
+          ]
+        },
+        {
+          "name": "defect_detected",
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": False
+        },
+        {
+          "name": "model_on",
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": False
+        },
+        {
+          "name": "squad_number",
+          "type": "long",
+          "default": 0,
+        },
+        {
+          "name": "model_config",
+          "type": "string",
+        }
+      ]
+    }
+
+    # model_config is a ClassVar, so we can't populate model anyway
+    with pytest.raises(ValidationError):
+        MetricV2(line_speed=2, model_config='str')                                                        # type: ignore

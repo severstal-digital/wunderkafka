@@ -1,8 +1,6 @@
-import sys
 from typing import Type, Optional
 from pathlib import Path
 
-import pytest
 from pydantic import BaseModel
 
 from wunderkafka.tests import TestProducer, TestHTTPClient
@@ -39,7 +37,7 @@ def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_de
     )
 
     key = None
-    value = schema_description(ts=fixed_ts)
+    value = schema_description(id=None, ts=fixed_ts)
 
     producer.send_message(topic, value, key)
 
@@ -67,7 +65,7 @@ def test_avro_producer_existing_schema(
     )
 
     key = None
-    value = schema_description(ts=fixed_ts)
+    value = schema_description(id=None, ts=fixed_ts)
 
     producer.send_message(topic, value, key)
 
@@ -95,7 +93,7 @@ def test_avro_producer_update_schema(
     )
 
     key = None
-    value = schema_description(ts=fixed_ts)
+    value = schema_description(id=None, ts=fixed_ts)
 
     producer.send_message(topic, value, key)
 

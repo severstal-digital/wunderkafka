@@ -3,9 +3,9 @@ from typing import Any, Dict, Type
 from dataclasses import is_dataclass
 
 from pydantic import BaseModel
-from pydantic.fields import ModelField, UndefinedType
 
 from dataclasses_avroschema import AvroModel
+from pydantic_core import PydanticUndefinedType
 
 
 def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
@@ -35,21 +35,26 @@ def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
 
 def _construct_model(attrs: Dict[str, Any], type_: Type[object]) -> AvroModel:
     if issubclass(type_, BaseModel):
-        for field in vars(type_).get('__fields__', {}).values():
-            if isinstance(field, ModelField) and not isinstance(field.field_info.default, UndefinedType):
-                attrs[field.name] = field.default
-                tp = attrs['__annotations__'].pop(field.name)
-                attrs['__annotations__'].update({field.name: tp})
+        for field_name, field_info in type_.model_fields.items():
+            if not isinstance(field_info.default, PydanticUndefinedType):
+                attrs[field_name] = field_info.default
+                tp = attrs['__annotations__'].pop(field_name)
+                attrs['__annotations__'].update({field_name: tp})
     # https://docs.python.org/3/library/functions.html?highlight=type#type
     return type(type_.__name__, (AvroModel,), attrs)                                                      # type: ignore
 
 
 def _extract_attributes(type_: Type[object]) -> Dict[str, Any]:
     fields = vars(type_).get('__annotations__', {})
-    for base in type_.mro():
-        fields = {**vars(base).get('__annotations__', {}), **fields}
-    for field in ['__slots__', 'klass', 'metadata', 'schema_def', '__config__']:
-        fields.pop(field, None)
+    _, *parents = type_.mro()
+    for base in parents:
+        new_fields = {**vars(base).get('__annotations__', {})}
+        # Currently it is `model_config: ClassVar[SettingsConfigDict]`
+        # https://github.com/pydantic/pydantic-settings/blob/919a20b77527ecc1cd6eeb0a09ca22cc21486fb8/pydantic_settings/main.py#L166
+        for field in ['__slots__', 'klass', 'metadata', 'schema_def', '__config__', 'model_config']:
+            new_fields.pop(field, None)
+        fields = {**new_fields, **fields}
+
     attributes = {}
     attributes.update({'__annotations__': fields})
     meta = vars(type_).get('Meta', None)
