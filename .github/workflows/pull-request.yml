@@ -6,7 +6,44 @@ on:
       - master
 
 jobs:
+  independent:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pydantic-settings-version: [ '~=2.0.0', '' ]
+        # ToDo (tribunsky.kir): make avro extra too but do not forget to require requests in the sake of SRs
+        dataclasses-avroschema-version: [ '~=0.36.0', '~=0.40.0', '' ]
+        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
+    container: python:${{ matrix.python-version }}-slim-bookworm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y librdkafka1
+      - name: install confluent-kafka w/o SASL/SSL support
+        run: |
+          pip install confluent-kafka[avro]~=1.9.0
+      - name: Install testing dependencies
+        run: |
+          if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
+              echo "Installed dependencies simultaneously"     
+          else
+              echo "Error resolving dependencies... Installing consequently"
+              python -m pip install pytest 
+              python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
+              python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
+          fi
+      - name: run pytest
+        run: pytest -s tests/
+      - name: Install dependencies
+        run: |
+          pip install mypy
+      - name: run mypy
+        run: mypy --config setup.cfg .
   checks:
+    needs: [independent]
     runs-on: ubuntu-latest
     strategy:
       matrix:
