@@ -48,7 +48,7 @@ class MetricV2(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: str
+    model_config: str                                                                                     # type: ignore
 
 
 class Event(BaseModel):
@@ -348,4 +348,4 @@ def test_pydantic_base_settings_v2_with_defaults() -> None:
 
     # model_config is a ClassVar, so we can't populate model anyway
     with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, model_config='str')
+        MetricV2(line_speed=2, model_config='str')                                                        # type: ignore
