@@ -1,36 +1,5 @@
-from typing import Any, Dict
-
-import pytest
-
-from wunderkafka import ConsumerConfig, ProducerConfig, SecurityProtocol
-
-RawConfig = Dict[str, Any]
-
-
-@pytest.fixture
-def default_config(boostrap_servers: str) -> RawConfig:
-    return {'bootstrap_servers': boostrap_servers}
-
-
-@pytest.fixture
-def non_krb_config(boostrap_servers: str) -> RawConfig:
-    return {
-        'bootstrap_servers': boostrap_servers,
-        'sasl_username': 'user',
-        'sasl_password': 'password',
-        'security_protocol': SecurityProtocol.sasl_ssl,
-        'sasl_mechanism': 'SCRAM-SHA-512',
-    }
-
-
-@pytest.fixture
-def krb_config(boostrap_servers: str) -> RawConfig:
-    return {
-        'bootstrap_servers': boostrap_servers,
-        'sasl_username': 'user',
-        'sasl_password': 'password',
-        'security_protocol': SecurityProtocol.sasl_ssl,
-    }
+from tests.smoke.conftest import RawConfig
+from wunderkafka import ConsumerConfig, ProducerConfig
 
 
 def test_default_consumer_not_requires_krb(default_config: RawConfig) -> None:
