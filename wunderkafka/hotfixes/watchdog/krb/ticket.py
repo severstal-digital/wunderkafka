@@ -115,7 +115,7 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
 
 def get_datetime(string: str) -> Optional[datetime.datetime]:
     if not HAS_DATEUTIL:
-        return
+        return None
     try:
         return parser.parse(string)
     except (ValueError, OverflowError):
