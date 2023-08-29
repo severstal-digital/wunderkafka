@@ -4,7 +4,7 @@ import datetime
 
 import pytest
 
-from wunderkafka.hotfixes.watchdog.krb.ticket import clean_stdout, get_datetime
+from wunderkafka.hotfixes.watchdog.krb.ticket import clean_stdout, get_datetime, HAS_DATEUTIL
 
 STDOUT1 = """
 Ticket cache: FILE:/tmp/krb5cc_1000
@@ -33,6 +33,7 @@ Valid starting     Expires            Service principal
 """
 
 
+@pytest.mark.skipif(not HAS_DATEUTIL, reason='requires installed python-dateutil')
 def test_parse_dates() -> None:
     unparsable = ('None', 'Expires')
     for st in unparsable:
