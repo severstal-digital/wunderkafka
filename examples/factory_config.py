@@ -8,7 +8,7 @@ from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
 
 # If you are the fan of 12 factors, you may want to config via env variables
 class OverridenSRConfig(SRConfig):
-    url: AnyHttpUrl = Field(alias='SCHEMA_REGISTRY_URL')
+    url: str = Field(alias='SCHEMA_REGISTRY_URL')
 
     @field_validator('sasl_username')
     @classmethod

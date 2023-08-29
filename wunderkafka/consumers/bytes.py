@@ -34,8 +34,8 @@ class BytesConsumer(AbstractConsumer):
             super().__init__(config.dict())
         except KafkaException as exc:
             logger.error(traceback.format_exc())
-            config.builtin_features = challenge_krb_arg(exc, config)
-            super().__init__(config.dict())
+            dct = challenge_krb_arg(exc, config)
+            super().__init__(dct)
         self.subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
 
         self._config = config

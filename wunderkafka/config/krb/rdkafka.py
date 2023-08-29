@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from confluent_kafka import KafkaError
 
 from wunderkafka.config.rdkafka import RDKafkaConfig
@@ -9,7 +11,7 @@ def exclude_gssapi(builtin_features: str) -> str:
     return ', '.join(features)
 
 
-def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> str:
+def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> Dict[str, Any]:
     """
     Check if we can just skip kerberos configuration which comes to RDKafkaConfig from documentation default.
 
@@ -33,4 +35,9 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> str:
         old = config.builtin_features
         new = exclude_gssapi(config.builtin_features)
         logger.warning('Changing builtin.features: {0} -> {1}'.format(old, new))
-        return new
+        config.builtin_features = new
+        # Will also raise KafkaError with -186
+        exclude = {'sasl.kerberos.kinit.cmd'}
+        for feature in exclude:
+            logger.warning('Excluding {0}...'.format(feature))
+        return config.dict(exclude=exclude)
