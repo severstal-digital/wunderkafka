@@ -30,8 +30,8 @@ class BytesProducer(AbstractProducer):
             super().__init__(config.dict())
         except KafkaException as exc:
             logger.error(traceback.format_exc())
-            dct = challenge_krb_arg(exc, config)
-            super().__init__(dct)
+            config = challenge_krb_arg(exc, config)
+            super().__init__(config.dict())
 
         self._config = config
         self._sasl_watchdog = sasl_watchdog

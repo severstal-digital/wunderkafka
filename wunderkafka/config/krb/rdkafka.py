@@ -11,7 +11,7 @@ def exclude_gssapi(builtin_features: str) -> str:
     return ', '.join(features)
 
 
-def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> Dict[str, Any]:
+def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
     """
     Check if we can just skip kerberos configuration which comes to RDKafkaConfig from documentation default.
 
@@ -36,8 +36,4 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> Dict[str, Any]:
         new = exclude_gssapi(config.builtin_features)
         logger.warning('Changing builtin.features: {0} -> {1}'.format(old, new))
         config.builtin_features = new
-        # Will also raise KafkaError with -186
-        exclude = {'sasl.kerberos.kinit.cmd'}
-        for feature in exclude:
-            logger.warning('Excluding {0}...'.format(feature))
-        return config.dict(exclude=exclude)
+        return config

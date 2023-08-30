@@ -77,7 +77,9 @@ class RDKafkaConfig(BaseSettings):
     sasl_kerberos_principal: str = 'kafkaclient'
     sasl_kerberos_service_name: str = 'kafka'
     sasl_mechanism: str = 'GSSAPI'
-    sasl_mechanisms: str = 'GSSAPI'
+    # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+    # It is just alias, but when setting it manually it may misbehave with current defaults.
+    # sasl_mechanisms: str = 'GSSAPI'
     sasl_oauthbearer_config: Optional[str] = None
     sasl_password: Optional[str] = None
     sasl_username: Optional[str] = None
@@ -259,7 +261,9 @@ if librdkafka.__version__ >= (1, 5, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_config: Optional[str] = None
         sasl_password: Optional[str] = None
         sasl_username: Optional[str] = None
@@ -444,7 +448,9 @@ if librdkafka.__version__ >= (1, 6, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_config: Optional[str] = None
         sasl_password: Optional[str] = None
         sasl_username: Optional[str] = None
@@ -631,7 +637,9 @@ if librdkafka.__version__ >= (1, 7, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_config: Optional[str] = None
         sasl_password: Optional[str] = None
         sasl_username: Optional[str] = None
@@ -821,7 +829,9 @@ if librdkafka.__version__ >= (1, 8, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_config: Optional[str] = None
         sasl_password: Optional[str] = None
         sasl_username: Optional[str] = None
@@ -1013,7 +1023,9 @@ if librdkafka.__version__ >= (1, 9, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_client_id: Optional[str] = None
         sasl_oauthbearer_client_secret: Optional[str] = None
         sasl_oauthbearer_config: Optional[str] = None
@@ -1215,7 +1227,9 @@ if librdkafka.__version__ >= (2, 0, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_client_id: Optional[str] = None
         sasl_oauthbearer_client_secret: Optional[str] = None
         sasl_oauthbearer_config: Optional[str] = None
@@ -1416,7 +1430,9 @@ if librdkafka.__version__ >= (2, 1, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_client_id: Optional[str] = None
         sasl_oauthbearer_client_secret: Optional[str] = None
         sasl_oauthbearer_config: Optional[str] = None
@@ -1618,7 +1634,9 @@ if librdkafka.__version__ >= (2, 2, 0):
         sasl_kerberos_principal: str = 'kafkaclient'
         sasl_kerberos_service_name: str = 'kafka'
         sasl_mechanism: str = 'GSSAPI'
-        sasl_mechanisms: str = 'GSSAPI'
+        # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+        # It is just alias, but when setting it manually it may misbehave with current defaults.
+        # sasl_mechanisms: str = 'GSSAPI'
         sasl_oauthbearer_client_id: Optional[str] = None
         sasl_oauthbearer_client_secret: Optional[str] = None
         sasl_oauthbearer_config: Optional[str] = None

@@ -72,7 +72,9 @@ class RDKafkaConfig(BaseSettings):
     sasl_kerberos_principal: str = 'kafkaclient'
     sasl_kerberos_service_name: str = 'kafka'
     sasl_mechanism: str = 'GSSAPI'
-    sasl_mechanisms: str = 'GSSAPI'
+    # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()
+    # It is just alias, but when setting it manually it may misbehave with current defaults.
+    # sasl_mechanisms: str = 'GSSAPI'
     sasl_oauthbearer_config: Optional[str] = None
     sasl_password: Optional[str] = None
     sasl_username: Optional[str] = None
