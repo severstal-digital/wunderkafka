@@ -28,11 +28,11 @@ def non_krb_config(boostrap_servers: str) -> RawConfig:
     }
 
 
-@pytest.fixture
-def krb_config(boostrap_servers: str) -> RawConfig:
+@pytest.fixture(params=[SecurityProtocol.sasl_ssl, SecurityProtocol.sasl_plaintext])
+def krb_config(request, boostrap_servers: str) -> RawConfig:
     return {
         'bootstrap_servers': boostrap_servers,
         'sasl_username': 'user',
         'sasl_password': 'password',
-        'security_protocol': SecurityProtocol.sasl_ssl,
+        'security_protocol': request.param,
     }
