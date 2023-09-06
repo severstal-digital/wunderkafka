@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from confluent_kafka import KafkaError
 
+from wunderkafka.config.generated import enums
 from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.logger import logger
 
@@ -9,6 +10,15 @@ from wunderkafka.logger import logger
 def exclude_gssapi(builtin_features: str) -> str:
     features = [feature.strip() for feature in builtin_features.split(',') if feature.strip() != 'sasl_gssapi']
     return ', '.join(features)
+
+
+def config_requires_kerberos(config: RDKafkaConfig) -> bool:
+    if config.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
+        return False
+    has_credentials = (config.sasl_username is not None and config.sasl_password is not None) or config.sasl_kerberos_keytab is None
+    if not has_credentials:
+        return False
+    return config.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
 
 
 def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
@@ -25,7 +35,7 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
         raise
     if 'sasl_gssapi' not in error.str():
         raise
-    if config.requires_kerberos:
+    if config_requires_kerberos(config):
         raise
     else:
         logger.warning(' '.join([

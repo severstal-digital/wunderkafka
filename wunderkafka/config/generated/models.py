@@ -116,15 +116,6 @@ class RDKafkaConfig(BaseSettings):
     topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
     topic_metadata_refresh_sparse: bool = True
 
-    @property
-    def requires_kerberos(self) -> bool:
-        if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-            return False
-        has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-        if not has_credentials:
-            return False
-        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
-
 
 class RDConsumerConfig(RDKafkaConfig):
     group_id: str
@@ -300,15 +291,6 @@ if librdkafka.__version__ >= (1, 5, 0):
         topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
-    
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -488,15 +470,6 @@ if librdkafka.__version__ >= (1, 6, 0):
         topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
-    
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -681,15 +654,6 @@ if librdkafka.__version__ >= (1, 7, 0):
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
     
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
-    
     
     class RDConsumerConfig(RDKafkaConfig):
         group_id: str
@@ -872,15 +836,6 @@ if librdkafka.__version__ >= (1, 8, 0):
         topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
-    
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1074,15 +1029,6 @@ if librdkafka.__version__ >= (1, 9, 0):
         topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
-    
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1279,15 +1225,6 @@ if librdkafka.__version__ >= (2, 0, 0):
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
     
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
-    
     
     class RDConsumerConfig(RDKafkaConfig):
         group_id: str
@@ -1481,15 +1418,6 @@ if librdkafka.__version__ >= (2, 1, 0):
         topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
-    
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1685,15 +1613,6 @@ if librdkafka.__version__ >= (2, 2, 0):
         topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
         topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
         topic_metadata_refresh_sparse: bool = True
-    
-        @property
-        def requires_kerberos(self) -> bool:
-            if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
-                return False
-            has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
-            if not has_credentials:
-                return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):

@@ -242,19 +242,6 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
                 properties.append('    # It is just alias, but when setting it manually it may misbehave with current defaults.')
             properties.append(str(prop))
 
-        if grp == '*':
-            properties += [
-                '',
-                '    @property',
-                '    def requires_kerberos(self) -> bool:',
-                "        if self.sasl_mechanism.casefold() != 'GSSAPI'.casefold():",
-                '            return False',
-                '        has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None',
-                '        if not has_credentials:',
-                '            return False',
-                '        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}',
-            ]
-
     return properties
 
 
