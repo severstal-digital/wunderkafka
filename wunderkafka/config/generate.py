@@ -252,7 +252,7 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
                 '        has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None',
                 '        if not has_credentials:',
                 '            return False',
-                '        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}',
+                '        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}',
             ]
 
     return properties

@@ -123,7 +123,7 @@ class RDKafkaConfig(BaseSettings):
         has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
         if not has_credentials:
             return False
-        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+        return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
 
 
 class RDConsumerConfig(RDKafkaConfig):
@@ -308,7 +308,7 @@ if librdkafka.__version__ >= (1, 5, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -496,7 +496,7 @@ if librdkafka.__version__ >= (1, 6, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -688,7 +688,7 @@ if librdkafka.__version__ >= (1, 7, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -880,7 +880,7 @@ if librdkafka.__version__ >= (1, 8, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1082,7 +1082,7 @@ if librdkafka.__version__ >= (1, 9, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1286,7 +1286,7 @@ if librdkafka.__version__ >= (2, 0, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1489,7 +1489,7 @@ if librdkafka.__version__ >= (2, 1, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
@@ -1693,7 +1693,7 @@ if librdkafka.__version__ >= (2, 2, 0):
             has_credentials = (self.sasl_username is not None and self.sasl_password is not None) or self.sasl_kerberos_keytab is None
             if not has_credentials:
                 return False
-            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_ssl}
+            return self.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
     
     
     class RDConsumerConfig(RDKafkaConfig):
