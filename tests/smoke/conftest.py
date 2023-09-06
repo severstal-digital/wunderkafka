@@ -1,6 +1,7 @@
 from typing import Dict, Any
 
 import pytest
+from pytest import FixtureRequest
 
 from wunderkafka import SecurityProtocol
 
@@ -29,7 +30,7 @@ def non_krb_config(boostrap_servers: str) -> RawConfig:
 
 
 @pytest.fixture(params=[SecurityProtocol.sasl_ssl, SecurityProtocol.sasl_plaintext])
-def krb_config(request, boostrap_servers: str) -> RawConfig:
+def krb_config(request: FixtureRequest, boostrap_servers: str) -> RawConfig:
     return {
         'bootstrap_servers': boostrap_servers,
         'sasl_username': 'user',
