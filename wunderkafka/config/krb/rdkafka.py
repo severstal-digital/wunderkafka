@@ -15,8 +15,7 @@ def exclude_gssapi(builtin_features: str) -> str:
 def config_requires_kerberos(config: RDKafkaConfig) -> bool:
     if config.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
         return False
-    has_credentials = (config.sasl_username is not None and config.sasl_password is not None) or config.sasl_kerberos_keytab is None
-    if not has_credentials:
+    if config.sasl_kerberos_keytab is None:
         return False
     return config.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
 
