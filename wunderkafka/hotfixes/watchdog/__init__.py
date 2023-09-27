@@ -92,7 +92,8 @@ def check_watchdog(
         log_once.warning('Watchdog: {0}'.format(msg))
         params = parse_kinit(config.sasl_kerberos_kinit_cmd)
         config.sasl_kerberos_min_time_before_relogin = 0
-        watchdog = KrbWatchDog(params)
+        watchdog = KrbWatchDog()
+        watchdog.add(params)
     return config, watchdog
 
 
@@ -128,42 +129,30 @@ def parse_kinit(kinit_cmd: str) -> KinitParams:
 
 
 class KerberosRefreshThread(Thread):
-    def __init__(self, params: List[KinitParams]) -> None:
+    def __init__(self, params: Set[KinitParams]) -> None:
         super().__init__(daemon=True)
 
-        self._params_refresh: Dict[KinitParams, float] = {
-            p: 0.0
-            for p in params
-        }
+        self._params_refresh: Dict[KinitParams, float] = {}
+        for p in params:
+            self._refresh_krb(p)
 
-        self.refresh_all()
-        self.__run = True
         logger.info("Kerberos thread: initiated")
 
     def run(self) -> None:
         logger.info("Kerberos thread: started")
-        while self.__run:
+        while True:
             for param in self._params_refresh:
                 if time.time() >= self._params_refresh[param]:
                     self._refresh_krb(param)
             time.sleep(0.01)
-        logger.info("Kerberos thread: stopped")
 
-    def update_keytabs(self, params: List[KinitParams]) -> None:
+    def update_keytabs(self, params: Set[KinitParams]) -> None:
         for param in params:
             if param not in self._params_refresh:
-                self._params_refresh[param] = 0.0
+                self._refresh_krb(param)
                 logger.debug("The addition of the new keytab ({0}|{1}) was successful".format(
                     param.principal, param.keytab_filename
                 ))
-        self.refresh_all()
-
-    def refresh_all(self) -> None:
-        for params in self._params_refresh:
-            self._refresh_krb(params)
-
-    def stop(self) -> None:
-        self.__run = False
 
     def _refresh_krb(self, params: KinitParams) -> None:
         t0 = time.perf_counter()
@@ -188,29 +177,30 @@ class KerberosRefreshThread(Thread):
 
 class KrbWatchDog(Borg):
     __thread: Optional[KerberosRefreshThread] = None
+    __kinit_params: Set[KinitParams] = set()
 
-    def __init__(self, params: KinitParams) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        if '_KrbWatchDog__kinit_params' not in self.__dict__:
-            self.__kinit_params: List[KinitParams] = [params]
-        else:
-            self.__kinit_params = self.__dict__['_KrbWatchDog__kinit_params']
-            self.__kinit_params.append(params)
         self._ensure_started()
+
+    def add(self, params: KinitParams) -> None:
+        if params not in self.__kinit_params:
+            self.__kinit_params.add(params)
+            self._ensure_started()
+
+    @property
+    def count_params(self) -> int:
+        return len(self.__kinit_params)
 
     def _ensure_started(self) -> None:
         if self.__thread is None:
             self.__thread = KerberosRefreshThread(self.__kinit_params)
             self.__thread.start()
         else:
-            self.__thread.update_keytabs(params=self.__kinit_params)
+            self.__thread.update_keytabs(self.__kinit_params)
         if self.__thread.is_alive() is False:
             self.__thread = KerberosRefreshThread(self.__kinit_params)
             self.__thread.start()
 
     def __call__(self) -> None:
         self._ensure_started()
-
-    def stop(self) -> None:
-        if self.__thread is not None:
-            self.__thread.stop()
