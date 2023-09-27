@@ -29,7 +29,6 @@ class BytesProducer(AbstractProducer):
         try:
             super().__init__(config.dict())
         except KafkaException as exc:
-            logger.error(traceback.format_exc())
             config = challenge_krb_arg(exc, config)
             super().__init__(config.dict())
 

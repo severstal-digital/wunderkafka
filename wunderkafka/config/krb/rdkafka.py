@@ -15,8 +15,7 @@ def exclude_gssapi(builtin_features: str) -> str:
 def config_requires_kerberos(config: RDKafkaConfig) -> bool:
     if config.sasl_mechanism.casefold() != 'GSSAPI'.casefold():
         return False
-    has_credentials = (config.sasl_username is not None and config.sasl_password is not None) or config.sasl_kerberos_keytab is None
-    if not has_credentials:
+    if config.sasl_kerberos_keytab is None:
         return False
     return config.security_protocol in {enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext}
 
@@ -29,6 +28,7 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
     so we are just checking error while instantiating original consumer/producer
     and override corresponding config values.
     """
+    logger.warning('Error while instantiating consumer/producer. Checking builtin.features...')
     # https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#kafkaexception
     error = exc.args[0]
     if error.code() != KafkaError._INVALID_ARG:
