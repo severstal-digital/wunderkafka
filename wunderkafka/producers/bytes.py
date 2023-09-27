@@ -1,8 +1,13 @@
 """This module contains implementation of extended confluent-kafka Producer's API."""
 
 import atexit
+import traceback
 from typing import Any, Union, Optional
 
+from confluent_kafka import KafkaException
+
+from wunderkafka.config.krb.rdkafka import challenge_krb_arg
+from wunderkafka.logger import logger
 from wunderkafka.types import DeliveryCallback
 from wunderkafka.config import ProducerConfig
 from wunderkafka.callbacks import error_callback
@@ -21,7 +26,11 @@ class BytesProducer(AbstractProducer):
         :param config:          Pydantic model with librdkafka producer's configuration.
         :param sasl_watchdog:   Callable to handle global state of kerberos auth (see Watchdog).
         """
-        super().__init__(config.dict())
+        try:
+            super().__init__(config.dict())
+        except KafkaException as exc:
+            config = challenge_krb_arg(exc, config)
+            super().__init__(config.dict())
 
         self._config = config
         self._sasl_watchdog = sasl_watchdog

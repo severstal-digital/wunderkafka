@@ -15,6 +15,7 @@ logger = logging
 IGNORE_PYDANTIC_TYPE = '# type: ignore[valid-type]'
 
 GROUP_ID = 'group.id'
+SASL_MECHANISMS = 'sasl.mechanisms'
 
 CLS_MAPPING = {
     'P': 'class RDProducerConfig(RDKafkaConfig):',
@@ -128,6 +129,8 @@ class Row(NamedTuple):
     def __str__(self) -> str:
         if self.property_name == GROUP_ID:
             return '    {0}: str'.format(self.name)
+        if self.property_name == SASL_MECHANISMS:
+            return '    # {0}: {1} = {2}'.format(self.name, self.annotation, self.default)
         if self.property_name == 'builtin.features':
             lines = ["', '.join(["]
             spaces = ' ' * 8
@@ -233,7 +236,11 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
                     uniq.append(row)
                 already_generated.add(row.property_name)
         properties += [str(row) for row in sorted(pre, key=operator.attrgetter('name'))]
-        properties += [str(row) for row in sorted(uniq, key=operator.attrgetter('name'))]
+        for prop in sorted(uniq, key=operator.attrgetter('name')):
+            if prop.property_name == SASL_MECHANISMS:
+                properties.append('    # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()')
+                properties.append('    # It is just alias, but when setting it manually it may misbehave with current defaults.')
+            properties.append(str(prop))
 
     return properties
 

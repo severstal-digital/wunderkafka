@@ -3,6 +3,7 @@
 from typing import Dict, Type, Union, Optional
 
 from wunderkafka import ConsumerConfig, ProducerConfig
+from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.types import TopicName, MessageDescription
 from wunderkafka.serdes.avro import (
     FastAvroSerializer,
@@ -51,7 +52,10 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         config, watchdog = check_watchdog(config)
         super().__init__(
             consumer=BytesConsumer(config, watchdog),
-            schema_registry=sr_client(KerberizableHTTPClient(sr), SimpleCache()),
+            schema_registry=sr_client(
+                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config)),
+                SimpleCache(),
+            ),
             headers_handler=ConfluentClouderaHeadersHandler().parse,
             deserializer=FastAvroDeserializer(),
         )
@@ -93,7 +97,10 @@ class AvroProducer(HighLevelSerializingProducer):
         config, watchdog = check_watchdog(config)
         super().__init__(
             producer=BytesProducer(config, watchdog),
-            schema_registry=sr_client(KerberizableHTTPClient(sr), SimpleCache()),
+            schema_registry=sr_client(
+                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config)),
+                SimpleCache(),
+            ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=FastAvroSerializer(),
             store=SchemaTextRepo(),
@@ -140,7 +147,10 @@ class AvroModelProducer(HighLevelSerializingProducer):
         config, watchdog = check_watchdog(config)
         super().__init__(
             producer=BytesProducer(config, watchdog),
-            schema_registry=sr_client(KerberizableHTTPClient(sr), SimpleCache()),
+            schema_registry=sr_client(
+                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config)),
+                SimpleCache(),
+            ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=AvroModelSerializer(),
             store=AvroModelRepo(),

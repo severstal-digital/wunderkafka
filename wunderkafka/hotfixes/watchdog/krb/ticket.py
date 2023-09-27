@@ -6,7 +6,12 @@ import datetime
 import subprocess
 from typing import Set, Optional
 
-from dateutil import parser
+try:
+    from dateutil import parser
+except ImportError:
+    HAS_DATEUTIL = False
+else:
+    HAS_DATEUTIL = True
 
 from wunderkafka.logger import logger
 
@@ -109,6 +114,8 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
 
 
 def get_datetime(string: str) -> Optional[datetime.datetime]:
+    if not HAS_DATEUTIL:
+        return None
     try:
         return parser.parse(string)
     except (ValueError, OverflowError):
