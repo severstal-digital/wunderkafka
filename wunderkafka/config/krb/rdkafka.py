@@ -29,6 +29,7 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
     so we are just checking error while instantiating original consumer/producer
     and override corresponding config values.
     """
+    logger.warning('Error while instantiating consumer/producer. Checking builtin.features...')
     # https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#kafkaexception
     error = exc.args[0]
     if error.code() != KafkaError._INVALID_ARG:
