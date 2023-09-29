@@ -28,7 +28,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None
+        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -44,12 +44,13 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         :raises ValueError: if schema registry configuration is missing.
         """
         sr = config.sr
+        self._default_timeout: int = 60
         if sr is None:
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
         if sr_client is None:
             sr_client = ClouderaSRClient
 
-        config, watchdog = check_watchdog(config)
+        config, watchdog = check_watchdog(config, default_timeout=self.krb_timeout)
         super().__init__(
             consumer=BytesConsumer(config, watchdog),
             schema_registry=sr_client(
@@ -59,6 +60,16 @@ class AvroConsumer(HighLevelDeserializingConsumer):
             headers_handler=ConfluentClouderaHeadersHandler().parse,
             deserializer=FastAvroDeserializer(),
         )
+
+    @property
+    def krb_timeout(self) -> int:
+        return self._default_timeout
+
+    @krb_timeout.setter
+    def krb_timeout(self, value: int) -> None:
+        if isinstance(value, int):
+            self._default_timeout = value
+        raise TypeError
 
 
 class AvroProducer(HighLevelSerializingProducer):
@@ -93,8 +104,9 @@ class AvroProducer(HighLevelSerializingProducer):
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
         if sr_client is None:
             sr_client = ClouderaSRClient
+        self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
+        config, watchdog = check_watchdog(config, default_timeout=self.krb_timeout)
         super().__init__(
             producer=BytesProducer(config, watchdog),
             schema_registry=sr_client(
@@ -107,6 +119,16 @@ class AvroProducer(HighLevelSerializingProducer):
             mapping=mapping,
             protocol_id=protocol_id
         )
+
+    @property
+    def krb_timeout(self) -> int:
+        return self._default_timeout
+
+    @krb_timeout.setter
+    def krb_timeout(self, value: int) -> None:
+        if isinstance(value, int):
+            self._default_timeout = value
+        raise TypeError
 
 
 class AvroModelProducer(HighLevelSerializingProducer):
@@ -143,8 +165,9 @@ class AvroModelProducer(HighLevelSerializingProducer):
 
         if sr_client is None:
             sr_client = ClouderaSRClient
+        self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
+        config, watchdog = check_watchdog(config, default_timeout=self.krb_timeout)
         super().__init__(
             producer=BytesProducer(config, watchdog),
             schema_registry=sr_client(
@@ -157,6 +180,16 @@ class AvroModelProducer(HighLevelSerializingProducer):
             mapping=mapping,
             protocol_id=protocol_id
         )
+
+    @property
+    def krb_timeout(self) -> int:
+        return self._default_timeout
+
+    @krb_timeout.setter
+    def krb_timeout(self, value: int) -> None:
+        if isinstance(value, int):
+            self._default_timeout = value
+        raise TypeError
 
 
 class AvroConfluentConsumer(AvroConsumer):
