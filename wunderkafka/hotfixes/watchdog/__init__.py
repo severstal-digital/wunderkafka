@@ -135,7 +135,7 @@ def parse_kinit(kinit_cmd: str) -> Tuple[str, str, str]:
 # ToDo (tribunsky.kir): BUG. Currently handling only single kinit_cmd while it is possible to create more than one
 #                            consumer with different keytabs
 class KerberosRefreshThread(Thread):
-    def __init__(self, params: KinitParams) -> None:
+    def __init__(self, params: KinitParams, default_timeout: int = 60) -> None:
         super().__init__()
         self.daemon = True
 
@@ -145,6 +145,7 @@ class KerberosRefreshThread(Thread):
         self._refreshed = 0
         self._next_refresh_ts = 0.0
 
+        self._default_timeout = default_timeout
         self.refresh()
         logger.info("Kerberos thread: initiated")
 
@@ -160,13 +161,20 @@ class KerberosRefreshThread(Thread):
 
         logger.info('Refreshing krb-ticket ({0}|{1})...'.format(self._params.principal, self._params.keytab_filename))
         try:
-            subprocess.run(self._refresh_cmd, stdout=subprocess.PIPE, check=True)
+            subprocess.run(self._refresh_cmd, timeout=self._default_timeout, stdout=subprocess.PIPE, check=True)
         # Will retry  shortly
         except subprocess.CalledProcessError as exc:
             logger.error(exc.output)
             logger.error(exc.stdout)
             logger.error(exc.stderr)
             logger.error('Command: {0} exit code: {1}'.format(self._refresh_cmd, exc.returncode))
+            logger.warning("Krb not refreshed!")
+        except subprocess.TimeoutExpired as exc:
+            logger.error(exc.output)
+            logger.error(exc.stdout)
+            logger.error(exc.stderr)
+            logger.error(str(exc))
+            logger.warning("Krb not refreshed!")
         else:
             duration = int(1000 * (time.perf_counter() - t0))
             logger.info('Refreshed! ({0} ms)'.format(duration))
