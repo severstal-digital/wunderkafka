@@ -1,7 +1,7 @@
 import os
 import time
 import subprocess
-from typing import Any, Set, Dict, Tuple, Optional
+from typing import Any, Set, Dict, Tuple, Optional, List
 from threading import Thread
 from dataclasses import dataclass
 
@@ -90,14 +90,10 @@ def check_watchdog(
             'For more info, please, check https://github.com/edenhill/librdkafka/pull/3340',
         ])
         log_once.warning('Watchdog: {0}'.format(msg))
-        user, realm, keytab = parse_kinit(config.sasl_kerberos_kinit_cmd)
+        params = parse_kinit(config.sasl_kerberos_kinit_cmd)
         config.sasl_kerberos_min_time_before_relogin = 0
-        watchdog = KrbWatchDog(KinitParams(
-            user=user,
-            realm=realm,
-            keytab=keytab,
-            cmd=config.sasl_kerberos_kinit_cmd,
-        ))
+        watchdog = KrbWatchDog()
+        watchdog.add(params)
     return config, watchdog
 
 
@@ -108,7 +104,7 @@ class Borg(object):
         self.__dict__ = self._shared_state
 
 
-def parse_kinit(kinit_cmd: str) -> Tuple[str, str, str]:
+def parse_kinit(kinit_cmd: str) -> KinitParams:
     kinit_cmd_msg = 'kinit_cmd: `{0}`'.format(kinit_cmd)
     parts = []
     keytab = None
@@ -129,63 +125,79 @@ def parse_kinit(kinit_cmd: str) -> Tuple[str, str, str]:
     user, realm = principal.split(delim)
     if not (user and realm):
         raise ValueError("Couldn't parse principal: {0} ({1})".format(principal, kinit_cmd_msg))
-    return user, realm, keytab
+    return KinitParams(user=user, realm=realm, keytab=keytab, cmd=kinit_cmd)
 
 
-# ToDo (tribunsky.kir): BUG. Currently handling only single kinit_cmd while it is possible to create more than one
-#                            consumer with different keytabs
 class KerberosRefreshThread(Thread):
-    def __init__(self, params: KinitParams) -> None:
-        super().__init__()
-        self.daemon = True
+    def __init__(self, params: Set[KinitParams]) -> None:
+        super().__init__(daemon=True)
 
-        self._params = params
-        self._refresh_cmd = params.cmd.split()
+        self._params_refresh: Dict[KinitParams, float] = {}
+        for p in params:
+            self._refresh_krb(p)
 
-        self._refreshed = 0
-        self._next_refresh_ts = 0.0
-
-        self.refresh()
         logger.info("Kerberos thread: initiated")
 
     def run(self) -> None:
         logger.info("Kerberos thread: started")
         while True:
-            if time.time() >= self._next_refresh_ts:
-                self.refresh()
+            for param in self._params_refresh:
+                if time.time() >= self._params_refresh[param]:
+                    self._refresh_krb(param)
             time.sleep(0.01)
 
-    def refresh(self) -> None:
-        t0 = time.perf_counter()
+    def update_keytabs(self, params: Set[KinitParams]) -> None:
+        for param in params:
+            if param not in self._params_refresh:
+                self._refresh_krb(param)
+                logger.debug("The addition of the new keytab ({0}|{1}) was successful".format(
+                    param.principal, param.keytab_filename
+                ))
 
-        logger.info('Refreshing krb-ticket ({0}|{1})...'.format(self._params.principal, self._params.keytab_filename))
+    def _refresh_krb(self, params: KinitParams) -> None:
+        t0 = time.perf_counter()
+        refresh_cmd = params.cmd.split()
+        logger.info('Refreshing krb-ticket ({0}|{1})...'.format(params.principal, params.keytab_filename))
         try:
-            subprocess.run(self._refresh_cmd, stdout=subprocess.PIPE, check=True)
+            subprocess.run(refresh_cmd, stdout=subprocess.PIPE, check=True)
         # Will retry  shortly
         except subprocess.CalledProcessError as exc:
             logger.error(exc.output)
             logger.error(exc.stdout)
             logger.error(exc.stderr)
-            logger.error('Command: {0} exit code: {1}'.format(self._refresh_cmd, exc.returncode))
+            logger.error('Command: {0} exit code: {1}'.format(refresh_cmd, exc.returncode))
         else:
             duration = int(1000 * (time.perf_counter() - t0))
             logger.info('Refreshed! ({0} ms)'.format(duration))
-            self._next_refresh_ts = get_expiration_ts(self._params.user, self._params.realm)
-            logger.debug('Nearest existing: {0}'.format(ts2dt(self._next_refresh_ts)))
+            self._params_refresh[params] = get_expiration_ts(params.user, params.realm)
+            logger.debug('Nearest existing: {0} keytab: ({1}|{2})'.format(
+                ts2dt(self._params_refresh[params]), params.principal, params.keytab_filename)
+            )
 
 
 class KrbWatchDog(Borg):
     __thread: Optional[KerberosRefreshThread] = None
+    __kinit_params: Set[KinitParams] = set()
 
-    def __init__(self, params: KinitParams):
+    def __init__(self) -> None:
         super().__init__()
-        self.__kinit_params: KinitParams = params
         self._ensure_started()
+
+    def add(self, params: KinitParams) -> None:
+        if params not in self.__kinit_params:
+            self.__kinit_params.add(params)
+            self._ensure_started()
+
+    @property
+    def count_params(self) -> int:
+        return len(self.__kinit_params)
 
     def _ensure_started(self) -> None:
         if self.__thread is None:
             self.__thread = KerberosRefreshThread(self.__kinit_params)
             self.__thread.start()
+        else:
+            self.__thread.update_keytabs(self.__kinit_params)
         if self.__thread.is_alive() is False:
             self.__thread = KerberosRefreshThread(self.__kinit_params)
             self.__thread.start()
