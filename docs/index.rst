@@ -21,6 +21,7 @@ Wunderkafka provides handful facade for C-powered consumer/producer. It's built 
    pages/advanced_usage.rst
    pages/install.rst
    pages/errata.rst
+   krb_thread.rst
 
 .. toctree::
    :maxdepth: 2

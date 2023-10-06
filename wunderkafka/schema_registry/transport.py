@@ -45,7 +45,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
 
     @property
     def base_url(self) -> str:
-        return self._base_url
+        return str(self._base_url)
 
     def close(self) -> None:
         self._session.close()
