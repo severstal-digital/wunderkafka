@@ -44,7 +44,6 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         :raises ValueError: if schema registry configuration is missing.
         """
         sr = config.sr
-        cmd_kinit = config.sasl_kerberos_kinit_cmd
 
         if sr is None:
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
@@ -55,7 +54,8 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         super().__init__(
             consumer=BytesConsumer(config, watchdog),
             schema_registry=sr_client(
-                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config), cmd_kinit=cmd_kinit),
+                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config),
+                                       cmd_kinit=config.sasl_kerberos_kinit_cmd),
                 SimpleCache(),
             ),
             headers_handler=ConfluentClouderaHeadersHandler().parse,
@@ -91,7 +91,6 @@ class AvroProducer(HighLevelSerializingProducer):
         :raises ValueError: if schema registry configuration is missing.
         """
         sr = config.sr
-        cmd_kinit = config.sasl_kerberos_kinit_cmd
 
         if sr is None:
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
@@ -102,7 +101,8 @@ class AvroProducer(HighLevelSerializingProducer):
         super().__init__(
             producer=BytesProducer(config, watchdog),
             schema_registry=sr_client(
-                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config), cmd_kinit=cmd_kinit),
+                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config),
+                                       cmd_kinit=config.sasl_kerberos_kinit_cmd),
                 SimpleCache(),
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
@@ -142,7 +142,6 @@ class AvroModelProducer(HighLevelSerializingProducer):
         :raises ValueError: if schema registry configuration is missing.
         """
         sr = config.sr
-        cmd_kinit = config.sasl_kerberos_kinit_cmd
 
         if sr is None:
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
@@ -154,7 +153,8 @@ class AvroModelProducer(HighLevelSerializingProducer):
         super().__init__(
             producer=BytesProducer(config, watchdog),
             schema_registry=sr_client(
-                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config), cmd_kinit=cmd_kinit),
+                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config),
+                                       cmd_kinit=config.sasl_kerberos_kinit_cmd),
                 SimpleCache(),
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
