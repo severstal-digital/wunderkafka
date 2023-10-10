@@ -1,7 +1,7 @@
 import os
 import time
 import subprocess
-from typing import Any, Set, Dict, Tuple, Optional, List
+from typing import Any, Set, Dict, Tuple, Optional
 from threading import Thread
 from dataclasses import dataclass
 
@@ -129,14 +129,24 @@ def parse_kinit(kinit_cmd: str) -> KinitParams:
 
 
 class KerberosRefreshThread(Thread):
-    def __init__(self, params: Set[KinitParams]) -> None:
-        super().__init__(daemon=True)
+    def __init__(self, params: Set[KinitParams], default_timeout: int) -> None:
+        super().__init__()
+        self.daemon = True
 
         self._params_refresh: Dict[KinitParams, float] = {}
         for p in params:
             self._refresh_krb(p)
 
+        self._default_timeout = default_timeout
         logger.info("Kerberos thread: initiated")
+
+    @property
+    def krb_timeout(self) -> int:
+        return self._default_timeout
+
+    @krb_timeout.setter
+    def krb_timeout(self, value: int) -> None:
+        self._default_timeout = value
 
     def run(self) -> None:
         logger.info("Kerberos thread: started")
@@ -159,17 +169,18 @@ class KerberosRefreshThread(Thread):
         refresh_cmd = params.cmd.split()
         logger.info('Refreshing krb-ticket ({0}|{1})...'.format(params.principal, params.keytab_filename))
         try:
-            subprocess.run(refresh_cmd, stdout=subprocess.PIPE, check=True)
-        # Will retry  shortly
-        except subprocess.CalledProcessError as exc:
+            subprocess.run(refresh_cmd, timeout=self._default_timeout, stdout=subprocess.PIPE, check=True)
+        # Will retry shortly
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
             logger.error(exc.output)
             logger.error(exc.stdout)
             logger.error(exc.stderr)
-            logger.error('Command: {0} exit code: {1}'.format(refresh_cmd, exc.returncode))
+            logger.error('Command: {0} exit error: {1}'.format(refresh_cmd, str(exc)))
+            logger.warning("Krb not refreshed!")
         else:
             duration = int(1000 * (time.perf_counter() - t0))
             logger.info('Refreshed! ({0} ms)'.format(duration))
-            self._params_refresh[params] = get_expiration_ts(params.user, params.realm)
+            self._params_refresh[params] = get_expiration_ts(params.user, params.realm, self._default_timeout)
             logger.debug('Nearest existing: {0} keytab: ({1}|{2})'.format(
                 ts2dt(self._params_refresh[params]), params.principal, params.keytab_filename)
             )
@@ -178,6 +189,7 @@ class KerberosRefreshThread(Thread):
 class KrbWatchDog(Borg):
     __thread: Optional[KerberosRefreshThread] = None
     __kinit_params: Set[KinitParams] = set()
+    __default_timeout: int = 60
 
     def __init__(self) -> None:
         super().__init__()
@@ -189,17 +201,28 @@ class KrbWatchDog(Borg):
             self._ensure_started()
 
     @property
+    def krb_timeout(self) -> int:
+        return self.__default_timeout
+
+    @krb_timeout.setter
+    def krb_timeout(self, value: int) -> None:
+        if self.__thread is not None:
+            if int(value) > 0:
+                self.__default_timeout = value
+            self.__thread.krb_timeout = self.__default_timeout
+
+    @property
     def count_params(self) -> int:
         return len(self.__kinit_params)
 
     def _ensure_started(self) -> None:
         if self.__thread is None:
-            self.__thread = KerberosRefreshThread(self.__kinit_params)
+            self.__thread = KerberosRefreshThread(self.__kinit_params, self.__default_timeout)
             self.__thread.start()
         else:
             self.__thread.update_keytabs(self.__kinit_params)
         if self.__thread.is_alive() is False:
-            self.__thread = KerberosRefreshThread(self.__kinit_params)
+            self.__thread = KerberosRefreshThread(self.__kinit_params, self.__default_timeout)
             self.__thread.start()
 
     def __call__(self) -> None:

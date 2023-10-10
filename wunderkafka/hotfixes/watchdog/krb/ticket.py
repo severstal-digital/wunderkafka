@@ -88,12 +88,12 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
     new_env = {**os.environ, 'LC_ALL': 'POSIX'}
     # logger.debug('Subprocess env to run klist: {0}'.format(new_env))
     try:
-        proc = subprocess.run(klist_cmd, stdout=subprocess.PIPE, check=True, env=new_env)
-    except subprocess.CalledProcessError as exc:
+        proc = subprocess.run(klist_cmd, timeout=default_timeout, stdout=subprocess.PIPE, check=True, env=new_env)
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
         logger.error(exc.output)
         logger.error(exc.stdout)
         logger.error(exc.stderr)
-        logger.error('klist exit code: {0}'.format(exc.returncode))
+        logger.error('klist exit: {0}'.format(str(exc)))
         return time.time() + default_timeout
     else:
         expire_dates = []

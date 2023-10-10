@@ -28,7 +28,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None
+        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -44,6 +44,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         :raises ValueError: if schema registry configuration is missing.
         """
         sr = config.sr
+        self._default_timeout: int = 60
         if sr is None:
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
         if sr_client is None:
@@ -93,6 +94,7 @@ class AvroProducer(HighLevelSerializingProducer):
             raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
         if sr_client is None:
             sr_client = ClouderaSRClient
+        self._default_timeout: int = 60
 
         config, watchdog = check_watchdog(config)
         super().__init__(
@@ -143,6 +145,7 @@ class AvroModelProducer(HighLevelSerializingProducer):
 
         if sr_client is None:
             sr_client = ClouderaSRClient
+        self._default_timeout: int = 60
 
         config, watchdog = check_watchdog(config)
         super().__init__(
