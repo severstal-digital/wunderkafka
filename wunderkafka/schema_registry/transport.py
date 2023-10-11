@@ -5,15 +5,21 @@ from typing import Any
 import requests
 
 from wunderkafka.config.krb.schema_registry import HTTPKerberosAuth
+from wunderkafka.hotfixes.watchdog import parse_kinit, KrbWatchDog
 from wunderkafka.logger import logger
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
 from wunderkafka.config.schema_registry import SRConfig
 
 
 class KerberizableHTTPClient(AbstractHTTPClient):
-    def __init__(self, config: SRConfig, *, requires_kerberos: bool = False, save_replay: bool = False) -> None:
+    def __init__(self, config: SRConfig, *, requires_kerberos: bool = False, save_replay: bool = False,
+                cmd_kinit: str) -> None:
         s = requests.Session()
         if requires_kerberos:
+            params = parse_kinit(cmd_kinit)
+            watchdog = KrbWatchDog()
+            watchdog.add(params)
+
             s.auth = HTTPKerberosAuth(
                 principal=config.sasl_username,
                 mutual_authentication=config.mutual_auth,
