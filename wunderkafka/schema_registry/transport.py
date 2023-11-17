@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Any
+from typing import Any, Optional
 
 import requests
 
@@ -12,10 +12,16 @@ from wunderkafka.config.schema_registry import SRConfig
 
 
 class KerberizableHTTPClient(AbstractHTTPClient):
-    def __init__(self, config: SRConfig, *, requires_kerberos: bool = False, save_replay: bool = False,
-                cmd_kinit: str) -> None:
+    def __init__(
+        self, 
+        config: SRConfig, 
+        *, 
+        requires_kerberos: bool = False, 
+        save_replay: bool = False,
+        cmd_kinit: Optional[str] = None
+    ) -> None:
         s = requests.Session()
-        if requires_kerberos:
+        if requires_kerberos and cmd_kinit is not None:
             params = parse_kinit(cmd_kinit)
             watchdog = KrbWatchDog()
             watchdog.add(params)
