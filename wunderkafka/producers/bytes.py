@@ -1,13 +1,11 @@
 """This module contains implementation of extended confluent-kafka Producer's API."""
 
 import atexit
-import traceback
 from typing import Any, Union, Optional
 
 from confluent_kafka import KafkaException
 
 from wunderkafka.config.krb.rdkafka import challenge_krb_arg
-from wunderkafka.logger import logger
 from wunderkafka.types import DeliveryCallback
 from wunderkafka.config import ProducerConfig
 from wunderkafka.callbacks import error_callback
@@ -57,6 +55,7 @@ class BytesProducer(AbstractProducer):
         on_delivery: Optional[DeliveryCallback] = error_callback,
         *args: Any,
         blocking: bool = False,
+        timeout: int = 10,
         **kwargs: Any,
     ) -> None:
         if self._sasl_watchdog is not None:
@@ -66,6 +65,6 @@ class BytesProducer(AbstractProducer):
         else:
             self.produce(topic, value, key=key, on_delivery=on_delivery, **kwargs)
         if blocking:
-            self.flush()
+            self.flush(timeout=timeout)
         else:
-            self.poll(0)
+            self.poll(timeout=timeout)
