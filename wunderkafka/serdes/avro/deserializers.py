@@ -16,7 +16,7 @@ class FastAvroDeserializer(AbstractDeserializer):
 
     def deserialize(self, schema: str, blob: bytes, seek_pos: Optional[int] = None) -> Any:
         if schema not in self._cache:
-            self._cache[schema] = parse_schema(loads(schema))
+            self._cache[schema] = parse_schema(loads(schema))  # type: ignore[assignment]
         reader_schema = self._cache[schema]
         with io.BytesIO(blob) as buffer:
             if seek_pos is not None:

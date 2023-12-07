@@ -5,7 +5,7 @@ from typing import Any, Optional
 import requests
 
 from wunderkafka.config.krb.schema_registry import HTTPKerberosAuth
-from wunderkafka.hotfixes.watchdog import parse_kinit, KrbWatchDog
+from wunderkafka.hotfixes.watchdog import parse_kinit, KrbWatchDog, check_watchdog, get_version
 from wunderkafka.logger import logger
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
 from wunderkafka.config.schema_registry import SRConfig
@@ -22,9 +22,10 @@ class KerberizableHTTPClient(AbstractHTTPClient):
     ) -> None:
         s = requests.Session()
         if requires_kerberos and cmd_kinit is not None:
-            params = parse_kinit(cmd_kinit)
-            watchdog = KrbWatchDog()
-            watchdog.add(params)
+            if get_version() < (1, 7):
+                params = parse_kinit(cmd_kinit)
+                watchdog = KrbWatchDog()
+                watchdog.add(params)
 
             s.auth = HTTPKerberosAuth(
                 principal=config.sasl_username,
