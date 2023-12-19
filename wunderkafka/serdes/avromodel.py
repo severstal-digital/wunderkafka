@@ -1,47 +1,88 @@
+import inspect
+import copy
 import json
+from typing import get_args
 from typing import Any, Dict, Type
 from dataclasses import is_dataclass
 
-from pydantic import BaseModel
+from dataclasses_avroschema.pydantic import AvroBaseModel
+from pydantic import BaseModel, create_model
+from dataclasses_avroschema import ModelGenerator, BaseClassEnum
+
 
 from dataclasses_avroschema import AvroModel
-from pydantic_core import PydanticUndefinedType
+from pydantic._internal._typing_extra import is_generic_alias
+
+from typing import List, get_origin, get_args
+
+from pydantic.fields import FieldInfo
 
 
-def derive(model: Type[object], topic: str, *, is_key: bool = False) -> str:
-    if is_dataclass(model):
+def is_generic_type(annotation):
+    return get_origin(annotation) is not None and len(get_args(annotation)) > 0
+
+
+def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
+    attributes = {}
+    for field_name, field_info in model_type.model_fields.items():
+        annotation_type = field_info.annotation
+        if isinstance(annotation_type, BaseModel):
+            attributes[field_name] = create_model(model_type.__name__, __base__=(annotation_type, AvroBaseModel))
+        else:
+            if is_generic_type(annotation_type):
+                arguments = []
+                for arg in get_args(annotation_type):
+                    if issubclass(arg, BaseModel):
+                        arguments.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
+                    else:
+                        arguments.append(arg)
+                new_annotation = get_origin(annotation_type)[*arguments]
+                field_info.annotation = new_annotation
+                attributes[field_name] = (new_annotation, field_info)
+            else:
+                if issubclass(annotation_type, BaseModel):
+                    new_type = _create_model(annotation_type)
+                    field_info.annotation = new_type
+                    attributes[field_name] = (new_type, field_info)
+                else:
+                    attributes[field_name] = (annotation_type, field_info)
+    return attributes
+
+
+def _create_model(model_type: Type[BaseModel]) -> Type[AvroBaseModel]:
+    attributes = get_model_attributes(model_type)
+    crafted_model = create_model(model_type.__name__, __base__=AvroBaseModel, **attributes)
+    return crafted_model
+
+
+def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str:
+    if is_dataclass(model_type):
         # https://github.com/python/mypy/issues/14941
-        model_schema = model.avro_schema_to_python()                                                      # type: ignore
+        model_schema = model_type.avro_schema_to_python()                                                      # type: ignore
+    elif issubclass(model_type, AvroBaseModel):
+        model_schema = model_type.avro_schema_to_python()
+    elif issubclass(model_type, BaseModel):
+        mdl = _create_model(model_type)
+        model_schema = mdl.avro_schema_to_python()
     else:
         # non-dataclasses objects may allow mixing defaults and non-default fields order,
         # so to still reuse dataclasses_avroschema, we extract fields and reorder them to satisfy dataclasses
         # restrictions, than reorder them back.
         # All this hacks will work only for flat schemas: we avoid describing objects via nested types for HDFS's sake.
-        attributes = _extract_attributes(model)
+        attributes = _extract_attributes(model_type)
         ordering = list(attributes['__annotations__'])
-        crafted_model = _construct_model(attributes, model)
+        crafted_model = type(model_type.__name__, (AvroModel,), attributes)                                    # type: ignore
         model_schema = crafted_model.avro_schema_to_python()
         fields_map = {field_data['name']: field_data for field_data in model_schema['fields']}
         reordered_fields = [fields_map[attr] for attr in ordering]
         model_schema['fields'] = reordered_fields
     model_schema.pop('doc', None)
     suffix = 'key' if is_key else 'value'
-    if hasattr(model, 'Meta') and hasattr(model.Meta, 'name'):
-        model_schema['name'] = model.Meta.name
+    if hasattr(model_type, 'Meta') and hasattr(model_type.Meta, 'name'):
+        model_schema['name'] = model_type.Meta.name
     else:
         model_schema['name'] = '{0}_{1}'.format(topic, suffix)
     return json.dumps(model_schema)
-
-
-def _construct_model(attrs: Dict[str, Any], type_: Type[object]) -> AvroModel:
-    if issubclass(type_, BaseModel):
-        for field_name, field_info in type_.model_fields.items():
-            if not isinstance(field_info.default, PydanticUndefinedType):
-                attrs[field_name] = field_info.default
-                tp = attrs['__annotations__'].pop(field_name)
-                attrs['__annotations__'].update({field_name: tp})
-    # https://docs.python.org/3/library/functions.html?highlight=type#type
-    return type(type_.__name__, (AvroModel,), attrs)                                                      # type: ignore
 
 
 def _extract_attributes(type_: Type[object]) -> Dict[str, Any]:
