@@ -1,6 +1,7 @@
 import json
+import sys
 import time
-from typing import Optional, List
+from typing import Optional, Union
 from datetime import datetime
 from dataclasses import dataclass
 
@@ -358,3 +359,71 @@ def test_pydantic_base_settings_v2_with_defaults() -> None:
 
 def test_avro_model():
     schema = derive(AvroSimilarImage, topic='test_data_1')
+    assert json.loads(schema) == {
+        'type': 'record',
+        'name': 'test_data_1_value',
+        'fields': [
+            {
+                'name': 'id',
+                 'type': {
+                     'type': 'string',
+                     'logicalType': 'uuid',
+                     'pydantic-class': 'UUID4'
+                 }
+             }
+        ]
+    }
+
+
+if sys.version_info <= (3, 10):
+    class ParentOptional(BaseModel):
+        volume: float = Field(description='...')
+        weight: Optional[float] = Field(description='...')
+
+    class ParentUnion(BaseModel):
+        payload: Union[bytes, str]
+        value: float
+else:
+    class ParentOptional(BaseModel):
+        volume: float = Field(description='...')
+        weight: float | None = Field(description='...')
+
+    class ParentUnion(BaseModel):
+        payload: bytes | str
+        value: float
+
+
+def test_optional_type() -> None:
+    schema = derive(ParentOptional, topic='test_data_1')
+    assert json.loads(schema) == {
+        'type': 'record',
+        'name': 'test_data_1_value',
+        'fields': [
+            {
+                'name': 'volume',
+                'type': 'double',
+            },
+            {
+                'name': 'weight',
+                'type': ['double', 'null'],
+            },
+        ],
+    }
+
+
+def test_union_type() -> None:
+    schma = derive(ParentUnion, topic='test_data_1')
+    assert json.loads(schma) == {
+        'type': 'record',
+        'name': 'test_data_1_value',
+        'fields': [
+            {
+                'name': 'payload',
+                'type': ['bytes', 'string'],
+            },
+            {
+                'name': 'value',
+                'type': 'double',
+            },
+        ],
+    }

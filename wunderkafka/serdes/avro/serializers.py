@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional
 from dataclasses import asdict, is_dataclass
 
 from fastavro import parse_schema, schemaless_writer
+from pydantic import BaseModel
 
 from wunderkafka.serdes.abc import AbstractSerializer
 from wunderkafka.serdes.avro.types import FastAvroParsedSchema
@@ -30,5 +31,8 @@ class AvroModelSerializer(AbstractSerializer):
         self._serializer = FastAvroSerializer()
 
     def serialize(self, schema: str, payload: Any, header: Optional[bytes] = None) -> bytes:
-        payload = asdict(payload) if is_dataclass(payload) else dict(payload)
-        return self._serializer.serialize(schema, payload, header)
+        if isinstance(payload, BaseModel):
+            dct = payload.model_dump()
+        else:
+            dct = asdict(payload) if is_dataclass(payload) else dict(payload)
+        return self._serializer.serialize(schema, dct, header)

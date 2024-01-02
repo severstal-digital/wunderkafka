@@ -1,21 +1,13 @@
-import inspect
-import copy
 import json
-from typing import get_args
-from typing import Any, Dict, Type
+import inspect
+from types import UnionType
+from typing import Any, Dict, Type, Union, get_origin, get_args
 from dataclasses import is_dataclass
 
-from dataclasses_avroschema.pydantic import AvroBaseModel
-from pydantic import BaseModel, create_model
-from dataclasses_avroschema import ModelGenerator, BaseClassEnum
-
-
 from dataclasses_avroschema import AvroModel
-from pydantic._internal._typing_extra import is_generic_alias
-
-from typing import List, get_origin, get_args
-
-from pydantic.fields import FieldInfo
+from dataclasses_avroschema.pydantic import AvroBaseModel
+from dataclasses_avroschema.utils import SchemaMetadata
+from pydantic import BaseModel, create_model
 
 
 def is_generic_type(annotation):
@@ -25,6 +17,10 @@ def is_generic_type(annotation):
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
     attributes = {}
     for field_name, field_info in model_type.model_fields.items():
+        # Here we are changing original model just for schema derivation, so we can override almost everything
+        # https://github.com/marcosschroh/dataclasses-avroschema/issues/400
+        if field_info.default_factory is not None:
+            field_info.default_factory = None
         annotation_type = field_info.annotation
         if isinstance(annotation_type, BaseModel):
             attributes[field_name] = create_model(model_type.__name__, __base__=(annotation_type, AvroBaseModel))
@@ -36,7 +32,13 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
                         arguments.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
                     else:
                         arguments.append(arg)
-                new_annotation = get_origin(annotation_type)[*arguments]
+                generic = get_origin(annotation_type)
+                # https://bugs.python.org/issue45418
+                is_union_type = inspect.isclass(generic) and issubclass(generic, UnionType)
+                if is_union_type:
+                    new_annotation = Union[*arguments]
+                else:
+                    new_annotation = generic[*arguments]
                 field_info.annotation = new_annotation
                 attributes[field_name] = (new_annotation, field_info)
             else:
@@ -51,14 +53,14 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
 
 def _create_model(model_type: Type[BaseModel]) -> Type[AvroBaseModel]:
     attributes = get_model_attributes(model_type)
-    crafted_model = create_model(model_type.__name__, __base__=AvroBaseModel, **attributes)
+    crafted_model = create_model(model_type.__name__, __base__=(model_type, AvroBaseModel), **attributes)
     return crafted_model
 
 
 def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str:
     if is_dataclass(model_type):
         # https://github.com/python/mypy/issues/14941
-        model_schema = model_type.avro_schema_to_python()                                                      # type: ignore
+        model_schema = model_type.avro_schema_to_python()                                                 # type: ignore
     elif issubclass(model_type, AvroBaseModel):
         model_schema = model_type.avro_schema_to_python()
     elif issubclass(model_type, BaseModel):
@@ -71,7 +73,7 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
         # All this hacks will work only for flat schemas: we avoid describing objects via nested types for HDFS's sake.
         attributes = _extract_attributes(model_type)
         ordering = list(attributes['__annotations__'])
-        crafted_model = type(model_type.__name__, (AvroModel,), attributes)                                    # type: ignore
+        crafted_model = type(model_type.__name__, (AvroModel,), attributes)                               # type: ignore
         model_schema = crafted_model.avro_schema_to_python()
         fields_map = {field_data['name']: field_data for field_data in model_schema['fields']}
         reordered_fields = [fields_map[attr] for attr in ordering]
