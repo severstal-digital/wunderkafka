@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import pytest
 from dataclasses_avroschema.pydantic import AvroBaseModel
@@ -128,7 +128,7 @@ def test_nested_base_model_list() -> None:
 
 
 class HasDictStrSchema(BaseModel):
-    dct: dict[str, NestedModel]
+    dct: Dict[str, NestedModel]
 
 
 def test_nested_base_model_dict_str_key() -> None:
@@ -163,14 +163,13 @@ def test_nested_base_model_dict_str_key() -> None:
 
 
 class HasDictIntSchema(BaseModel):
-    dct: dict[int, NestedModel]
+    dct: Dict[int, NestedModel]
 
 
 def test_nested_base_model_dict_int_key() -> None:
     # InvalidMap derived from Exception =/
     with pytest.raises(Exception):
         derive(HasDictIntSchema, topic='test_data_1')
-
 
 
 class Error(BaseModel):

@@ -1,6 +1,4 @@
 import json
-import inspect
-from types import UnionType
 from typing import Any, Dict, Type, Union, get_origin, get_args, FrozenSet, Final, Optional
 from dataclasses import is_dataclass
 
@@ -8,6 +6,8 @@ from dataclasses_avroschema import AvroModel
 from dataclasses_avroschema.pydantic import AvroBaseModel
 from pydantic import BaseModel, create_model, ConfigDict
 from pydantic_settings import BaseSettings
+
+from wunderkafka.serdes.compat.typing import get_generic, create_annotation, is_union_type
 
 PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
     'model_config',
@@ -24,7 +24,7 @@ def is_generic_type(annotation: Optional[Type[object]]) -> bool:
 
 
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
-    attributes: dict[str, Any] = {}
+    attributes: Dict[str, Any] = {}
     for field_name, field_info in model_type.model_fields.items():
         # Here we are changing original model just for schema derivation, so we can override almost everything
         # https://github.com/marcosschroh/dataclasses-avroschema/issues/400
@@ -38,21 +38,21 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
                 attributes[field_name] = (annotation_type, field_info)
             else:
                 if is_generic_type(annotation_type):
-                    arguments = []
+                    types_list = []
                     for arg in get_args(annotation_type):
                         if issubclass(arg, BaseModel):
-                            arguments.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
+                            types_list.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
                         else:
-                            arguments.append(arg)
-                    generic = get_origin(annotation_type)
+                            types_list.append(arg)
+                    generic = get_generic(annotation_type)
                     # already checked in is_generic_type
                     # so this is just for mypy only
                     assert generic is not None
                     # https://bugs.python.org/issue45418
-                    is_union_type = inspect.isclass(generic) and issubclass(generic, UnionType)
-                    if is_union_type:
+                    union_type = is_union_type(generic)
+                    if union_type:
                         generic = Union
-                    new_annotation = generic[*arguments]
+                    new_annotation = create_annotation(generic, types_list)
                     field_info.annotation = new_annotation
                     attributes[field_name] = (new_annotation, field_info)
                 else:
