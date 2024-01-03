@@ -2,7 +2,7 @@ import inspect
 import sys
 import typing
 from types import MappingProxyType
-from typing import Type, Union, Any, get_origin
+from typing import Any, Generic, List, Type, Union, get_origin
 
 HAS_UNION_TYPE = True
 try:
@@ -11,7 +11,7 @@ except ImportError:
     HAS_UNION_TYPE = False
 
 
-def create_annotation(generic: Type[object], types_list: Type[object]) -> Type[object]:
+def create_annotation(generic: Any, types_list: List[Type[object]]) -> Type[object]:
     # return generic[Union[types_list]]
     return generic[tuple(types_list)]
 
