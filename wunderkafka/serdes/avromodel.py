@@ -1,13 +1,22 @@
 import json
 import inspect
 from types import UnionType
-from typing import Any, Dict, Type, Union, get_origin, get_args
+from typing import Any, Dict, Type, Union, get_origin, get_args, FrozenSet, Final
 from dataclasses import is_dataclass
 
 from dataclasses_avroschema import AvroModel
 from dataclasses_avroschema.pydantic import AvroBaseModel
-from dataclasses_avroschema.utils import SchemaMetadata
-from pydantic import BaseModel, create_model
+from pydantic import BaseModel, create_model, ConfigDict
+from pydantic_settings import BaseSettings
+
+PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
+    'model_config',
+    'model_fields',
+    # even the latest ones are properties, we don't want to shadow them too
+    'model_computed_fields',
+    'model_extra',
+    'model_fields_set',
+})
 
 
 def is_generic_type(annotation):
@@ -57,7 +66,29 @@ def _create_model(model_type: Type[BaseModel]) -> Type[AvroBaseModel]:
     return crafted_model
 
 
+def _check_pydantic_service_fields(model_type: Type[object]) -> None:
+    if issubclass(model_type, BaseModel):
+        all_annotations = set()
+        for model in model_type.mro():
+            # fragile, maybe it's better to check any of the fields
+            is_just_a_base_model = model is BaseModel or model is BaseSettings
+            if not is_just_a_base_model:
+                for annotation in vars(model).get('__annotations__', {}):
+                    is_real_config_dict = annotation == 'model_config' and model.__annotations__[annotation] is ConfigDict
+                    if not is_real_config_dict:
+                        all_annotations.add(annotation)
+        has_protected_fields = all_annotations & PYDANTIC_PROTECTED_FIELDS
+        if has_protected_fields:
+            msg = ' '.join([
+                'Pydantic model {0} has protected fields {1}.'.format(model_type, has_protected_fields),
+                'Please use another name for your field.',
+                'Even if we may derive a schema with such field(s), it would be impossible to instantiate a model',
+            ])
+            raise ValueError(msg)
+
+
 def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str:
+    _check_pydantic_service_fields(model_type)
     if is_dataclass(model_type):
         # https://github.com/python/mypy/issues/14941
         model_schema = model_type.avro_schema_to_python()                                                 # type: ignore

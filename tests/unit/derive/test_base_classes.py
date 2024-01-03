@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 import pytest
 from dataclasses_avroschema.pydantic import AvroBaseModel
-from pydantic import Field, BaseModel, ValidationError, UUID4
+from pydantic import Field, BaseModel, ValidationError, UUID4, ConfigDict
 from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
@@ -53,6 +53,17 @@ class MetricV2(BaseSettings):
     model_config: str                                                                                     # type: ignore
 
 
+class MetricV21(BaseModel):
+    line_speed: Optional[int]
+    defect_detected: Optional[bool] = False
+    model_on: Optional[bool] = False
+    squad_number: int = 0
+    model_config: str
+
+    class Config:
+        extra = 'allow'
+
+
 class Event(BaseModel):
     id: Optional[int]
     ts: Optional[int] = None
@@ -93,6 +104,16 @@ class TsWithMeta(BaseModel):
 
 class AvroSimilarImage(AvroBaseModel):
     id: UUID4
+
+
+class User1(BaseModel):
+    model_config = ConfigDict(extra='ignore')
+    name: str
+
+
+class User2(BaseModel):
+    model_config: ConfigDict = ConfigDict(extra='ignore')
+    name: str
 
 
 def test_dataclass() -> None:
@@ -311,50 +332,19 @@ def test_pydantic_base_settings_with_defaults() -> None:
 
 
 def test_pydantic_base_settings_v2_with_defaults() -> None:
-    schema = derive(MetricV2, topic='some_topic')
+    with pytest.raises(ValueError):
+        derive(MetricV2, topic='some_topic')
 
-    assert json.loads(schema) == {
-      "type": "record",
-      "name": "some_topic_value",
-      "fields": [
-        {
-          "name": "line_speed",
-          "type": [
-            "long",
-            "null"
-          ]
-        },
-        {
-          "name": "defect_detected",
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "default": False
-        },
-        {
-          "name": "model_on",
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "default": False
-        },
-        {
-          "name": "squad_number",
-          "type": "long",
-          "default": 0,
-        },
-        {
-          "name": "model_config",
-          "type": "string",
-        }
-      ]
-    }
-
-    # model_config is a ClassVar, so we can't populate model anyway
     with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, model_config='str')                                                        # type: ignore
+        MetricV2(line_speed=2, model_config='str')
+
+
+def test_pydantic_base_settings_v21_with_defaults() -> None:
+    with pytest.raises(ValueError):
+        derive(MetricV21, topic='some_topic')
+
+    # https://github.com/pydantic/pydantic/issues/8469
+    MetricV21(line_speed=2, model_config='str')                                                           # type: ignore
 
 
 def test_avro_model():
@@ -412,8 +402,8 @@ def test_optional_type() -> None:
 
 
 def test_union_type() -> None:
-    schma = derive(ParentUnion, topic='test_data_1')
-    assert json.loads(schma) == {
+    schema = derive(ParentUnion, topic='test_data_1')
+    assert json.loads(schema) == {
         'type': 'record',
         'name': 'test_data_1_value',
         'fields': [
@@ -424,6 +414,34 @@ def test_union_type() -> None:
             {
                 'name': 'value',
                 'type': 'double',
+            },
+        ],
+    }
+
+
+def test_pydantic_v2_legal_model_config():
+    schema = derive(User1, topic='test_data_1')
+    assert json.loads(schema) == {
+        'type': 'record',
+        'name': 'test_data_1_value',
+        'fields': [
+            {
+                'name': 'name',
+                'type': 'string',
+            },
+        ],
+    }
+
+
+def test_pydantic_v2_legal_model_config_annotated():
+    schema = derive(User2, topic='test_data_1')
+    assert json.loads(schema) == {
+        'type': 'record',
+        'name': 'test_data_1_value',
+        'fields': [
+            {
+                'name': 'name',
+                'type': 'string',
             },
         ],
     }
