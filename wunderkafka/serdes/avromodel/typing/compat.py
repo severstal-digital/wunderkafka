@@ -6,7 +6,7 @@ from typing import Any, List, Type, Union, get_origin
 
 HAS_UNION_TYPE = True
 try:
-    from types import UnionType, MappingProxyType
+    from types import UnionType  # type: ignore[attr-defined]
 except ImportError:
     HAS_UNION_TYPE = False
 
