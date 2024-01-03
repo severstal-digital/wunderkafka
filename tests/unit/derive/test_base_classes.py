@@ -6,7 +6,6 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from dataclasses_avroschema.pydantic import AvroBaseModel
 from pydantic import Field, BaseModel, ValidationError, UUID4, ConfigDict
 from pydantic_settings import BaseSettings
 
@@ -100,10 +99,6 @@ class TsWithMeta(BaseModel):
     class Meta:
         namespace = 'com.namespace.my'
         name = 'MsgKey'
-
-
-class AvroSimilarImage(AvroBaseModel):
-    id: UUID4
 
 
 class User1(BaseModel):
@@ -346,23 +341,6 @@ def test_pydantic_base_settings_v21_with_defaults() -> None:
     # https://github.com/pydantic/pydantic/issues/8469
     MetricV21(line_speed=2, model_config='str')                                                           # type: ignore
 
-
-def test_avro_model() -> None:
-    schema = derive(AvroSimilarImage, topic='test_data_1')
-    assert json.loads(schema) == {
-        'type': 'record',
-        'name': 'test_data_1_value',
-        'fields': [
-            {
-                'name': 'id',
-                 'type': {
-                     'type': 'string',
-                     'logicalType': 'uuid',
-                     'pydantic-class': 'UUID4'
-                 }
-             }
-        ]
-    }
 
 
 if sys.version_info <= (3, 10):

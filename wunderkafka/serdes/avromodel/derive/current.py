@@ -4,7 +4,7 @@ from dataclasses import is_dataclass
 
 from dataclasses_avroschema import AvroModel
 
-from wunderkafka.serdes.avromodel.pydantic import derive_from_pydantic
+from wunderkafka.serdes.avromodel.pydantic import derive_from_pydantic, exclude_pydantic_class
 
 
 def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str:
@@ -33,6 +33,9 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
         model_schema['name'] = model_type.Meta.name
     else:
         model_schema['name'] = '{0}_{1}'.format(topic, suffix)
+    if pydantic_model:
+        # I would not prefer to just override PydanticParser because it always may be broken or thrown-out
+        model_schema = exclude_pydantic_class(model_schema)
     return json.dumps(model_schema)
 
 

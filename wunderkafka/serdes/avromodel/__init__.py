@@ -1,1 +1,1 @@
-from wunderkafka.serdes.avromodel.derive import derive
+from wunderkafka.serdes.avromodel.derive.current import derive

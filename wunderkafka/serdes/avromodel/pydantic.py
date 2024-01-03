@@ -1,6 +1,9 @@
 from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional
 
-from dataclasses_avroschema.pydantic import AvroBaseModel
+try:
+    from dataclasses_avroschema.avrodantic import AvroBaseModel
+except ImportError:
+    from dataclasses_avroschema.pydantic import AvroBaseModel
 from pydantic import BaseModel, create_model, ConfigDict
 from pydantic_settings import BaseSettings
 
@@ -15,6 +18,18 @@ PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
     'model_extra',
     'model_fields_set',
 })
+
+
+def exclude_pydantic_class(schema: Dict[str, Any]) -> Dict[str, Any]:
+    schema.pop('pydantic-class', None)
+    for value in schema.values():
+        if isinstance(value, dict):
+            exclude_pydantic_class(value)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    exclude_pydantic_class(item)
+    return schema
 
 
 def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseModel]]:

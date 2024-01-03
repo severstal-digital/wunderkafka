@@ -3,59 +3,10 @@ from pathlib import Path
 from typing import List, Optional, Dict
 
 import pytest
-from dataclasses_avroschema.pydantic import AvroBaseModel
 from pydantic import BaseModel, UUID4, ValidationError
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel import derive
-
-
-class AvroNestedClass(AvroBaseModel):
-    id: UUID4
-
-
-class AcroResultClass(AvroBaseModel):
-    id: UUID4
-    nested: List[AvroNestedClass]
-
-
-def test_avro_base_model() -> None:
-    schema = derive(AcroResultClass, topic='test_data_1')
-    assert json.loads(schema) == {
-        'type': 'record',
-        'name': 'test_data_1_value',
-        'fields': [
-            {
-                'name': 'id',
-                'type': {
-                    'type': 'string',
-                    'logicalType': 'uuid',
-                    'pydantic-class': 'UUID4'
-                }
-            },
-            {
-                'name': 'nested',
-                'type': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'record',
-                        'name': 'AvroNestedClass',
-                        'fields': [
-                            {
-                                'name': 'id',
-                                'type': {
-                                    'type': 'string',
-                                    'logicalType': 'uuid',
-                                    'pydantic-class': 'UUID4'
-                                }
-                            }
-                        ]
-                    },
-                    'name': 'nested'
-                }
-            }
-        ]
-    }
 
 
 class NestedModel(BaseModel):
@@ -72,9 +23,7 @@ def test_simple_base_model() -> None:
                 'name': 'id',
                 'type': {
                     'type': 'string',
-                    'logicalType': 'uuid',
-                    # FixMe (k.tribunskii): remove this
-                    'pydantic-class': 'UUID4'
+                    'logicalType': 'uuid'
                 }
             }
         ]
@@ -96,9 +45,7 @@ def test_nested_base_model_list() -> None:
                 'name': 'id',
                 'type': {
                     'type': 'string',
-                    'logicalType': 'uuid',
-                    # FixMe (k.tribunskii): remove this
-                    'pydantic-class': 'UUID4'
+                    'logicalType': 'uuid'
                 }
             },
             {
@@ -113,9 +60,7 @@ def test_nested_base_model_list() -> None:
                                 'name': 'id',
                                 'type': {
                                     'type': 'string',
-                                    'logicalType': 'uuid',
-                                    # FixMe (k.tribunskii): remove this
-                                    'pydantic-class': 'UUID4'
+                                    'logicalType': 'uuid'
                                 }
                             }
                         ]
@@ -149,8 +94,7 @@ def test_nested_base_model_dict_str_key() -> None:
                                 'name': 'id',
                                 'type': {
                                     'type': 'string',
-                                    'logicalType': 'uuid',
-                                    'pydantic-class': 'UUID4'
+                                    'logicalType': 'uuid'
                                 }
                             }
                         ]
@@ -192,8 +136,7 @@ def test_nested_base_model_optional() -> None:
                 'name': 'id',
                 'type': {
                     'type': 'string',
-                    'logicalType': 'uuid',
-                    'pydantic-class': 'UUID4'
+                    'logicalType': 'uuid'
                 }
             },
             {
@@ -207,8 +150,7 @@ def test_nested_base_model_optional() -> None:
                                 'name': 'id',
                                 'type': {
                                     'type': 'string',
-                                    'logicalType': 'uuid',
-                                    'pydantic-class': 'UUID4'
+                                    'logicalType': 'uuid'
                                 }
                             }
                         ]
@@ -256,8 +198,7 @@ def test_deep_nested_base_model() -> None:
                             'name': 'id',
                             'type': {
                                 'type': 'string',
-                                'logicalType': 'uuid',
-                                'pydantic-class': 'UUID4'
+                                'logicalType': 'uuid'
                             }
                         },
                         {
@@ -272,8 +213,7 @@ def test_deep_nested_base_model() -> None:
                                             'name': 'id',
                                             'type': {
                                                 'type': 'string',
-                                                'logicalType': 'uuid',
-                                                'pydantic-class': 'UUID4'
+                                                'logicalType': 'uuid'
                                             }
                                         }
                                     ]
