@@ -1,7 +1,7 @@
 import json
 import inspect
 from types import UnionType
-from typing import Any, Dict, Type, Union, get_origin, get_args, FrozenSet, Final
+from typing import Any, Dict, Type, Union, get_origin, get_args, FrozenSet, Final, Optional
 from dataclasses import is_dataclass
 
 from dataclasses_avroschema import AvroModel
@@ -19,12 +19,12 @@ PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
 })
 
 
-def is_generic_type(annotation):
+def is_generic_type(annotation: Optional[Type[object]]) -> bool:
     return get_origin(annotation) is not None and len(get_args(annotation)) > 0
 
 
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
-    attributes = {}
+    attributes: dict[str, Any] = {}
     for field_name, field_info in model_type.model_fields.items():
         # Here we are changing original model just for schema derivation, so we can override almost everything
         # https://github.com/marcosschroh/dataclasses-avroschema/issues/400
@@ -34,35 +34,41 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
         if isinstance(annotation_type, BaseModel):
             attributes[field_name] = create_model(model_type.__name__, __base__=(annotation_type, AvroBaseModel))
         else:
-            if is_generic_type(annotation_type):
-                arguments = []
-                for arg in get_args(annotation_type):
-                    if issubclass(arg, BaseModel):
-                        arguments.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
-                    else:
-                        arguments.append(arg)
-                generic = get_origin(annotation_type)
-                # https://bugs.python.org/issue45418
-                is_union_type = inspect.isclass(generic) and issubclass(generic, UnionType)
-                if is_union_type:
-                    new_annotation = Union[*arguments]
-                else:
-                    new_annotation = generic[*arguments]
-                field_info.annotation = new_annotation
-                attributes[field_name] = (new_annotation, field_info)
+            if annotation_type is None:
+                attributes[field_name] = (annotation_type, field_info)
             else:
-                if issubclass(annotation_type, BaseModel):
-                    new_type = _create_model(annotation_type)
-                    field_info.annotation = new_type
-                    attributes[field_name] = (new_type, field_info)
+                if is_generic_type(annotation_type):
+                    arguments = []
+                    for arg in get_args(annotation_type):
+                        if issubclass(arg, BaseModel):
+                            arguments.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
+                        else:
+                            arguments.append(arg)
+                    generic = get_origin(annotation_type)
+                    # already checked in is_generic_type
+                    # so this is just for mypy only
+                    assert generic is not None
+                    # https://bugs.python.org/issue45418
+                    is_union_type = inspect.isclass(generic) and issubclass(generic, UnionType)
+                    if is_union_type:
+                        generic = Union
+                    new_annotation = generic[*arguments]
+                    field_info.annotation = new_annotation
+                    attributes[field_name] = (new_annotation, field_info)
                 else:
-                    attributes[field_name] = (annotation_type, field_info)
+                    if issubclass(annotation_type, BaseModel):
+                        new_type = _create_model(annotation_type)
+                        field_info.annotation = new_type
+                        attributes[field_name] = (new_type, field_info)
+                    else:
+                        attributes[field_name] = (annotation_type, field_info)
     return attributes
 
 
 def _create_model(model_type: Type[BaseModel]) -> Type[AvroBaseModel]:
     attributes = get_model_attributes(model_type)
     crafted_model = create_model(model_type.__name__, __base__=(model_type, AvroBaseModel), **attributes)
+    assert issubclass(crafted_model, AvroBaseModel)
     return crafted_model
 
 
@@ -104,7 +110,7 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
         # All this hacks will work only for flat schemas: we avoid describing objects via nested types for HDFS's sake.
         attributes = _extract_attributes(model_type)
         ordering = list(attributes['__annotations__'])
-        crafted_model = type(model_type.__name__, (AvroModel,), attributes)                               # type: ignore
+        crafted_model: AvroModel = type(model_type.__name__, (AvroModel,), attributes)        # type: ignore[assignment]
         model_schema = crafted_model.avro_schema_to_python()
         fields_map = {field_data['name']: field_data for field_data in model_schema['fields']}
         reordered_fields = [fields_map[attr] for attr in ordering]

@@ -58,7 +58,7 @@ class MetricV21(BaseModel):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: str
+    model_config: str                                                                    # type: ignore[assignment,misc]
 
     class Config:
         extra = 'allow'
@@ -112,7 +112,7 @@ class User1(BaseModel):
 
 
 class User2(BaseModel):
-    model_config: ConfigDict = ConfigDict(extra='ignore')
+    model_config: ConfigDict = ConfigDict(extra='ignore')                                # type: ignore[assignment,misc]
     name: str
 
 
@@ -336,7 +336,7 @@ def test_pydantic_base_settings_v2_with_defaults() -> None:
         derive(MetricV2, topic='some_topic')
 
     with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, model_config='str')
+        MetricV2(line_speed=2, model_config='str')                                              # type: ignore[call-arg]
 
 
 def test_pydantic_base_settings_v21_with_defaults() -> None:
@@ -347,7 +347,7 @@ def test_pydantic_base_settings_v21_with_defaults() -> None:
     MetricV21(line_speed=2, model_config='str')                                                           # type: ignore
 
 
-def test_avro_model():
+def test_avro_model() -> None:
     schema = derive(AvroSimilarImage, topic='test_data_1')
     assert json.loads(schema) == {
         'type': 'record',
@@ -419,7 +419,7 @@ def test_union_type() -> None:
     }
 
 
-def test_pydantic_v2_legal_model_config():
+def test_pydantic_v2_legal_model_config() -> None:
     schema = derive(User1, topic='test_data_1')
     assert json.loads(schema) == {
         'type': 'record',
@@ -433,7 +433,7 @@ def test_pydantic_v2_legal_model_config():
     }
 
 
-def test_pydantic_v2_legal_model_config_annotated():
+def test_pydantic_v2_legal_model_config_annotated() -> None:
     schema = derive(User2, topic='test_data_1')
     assert json.loads(schema) == {
         'type': 'record',

@@ -299,7 +299,7 @@ class MetricV22(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: MLConfig
+    model_config: MLConfig                                                               # type: ignore[assignment,misc]
 
     class Config:
         extra = 'allow'
