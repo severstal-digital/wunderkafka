@@ -2,7 +2,7 @@ import inspect
 import sys
 import typing
 from types import MappingProxyType
-from typing import Any, Generic, List, Type, Union, get_origin
+from typing import Any, List, Type, Union, get_origin
 
 HAS_UNION_TYPE = True
 try:
@@ -27,7 +27,9 @@ if sys.version_info >= (3, 9):
     def get_generic(annotation: Any) -> Any:
         return get_origin(annotation)
 else:
-    _TYPE_MAPPING = MappingProxyType({getattr(t, '__origin__', None): t for t in typing.__dict__.values() if hasattr(t, '__origin__')})
+    _TYPE_MAPPING = MappingProxyType({
+        getattr(t, '__origin__', None): t for t in typing.__dict__.values() if hasattr(t, '__origin__')
+    })
 
     def get_generic(annotation: Any) -> Any:
         origin = get_origin(annotation)
