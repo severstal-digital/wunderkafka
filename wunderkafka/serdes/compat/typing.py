@@ -16,7 +16,7 @@ def create_annotation(generic: Type[object], types_list: Type[object]) -> Type[o
     return generic[tuple(types_list)]
 
 
-if sys.version_info <= (3, 9):
+if sys.version_info <= (3, 10):
     def is_union_type(_: Any) -> bool:
         return False
 else:
