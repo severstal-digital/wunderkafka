@@ -8,10 +8,13 @@ All moving parts should be interchangeable in terms of schema, header and serial
 """
 
 import datetime
-from typing import Any, List, Union, Optional
+from typing import Any, List, Union, Optional, TypeVar
 
 from confluent_kafka import Message, TopicPartition
+from confluent_kafka.serialization import SerializationError
+from pydantic import ValidationError
 
+from wunderkafka.consumers.types import StreamResult, PayloadError
 from wunderkafka.types import HeaderParser
 from wunderkafka.logger import logger
 from wunderkafka.serdes.abc import AbstractDeserializer
@@ -19,6 +22,8 @@ from wunderkafka.structures import SchemaMeta, SchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
 from wunderkafka.consumers.subscription import TopicSubscription
+
+T = TypeVar("T")
 
 
 class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
@@ -30,6 +35,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         headers_handler: HeaderParser,
         schema_registry: AbstractSchemaRegistry,
         deserializer: AbstractDeserializer,
+        *,
+        stream_result: bool = False,
     ):
         """
         Init consumer with specific dependencies.
@@ -38,11 +45,13 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         :param headers_handler:     Callable to parse binary headers.
         :param schema_registry:     Schema registry client.
         :param deserializer:        Message deserializer.
+        :param stream_result:       If True, return complicated StreamResult object instead of just a model.
         """
         self.consumer = consumer
         self._header_parser = headers_handler
         self._registry = schema_registry
         self._deserializer = deserializer
+        self._stream_result = stream_result
 
     def subscribe(  # noqa: D102,WPS211  # docstring inherited from superclass.
         self,
@@ -78,7 +87,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         ignore_keys: bool = False,
         raise_on_error: bool = True,
         raise_on_lost: bool = True,
-    ) -> List[Message]:
+    ) -> List[T]:
         """
         Consume as many messages as we can for a given timeout and decode them.
 
@@ -95,15 +104,14 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         :return:                A list of Message objects with decoded value() and key() (possibly empty on timeout).
         """
         msgs = self.consumer.batch_poll(timeout, num_messages, raise_on_lost=raise_on_lost)
-        return self._decoded(msgs, ignore_keys=ignore_keys, raise_on_error=raise_on_error)
+        return self._decoded(
+            msgs,
+            ignore_keys=ignore_keys,
+            raise_on_error=raise_on_error,
+        )
 
-    def _decoded(
-        self,
-        msgs: List[Message],
-        *,
-        ignore_keys: bool,
-        raise_on_error: bool,
-    ) -> Any:
+    def _decoded(self, msgs: List[Message], *, ignore_keys: bool, raise_on_error: bool) -> List[T]:
+        results: List[StreamResult] = []
         for msg in msgs:
             kafka_error = msg.error()
             # Not sure if there is any need for an option to exclude errored message from the consumed ones,
@@ -114,17 +122,47 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             if kafka_error is not None:
                 logger.error(kafka_error)
                 if raise_on_error:
+                    # Even PyCharm stubs show that it is inherited from object, in fact it is valid Exception
                     raise kafka_error
 
             topic = msg.topic()
-            msg.set_value(self._decode(topic, msg.value()))
+
+            raw_key_value = msg.key()
+            decode_key_ok = True
             if ignore_keys:
                 # Yes, we lose information, but it is necessary to not get raw bytes
                 # if `.key()` will be called in client code later.
                 msg.set_key(None)
             else:
-                msg.set_key(self._decode(topic, msg.key(), is_key=True))
-        return msgs
+                try:
+                    decoded_key = self._decode(topic, msg.key(), is_key=True)
+                # KeyDeserializationError is inherited from SerializationError
+                except SerializationError:
+                    decode_key_ok = False
+                    if not ignore_keys:
+                        raise
+                else:
+                    msg.set_key(decoded_key)
+
+            try:
+                decoded_value = self._decode(topic, msg.value())
+            except (SerializationError, ValueError, ValidationError) as exc:
+                if not self._stream_result:
+                    raise
+                value_error = str(exc)
+                if decode_key_ok:
+                    error = PayloadError(description=value_error)
+                else:
+                    message = "Unable to decode key (topic: {0}, key payload: {1})".format(topic, raw_key_value)
+                    error = PayloadError(description=message)
+                results.append(StreamResult(payload=None, error=error, msg=msg))
+            else:
+                msg.set_value(decoded_value)
+                if self._stream_result:
+                    results.append(StreamResult(payload=decoded_value, error=None, msg=msg))
+
+        to_return = results if self._stream_result else msgs
+        return to_return
 
     # Todo (tribunsky.kir): arguable: make different composition (headers, SR & deserializer united cache)
     def _decode(self, topic: str, blob: Optional[bytes], *, is_key: bool = False) -> Any:

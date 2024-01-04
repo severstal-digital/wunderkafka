@@ -4,10 +4,11 @@ from dataclasses import dataclass
 
 import pytest
 
+from wunderkafka.consumers.types import StreamResult
 from wunderkafka.tests import TestConsumer, TestHTTPClient
 from wunderkafka.serdes.avro import FastAvroDeserializer, ConfluentClouderaHeadersHandler
 from wunderkafka.tests.consumer import Message
-from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient
+from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 
 
@@ -33,24 +34,23 @@ SIGNAL_MESSAGE = Msg(
 
 
 HEADERS = (
-    b'\x01\x00\x00\x00\x00\x00\x00\x06\x9c\x00\x00\x00\x01',
-    b'\x02\x00\x00\x00\x00\x00\x00\x08<',
-    b'\x03\x00\x00\x08<',
+    b'\x00\x00\x00\x08<',
 )
 
 
 @pytest.mark.parametrize("header", list(HEADERS))
-def test_consume_moving_parts(sr_root: Path, topic: str, header: bytes) -> None:
+def test_consume_moving_parts(sr_root_existing: Path, topic: str, header: bytes) -> None:
     consumer = HighLevelDeserializingConsumer(
         consumer=TestConsumer([Message(topic, value=SIGNAL_MESSAGE.serialized(header))]),
-        schema_registry=ClouderaSRClient(TestHTTPClient(sr_root), SimpleCache()),
+        schema_registry=ConfluentSRClient(TestHTTPClient(sr_root_existing), SimpleCache()),
         headers_handler=ConfluentClouderaHeadersHandler().parse,
         deserializer=FastAvroDeserializer(),
+        stream_result=True,
     )
 
     consumer.subscribe([topic], from_beginning=True)
 
-    msgs: List[Message] = consumer.consume()
+    msgs: List[StreamResult] = consumer.consume()
     [message] = msgs
-    assert message.key() is None
-    assert message.value() == SIGNAL_MESSAGE.deserialized
+
+    assert message.payload == SIGNAL_MESSAGE.deserialized
