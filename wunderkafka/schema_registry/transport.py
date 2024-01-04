@@ -13,12 +13,12 @@ from wunderkafka.config.schema_registry import SRConfig
 
 class KerberizableHTTPClient(AbstractHTTPClient):
     def __init__(
-        self, 
-        config: SRConfig, 
-        *, 
-        requires_kerberos: bool = False, 
+        self,
+        config: SRConfig,
+        *,
+        requires_kerberos: bool = False,
         save_replay: bool = False,
-        cmd_kinit: Optional[str] = None
+        cmd_kinit: Optional[str] = None,
     ) -> None:
         s = requests.Session()
         if requires_kerberos and cmd_kinit is not None:

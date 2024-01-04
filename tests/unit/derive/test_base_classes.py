@@ -6,7 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import Field, BaseModel, ValidationError, UUID4, ConfigDict
+from pydantic import Field, BaseModel, ValidationError, ConfigDict
 from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
@@ -340,7 +340,6 @@ def test_pydantic_base_settings_v21_with_defaults() -> None:
 
     # https://github.com/pydantic/pydantic/issues/8469
     MetricV21(line_speed=2, model_config='str')                                                           # type: ignore
-
 
 
 if sys.version_info <= (3, 10):

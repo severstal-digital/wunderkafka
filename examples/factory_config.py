@@ -1,7 +1,7 @@
 import os
 from functools import partial
 
-from pydantic import field_validator, AnyHttpUrl, Field
+from pydantic import field_validator, Field
 from wunderkafka.time import now
 from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
 

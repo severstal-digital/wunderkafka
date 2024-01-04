@@ -23,7 +23,7 @@ else:
         OPTIONAL = 2
         DISABLED = 3
 
-    class HTTPKerberosAuth(AuthBase):                                                                     # type: ignore
+    class HTTPKerberosAuth(AuthBase):                                                       # noqa: F811  # type: ignore
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             message = ' '.join([
                 'Something went wrong: trying to use HTTPKerberosAuth while missing requests-kerberos.',

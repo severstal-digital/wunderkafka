@@ -99,7 +99,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         :param raise_on_lost:   if True, check on own clocks if max.poll.interval.ms is exceeded. If so, raises
                                 ConsumerException to be handled in client code.
 
-        :raises KafkaError:     See https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#confluent_kafka.KafkaError
+        :raises KafkaError:     See https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#confluent_kafka.KafkaError  # noqa: E501
 
         :return:                A list of Message objects with decoded value() and key() (possibly empty on timeout).
         """

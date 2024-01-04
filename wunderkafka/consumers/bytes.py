@@ -3,7 +3,6 @@
 import time
 import atexit
 import datetime
-import traceback
 from typing import Dict, List, Union, Optional
 
 from confluent_kafka import KafkaException
