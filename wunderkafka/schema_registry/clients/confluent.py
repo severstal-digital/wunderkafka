@@ -66,14 +66,14 @@ class SchemaRegistryClient(ConfluentSchemaRegistryClient):
 class ConfluentSRClient(AbstractSchemaRegistry):
 
     def __init__(self, http_client: AbstractHTTPClient, _: Optional[SimpleCache] = None) -> None:
-        self._client = SchemaRegistryClient.from_client(http_client)
+        self.client = SchemaRegistryClient.from_client(http_client)
 
     def get_schema_text(self, meta: SchemaMeta) -> str:
-        schema = self._client.get_schema(meta.header.schema_id)
+        schema = self.client.get_schema(meta.header.schema_id)
         return schema.schema_str
 
     def register_schema(self, topic: str, schema_text: str, *, is_key: bool = True) -> SRMeta:
         # FixMe (tribunsky.kir): lack of symmetry here - SchemaMeta knows about different vendors, but not vice versa.
         subject = '{0}{1}'.format(topic, '_key' if is_key else '_value')
-        schema_id = self._client.register_schema(subject, Schema(schema_text, schema_type='AVRO'))
+        schema_id = self.client.register_schema(subject, Schema(schema_text, schema_type='AVRO'))
         return SRMeta(schema_id, schema_version=None)

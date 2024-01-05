@@ -24,7 +24,15 @@ class AbstractDeserializer(ABC):
 
 class AbstractSerializer(ABC):
     @abstractmethod
-    def serialize(self, schema: str, payload: Any, header: Optional[bytes] = None) -> bytes: ...
+    def serialize(
+        self,
+        schema: str,
+        payload: Any,
+        header: Optional[bytes] = None,
+        topic: Optional[str] = None,
+        *,
+        is_key: Optional[bool] = None,
+    ) -> bytes: ...
 
 
 class AbstractDescriptionStore(ABC):

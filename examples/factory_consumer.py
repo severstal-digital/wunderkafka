@@ -7,7 +7,7 @@ from wunderkafka.schema_registry.cache import SimpleCache
 from wunderkafka.schema_registry import ClouderaSRClient
 from wunderkafka.schema_registry.transport import KerberizableHTTPClient
 from wunderkafka.serdes.avro.deserializers import FastAvroDeserializer
-from wunderkafka.serdes.avro.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 
 
 def MyAvroConsumer(

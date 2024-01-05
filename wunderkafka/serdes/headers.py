@@ -4,7 +4,7 @@ from types import MappingProxyType
 from wunderkafka.errors import DeserializerException
 from wunderkafka.serdes.abc import AbstractProtocolHandler
 from wunderkafka.structures import SRMeta, ParsedHeader
-from wunderkafka.serdes.avro.structures import Mask, Protocol
+from wunderkafka.serdes.structures import Mask, Protocol
 
 # see: https://git.io/JvYyC
 PROTOCOLS = MappingProxyType({

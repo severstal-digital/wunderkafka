@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, Any
 
 import pytest
 
@@ -26,3 +28,12 @@ def sr_root_existing(sr_root: Path) -> Path:
 @pytest.fixture
 def sr_root_update(sr_root: Path) -> Path:
     return sr_root / 'update'
+
+
+@dataclass
+class Msg(object):
+    payload: bytes
+    deserialized: Dict[str, Any]
+
+    def serialized(self, header: bytes) -> bytes:
+        return header + self.payload

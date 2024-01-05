@@ -1,3 +1,3 @@
-from wunderkafka.serdes.avro.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.serdes.avro.serializers import FastAvroSerializer, AvroModelSerializer
+from wunderkafka.serdes.avro.serializers import FastAvroSerializer
 from wunderkafka.serdes.avro.deserializers import FastAvroDeserializer
+from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer

@@ -4,12 +4,12 @@ from typing import Dict, Type, Union, Optional
 
 from wunderkafka import ConsumerConfig, ProducerConfig
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.types import TopicName, MessageDescription
 from wunderkafka.serdes.avro import (
     FastAvroSerializer,
     AvroModelSerializer,
     FastAvroDeserializer,
-    ConfluentClouderaHeadersHandler,
 )
 from wunderkafka.serdes.store import AvroModelRepo, SchemaTextRepo
 from wunderkafka.consumers.bytes import BytesConsumer

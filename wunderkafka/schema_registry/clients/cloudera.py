@@ -4,7 +4,7 @@ from wunderkafka.errors import SchemaRegistryLookupException
 from wunderkafka.logger import logger
 from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
-from wunderkafka.serdes.avro.headers import PROTOCOLS
+from wunderkafka.serdes.headers import PROTOCOLS
 from wunderkafka.schema_registry.cache import SimpleCache, AlwaysEmptyCache
 
 

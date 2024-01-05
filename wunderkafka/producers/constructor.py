@@ -161,7 +161,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
             available_meta = self._check_schema(topic, schema, is_key=is_key)
             # ToDo (tribunsky.kir): add to (de)serialization ability to include the whole schema to the header.
             header = self._header_packer(protocol_id, available_meta)
-            return self._serializer.serialize(schema.text, obj, header)
+            return self._serializer.serialize(schema.text, obj, header, topic, is_key=is_key)
         # ToDo (tribunsky.kir): In the sake of mypy, re-do (add strict flag or something like that).
         logger.warning('Missing schema for {0} (key: {1}'.format(topic, is_key))
         return None

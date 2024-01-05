@@ -1,0 +1,36 @@
+import json
+from typing import Dict, Optional, Any
+
+from confluent_kafka.schema_registry import SchemaRegistryClient
+from confluent_kafka.schema_registry.json_schema import JSONSerializer
+from confluent_kafka.serialization import SerializationContext, MessageField
+from pydantic import BaseModel
+
+from wunderkafka.serdes.abc import AbstractSerializer
+
+
+def pydantic_to_dict(model: BaseModel, _: SerializationContext) -> dict:
+    dump = model.model_dump_json()
+    dct = json.loads(dump)
+    return dct
+
+
+class JSONModelSerializer(AbstractSerializer):
+    def __init__(self, schema_registry_client: SchemaRegistryClient) -> None:
+        self._cache: Dict[str, JSONSerializer] = {}
+        self._sr_client = schema_registry_client
+
+    def serialize(
+        self,
+        schema: str,
+        obj: Any,
+        header: Optional[bytes] = None,
+        topic: Optional[str] = None,
+        *,
+        is_key: Optional[bool] = None,
+    ) -> bytes:
+        if schema not in self._cache:
+            self._cache[schema] = JSONSerializer(schema, self._sr_client, pydantic_to_dict)
+        serializer = self._cache[schema]
+        field = MessageField.KEY if is_key else MessageField.VALUE
+        return serializer(obj, SerializationContext(topic, field))

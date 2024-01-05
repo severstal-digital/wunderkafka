@@ -1,24 +1,16 @@
 from typing import Any, Dict, List
 from pathlib import Path
-from dataclasses import dataclass
 
 import pytest
 
+from tests.integration.confluent.conftest import Msg
 from wunderkafka.consumers.types import StreamResult
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestConsumer, TestHTTPClient
-from wunderkafka.serdes.avro import FastAvroDeserializer, ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.avro import FastAvroDeserializer
 from wunderkafka.tests.consumer import Message
 from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
-
-
-@dataclass
-class Msg(object):
-    payload: bytes
-    deserialized: Dict[str, Any]
-
-    def serialized(self, header: bytes) -> bytes:
-        return header + self.payload
 
 
 SIGNAL_MESSAGE = Msg(
@@ -50,7 +42,7 @@ def test_consume_moving_parts(sr_root_existing: Path, topic: str, header: bytes)
 
     consumer.subscribe([topic], from_beginning=True)
 
-    msgs: List[StreamResult] = consumer.consume()
-    [message] = msgs
+    events: List[StreamResult] = consumer.consume()
+    [event] = events
 
-    assert message.payload == SIGNAL_MESSAGE.deserialized
+    assert event.payload == SIGNAL_MESSAGE.deserialized
