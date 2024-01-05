@@ -31,6 +31,8 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         store: AbstractDescriptionStore,
         # ToDo: switch mapping to something like consumer's TopicSubscription?
         mapping: Optional[Dict[TopicName, MessageDescription]] = None,
+        value_serializer: Optional[AbstractSerializer] = None,
+        key_serializer: Optional[AbstractSerializer] = None,
         *,
         protocol_id: int = 1,
         lazy: bool = False,
@@ -60,6 +62,12 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         self._producer = producer
         self._header_packer = header_packer
         self._protocol_id = protocol_id
+        self._value_serializer = value_serializer
+        if self._value_serializer is None:
+            self._value_serializer = serializer
+        self._key_serializer = key_serializer
+        if self._key_serializer is None:
+            self._key_serializer = serializer
 
         for topic, description in self._mapping.items():
             if isinstance(description, (tuple, list)):
@@ -161,7 +169,10 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
             available_meta = self._check_schema(topic, schema, is_key=is_key)
             # ToDo (tribunsky.kir): add to (de)serialization ability to include the whole schema to the header.
             header = self._header_packer(protocol_id, available_meta)
-            return self._serializer.serialize(schema.text, obj, header, topic, is_key=is_key)
+            if is_key:
+                return self._key_serializer.serialize(schema.text, obj, header, topic, is_key=is_key)
+            else:
+                return self._value_serializer.serialize(schema.text, obj, header, topic, is_key=is_key)
         # ToDo (tribunsky.kir): In the sake of mypy, re-do (add strict flag or something like that).
         logger.warning('Missing schema for {0} (key: {1}'.format(topic, is_key))
         return None

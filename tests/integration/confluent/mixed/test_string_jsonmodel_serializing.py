@@ -1,0 +1,51 @@
+from typing import Optional
+from pathlib import Path
+
+import pytest
+from confluent_kafka.serialization import StringSerializer
+from pydantic import BaseModel, UUID4
+
+from wunderkafka.serdes.json import HAS_JSON_SCHEMA
+from wunderkafka.serdes.store import JSONModelRepo
+
+if not HAS_JSON_SCHEMA:
+    pytest.skip("skipping json-schema-only tests", allow_module_level=True)
+from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
+
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.tests import TestProducer, TestHTTPClient
+from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
+from wunderkafka.producers.constructor import HighLevelSerializingProducer
+
+
+class Image(BaseModel):
+    id: Optional[UUID4] = None
+    path: Optional[str] = None
+
+
+def test_json_producer_string_key_create_schema(sr_root_existing: Path, topic: str) -> None:
+    test_producer = TestProducer()
+    sr_client = ConfluentSRClient(TestHTTPClient(sr_root_existing), SimpleCache())
+    producer = HighLevelSerializingProducer(
+        producer=test_producer,
+        schema_registry=sr_client,
+        header_packer=ConfluentClouderaHeadersHandler().pack,
+        serializer=JSONModelSerializer(sr_client.client),
+        key_serializer=StringSerializer(),
+        store=JSONModelRepo(),
+        mapping={topic: Image},
+        protocol_id=0,
+    )
+
+    key = "714fc713-37ff-4477-9157-cb4f14b63e1a"
+    value = Image(
+        id="714fc713-37ff-4477-9157-cb4f14b63e1a",
+        path="/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3",
+    )
+
+    producer.send_message(topic, value, key)
+
+    [message] = test_producer.sent
+
+    assert message.key == key
+    assert message.value == b'\x00\x00\x00\x07<{"id": "714fc713-37ff-4477-9157-cb4f14b63e1a", "path": "/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3"}'
