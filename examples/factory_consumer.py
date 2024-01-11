@@ -1,13 +1,13 @@
 from typing import Optional
 
 from wunderkafka.consumers.bytes import BytesConsumer
-from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
+from wunderkafka.schema_registry import ClouderaSRClient
 from wunderkafka.hotfixes.watchdog import check_watchdog
+from wunderkafka.serdes.avro.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.schema_registry.cache import SimpleCache
-from wunderkafka.schema_registry.client import ClouderaSRClient
 from wunderkafka.schema_registry.transport import KerberizableHTTPClient
 from wunderkafka.serdes.avro.deserializers import FastAvroDeserializer
-from wunderkafka.serdes.avro.headers import AvroClouderaConfluent
 
 
 def MyAvroConsumer(
@@ -18,6 +18,6 @@ def MyAvroConsumer(
     return HighLevelDeserializingConsumer(
         consumer=BytesConsumer(config, watchdog),
         schema_registry=ClouderaSRClient(KerberizableHTTPClient(config.sr), SimpleCache()),
-        headers_handler=AvroClouderaConfluent(),
+        headers_handler=ConfluentClouderaHeadersHandler().parse,
         deserializer=FastAvroDeserializer(),
     )

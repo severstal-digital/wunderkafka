@@ -6,7 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import Field, BaseModel, ValidationError, UUID4, ConfigDict
+from pydantic import Field, BaseModel, ValidationError, ConfigDict
 from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
