@@ -3,7 +3,7 @@ import datetime
 from wunderkafka import BytesConsumer, ConsumerConfig, SecurityProtocol
 
 if __name__ == '__main__':
-    # Config is still pretty long, it is essential complexity.
+    # Config is still pretty long, it is an essential complexity.
     # But in minimal setup you only need to specify just `group_id` and `bootstrap_servers`
     config = ConsumerConfig(
         enable_auto_commit=False,
