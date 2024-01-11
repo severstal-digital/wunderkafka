@@ -54,7 +54,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         super().__init__(
             consumer=BytesConsumer(config, watchdog),
             schema_registry=sr_client(
-                KerberizableHTTPClient(config),
+                KerberizableHTTPClient(config.sr, requires_kerberos=config_requires_kerberos(config)),
                 SimpleCache(),
             ),
             headers_handler=ConfluentClouderaHeadersHandler().parse,
@@ -100,7 +100,7 @@ class AvroProducer(HighLevelSerializingProducer):
         super().__init__(
             producer=BytesProducer(config, watchdog),
             schema_registry=sr_client(
-                KerberizableHTTPClient(config),
+                KerberizableHTTPClient(config.sr, requires_kerberos=config_requires_kerberos(config)),
                 SimpleCache(),
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
@@ -151,7 +151,7 @@ class AvroModelProducer(HighLevelSerializingProducer):
         super().__init__(
             producer=BytesProducer(config, watchdog),
             schema_registry=sr_client(
-                KerberizableHTTPClient(config),
+                KerberizableHTTPClient(config.sr, requires_kerberos=config_requires_kerberos(config)),
                 SimpleCache(),
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,

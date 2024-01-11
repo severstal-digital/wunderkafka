@@ -16,28 +16,26 @@ from wunderkafka.config.schema_registry import SRConfig
 class KerberizableHTTPClient(AbstractHTTPClient):
     def __init__(
         self,
-        config: RDKafkaConfig,
+        config: SRConfig,
         *,
+        requires_kerberos: bool = False,
         save_replay: bool = False,
     ) -> None:
-        if config.sr is None:
-            raise RuntimeError("You have not initialized the configuration for Schema Registry!")
         s = requests.Session()
-        if config_requires_kerberos(config) and config.sasl_kerberos_kinit_cmd is not None:
-            check_watchdog(config)
+        if requires_kerberos:
             s.auth = HTTPKerberosAuth(
-                principal=config.sr.sasl_username,
-                mutual_authentication=config.sr.mutual_auth,
+                principal=config.sasl_username,
+                mutual_authentication=config.mutual_auth,
             )
 
-        if config.sr.ssl_certificate_location is not None:
-            if config.sr.ssl_key_location is not None:
-                s.cert = (config.sr.ssl_certificate_location, config.ssl_key_location)
+        if config.ssl_certificate_location is not None:
+            if config.ssl_key_location is not None:
+                s.cert = (config.ssl_certificate_location, config.ssl_key_location)
             else:
-                s.cert = config.sr.ssl_certificate_location
+                s.cert = config.ssl_certificate_location
 
-        if config.sr.ssl_key_location is not None:
-            s.verify = config.sr.ssl_ca_location
+        if config.ssl_key_location is not None:
+            s.verify = config.ssl_ca_location
 
         accept = ', '.join([
             'application/vnd.schemaregistry.v1+json',
@@ -50,7 +48,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
         })
 
         self._session = s
-        self._base_url = config.sr.url
+        self._base_url = config.url
 
         self._save_replay = save_replay
 
