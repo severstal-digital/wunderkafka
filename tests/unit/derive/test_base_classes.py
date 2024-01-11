@@ -111,6 +111,11 @@ class User2(BaseModel):
     name: str
 
 
+class User3(BaseModel):
+    model_config: int = ConfigDict(extra='ignore')                                       # type: ignore[assignment,misc]
+    name: str
+
+
 def test_dataclass() -> None:
     schema = derive(SomeData, topic='test_data_1')
     assert json.loads(schema) == {
@@ -423,3 +428,9 @@ def test_pydantic_v2_legal_model_config_annotated() -> None:
             },
         ],
     }
+
+
+def test_pydantic_v2_wrong_model_config_annotated() -> None:
+    # Maybe we should not raise an error here and check if field value, not the annotation, is ConfigDict?
+    with pytest.raises(ValueError):
+        derive(User3, topic='test_data_1')
