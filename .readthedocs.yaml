@@ -1,12 +1,13 @@
 version: 2
 
 build:
-  image: latest
+  os: ubuntu20
+  languages:
+    python: "3.9"
   apt_packages:
     - libkrb5-dev
 
 python:
-  version: "3.8"
   install:
     - requirements: docs/requirements.txt
 
