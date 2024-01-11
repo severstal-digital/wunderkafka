@@ -3,9 +3,10 @@
 import time
 import atexit
 import datetime
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional, TypeVar, Callable
 
-from confluent_kafka import KafkaException
+import confluent_kafka
+from confluent_kafka import KafkaException, Consumer
 
 from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.types import HowToSubscribe
@@ -26,7 +27,7 @@ class BytesConsumer(AbstractConsumer):
         """
         Init consumer.
 
-        :param config:          Pydantic model with librdkafka consumer's configuration.
+        :param config:          Pydantic BaseSettings model with librdkafka consumer's configuration.
         :param sasl_watchdog:   Callable to handle global state of kerberos auth (see Watchdog).
         """
         try:
@@ -84,6 +85,15 @@ class BytesConsumer(AbstractConsumer):
         ts: Optional[int] = None,
         with_timedelta: Optional[datetime.timedelta] = None,
     ) -> None:
+        """
+        Subscribe to a list of topics, or a list of specific TopicSubscriptions.
+
+        This method overrides original `subscribe()` method of `confluent-kafka.Consumer` and allows to subscribe
+        to topic via specific offset or timestamp.
+        
+        .. warning::
+            Currently this method doesn't allow to pass callbacks and uses it's own to reset partitions.
+        """  # noqa: E501
         subscriptions = {}
         for tpc in topics:
             if isinstance(tpc, str):
@@ -99,3 +109,43 @@ class BytesConsumer(AbstractConsumer):
             super().subscribe(topics=list(self.subscription_offsets), on_assign=reset_partitions)
         else:
             super().subscribe(topics=list(subscriptions))
+
+
+T = TypeVar('T')
+
+
+def _patched_docstring(method: Callable[..., T], parent_method: Callable[..., T]) -> Optional[str]:
+    current_doc = method.__doc__
+    if not current_doc:
+        return None
+    first, *_ = [line for line in current_doc.split('\n') if line]
+    spaces = 0
+    for ch in first:
+        if ch != ' ':
+            break
+        spaces += 1
+    prefix = ' ' * spaces
+    disclaimer = " ".join([
+        "Doc of an original method depends on python's :code:`confluent-kafka` version.",
+        "Please, refer to `confluent-kafka documentation",
+        "<https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#pythonclient-consumer>`__.",  # noqa: E501
+    ])
+    version_notes = [
+        disclaimer,
+        "Below is the version rendered for version **{0}**:".format(confluent_kafka.__version__),
+    ]
+    version_note = '\n\n'.join(prefix + note for note in version_notes)
+    original_doc = parent_method.__doc__ or ''
+    intended = []
+    if original_doc:
+        original_doc_lines = original_doc.split('\n')
+        for line in original_doc_lines:
+            if line:
+                intended.append(prefix + line)
+            else:
+                intended.append(line)
+        original_doc = '\n\n{0}'.format('\n'.join(intended))
+    return '{0}\n{1}{2}'.format(current_doc, version_note, original_doc)
+
+
+BytesConsumer.subscribe.__doc__ = _patched_docstring(BytesConsumer.subscribe, Consumer.subscribe)

@@ -26,7 +26,7 @@ Corresponding to `ASF wiki <https://cwiki.apache.org/confluence/display/KAFKA/Cl
 
 - `confluent-kafka <https://pypi.org/project/confluent-kafka/>`_ is a de-facto standard, but doesn't work out-of-the-box for us, as mentioned above
 - `Kafka Python <https://github.com/dpkp/kafka-python>`_ is awesome, but not as performant as confluent-kafka
-- pykafka `here <https://github.com/Parsely/pykafka>`_ and `here <https://github.com/dsully/pykafka>`_ looks unmaintained: has been archived
+- pykafka `here <https://github.com/Parsely/pykafka>`__ and `here <https://github.com/dsully/pykafka>`__ looks unmaintained: has been archived
 - `pykafkap <https://github.com/urbanairship/pykafkap>`_ has only producer and looks unmaintained: no updates since 2014
 - `brod <https://github.com/datadog/brod>`_ is not maintained in favor of Kafka Python.
 

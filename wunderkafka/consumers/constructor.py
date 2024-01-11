@@ -23,7 +23,7 @@ from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingCon
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
 from wunderkafka.consumers.subscription import TopicSubscription
 
-T = TypeVar("T")
+T = TypeVar("T", Message, StreamResult)
 
 
 class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
@@ -99,10 +99,10 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         :param raise_on_lost:   if True, check on own clocks if max.poll.interval.ms is exceeded. If so, raises
                                 ConsumerException to be handled in client code.
 
-        :raises KafkaError:     See https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#confluent_kafka.KafkaError  # noqa: E501
+        :raises KafkaError:     See `confluent-kafka documentation <https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#confluent_kafka.KafkaError>`__
 
         :return:                A list of Message objects with decoded value() and key() (possibly empty on timeout).
-        """
+        """   # noqa: E501
         msgs = self.consumer.batch_poll(timeout, num_messages, raise_on_lost=raise_on_lost)
         return self._decoded(
             msgs,
