@@ -15,8 +15,8 @@ class FastAvroSerializer(AbstractSerializer):
 
     def serialize(self, schema: str, obj: Any, header: Optional[bytes] = None) -> bytes:
         if schema not in self._cache:
-            self._cache[schema] = parse_schema(loads(schema))  # type: ignore[assignment]
-        writer_schema = self._cache[schema]  # type: ignore[assignment]
+            self._cache[schema] = parse_schema(loads(schema))
+        writer_schema = self._cache[schema]
         with io.BytesIO() as buffer:
             if header is not None:
                 buffer.write(header)

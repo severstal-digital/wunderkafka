@@ -1,4 +1,3 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 
-Field = Dict[str, Union[str, List[str]]]
-FastAvroParsedSchema = Dict[str, Union[bool, str, List[Field]]]
+FastAvroParsedSchema = Union[str, List[Any], Dict[Any, Any]]
