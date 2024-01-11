@@ -74,9 +74,6 @@ class MyConsumer(AvroConsumer):
 ```
 #### Building your own transport
 
-class Field:
-pass
-
 ```python
 from typing import Optional
 
