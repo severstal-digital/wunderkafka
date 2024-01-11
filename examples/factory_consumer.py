@@ -17,7 +17,7 @@ def MyAvroConsumer(
     config, watchdog = check_watchdog(config)
     return HighLevelDeserializingConsumer(
         consumer=BytesConsumer(config, watchdog),
-        schema_registry=ClouderaSRClient(KerberizableHTTPClient(config.sr), SimpleCache()),
+        schema_registry=ClouderaSRClient(KerberizableHTTPClient(config), SimpleCache()),
         headers_handler=AvroClouderaConfluent(),
         deserializer=FastAvroDeserializer(),
     )

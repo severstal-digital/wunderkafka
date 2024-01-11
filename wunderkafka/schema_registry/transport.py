@@ -4,7 +4,9 @@ from typing import Any, Optional
 
 import requests
 
+from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.config.krb.schema_registry import HTTPKerberosAuth
+from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.hotfixes.watchdog import parse_kinit, KrbWatchDog, check_watchdog, get_version
 from wunderkafka.logger import logger
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
@@ -13,33 +15,29 @@ from wunderkafka.config.schema_registry import SRConfig
 
 class KerberizableHTTPClient(AbstractHTTPClient):
     def __init__(
-        self, 
-        config: SRConfig, 
-        *, 
-        requires_kerberos: bool = False, 
+        self,
+        config: RDKafkaConfig,
+        *,
         save_replay: bool = False,
-        cmd_kinit: Optional[str] = None
     ) -> None:
+        if config.sr is None:
+            raise RuntimeError("You have not initialized the configuration for Schema Registry!")
         s = requests.Session()
-        if requires_kerberos and cmd_kinit is not None:
-            if get_version() < (1, 7):
-                params = parse_kinit(cmd_kinit)
-                watchdog = KrbWatchDog()
-                watchdog.add(params)
-
+        if config_requires_kerberos(config) and config.sasl_kerberos_kinit_cmd is not None:
+            check_watchdog(config)
             s.auth = HTTPKerberosAuth(
-                principal=config.sasl_username,
-                mutual_authentication=config.mutual_auth,
+                principal=config.sr.sasl_username,
+                mutual_authentication=config.sr.mutual_auth,
             )
 
-        if config.ssl_certificate_location is not None:
-            if config.ssl_key_location is not None:
-                s.cert = (config.ssl_certificate_location, config.ssl_key_location)
+        if config.sr.ssl_certificate_location is not None:
+            if config.sr.ssl_key_location is not None:
+                s.cert = (config.sr.ssl_certificate_location, config.ssl_key_location)
             else:
-                s.cert = config.ssl_certificate_location
+                s.cert = config.sr.ssl_certificate_location
 
-        if config.ssl_key_location is not None:
-            s.verify = config.ssl_ca_location
+        if config.sr.ssl_key_location is not None:
+            s.verify = config.sr.ssl_ca_location
 
         accept = ', '.join([
             'application/vnd.schemaregistry.v1+json',
@@ -52,7 +50,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
         })
 
         self._session = s
-        self._base_url = config.url
+        self._base_url = config.sr.url
 
         self._save_replay = save_replay
 
