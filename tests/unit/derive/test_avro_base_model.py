@@ -11,7 +11,7 @@ class AvroNestedClass(AvroBaseModel):
     id: UUID4
 
 
-class AcroResultClass(AvroBaseModel):
+class AvroResultClass(AvroBaseModel):
     id: UUID4
     nested: List[AvroNestedClass]
 
@@ -38,7 +38,7 @@ def test_avro_model() -> None:
 
 
 def test_avro_base_model() -> None:
-    schema = derive(AcroResultClass, topic='test_data_1')
+    schema = derive(AvroResultClass, topic='test_data_1')
     assert json.loads(schema) == {
         'type': 'record',
         'name': 'test_data_1_value',

@@ -1,7 +1,7 @@
 """
 This module contains the high-level pipeline to produce messages with a nested consumer.
 
-It is intended to be testable enough due to composition of dependencies.
+It is intended to be testable enough due to the composition of dependencies.
 
 All moving parts should be interchangeable in terms of schema, header and serialization handling
 (for further overriding^W extending).
@@ -44,7 +44,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         self._registry = schema_registry
         self._deserializer = deserializer
 
-    def subscribe(  # noqa: D102,WPS211  # docstring inherited from superclass.
+    def subscribe(  # noqa: D102,WPS211 # docstring inherited from superclass.
         self,
         topics: List[Union[str, TopicSubscription]],
         *,
@@ -57,7 +57,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             topics, from_beginning=from_beginning, offset=offset, ts=ts, with_timedelta=with_timedelta,
         )
 
-    def commit(  # noqa: D102,WPS211  # docstring inherited from superclass.
+    def commit(  # noqa: D102,WPS211 # docstring inherited from superclass.
         self,
         message: Optional[Message] = None,
         offsets: Optional[List[TopicPartition]] = None,
@@ -84,16 +84,16 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
 
         :param timeout:         The maximum time to block waiting for messages. Decoding time doesn't count.
         :param num_messages:    The maximum number of messages to receive from broker.
-                                Default is 1000000 which was the allowed maximum for librdkafka 1.2.
+                                Default is 1000000 that was the allowed maximum for librdkafka 1.2.
         :param ignore_keys:     If True, skip key decoding, key will be set to None. Otherwise, decode key as usual.
-        :param raise_on_error:  if True, raise KafkaError form confluent_kafka library to handle in client code.
-        :param raise_on_lost:   if True, check on own clocks if max.poll.interval.ms is exceeded. If so, raises
+        :param raise_on_error:  If True, raise KafkaError form confluent_kafka library to handle in client code.
+        :param raise_on_lost:   If True, check on own clocks if max.poll.interval.ms is exceeded. If so, raises
                                 ConsumerException to be handled in client code.
 
         :raises KafkaError:     See https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#confluent_kafka.KafkaError
 
         :return:                A list of Message objects with decoded value() and key() (possibly empty on timeout).
-        """
+        """  # noqa: E501
         msgs = self.consumer.batch_poll(timeout, num_messages, raise_on_lost=raise_on_lost)
         return self._decoded(msgs, ignore_keys=ignore_keys, raise_on_error=raise_on_error)
 
@@ -131,7 +131,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         if blob is None:
             return None
 
-        # Header is separate in the sake of customisation, e.g. we don't have SR and put schema directly in message
+        # Header is separate in the sake of customization, e.g., we don't have SR and put schema directly in a message
         parsed_header = self._header_parser(blob)
         schema_meta = SchemaMeta(
             topic=topic,
@@ -140,7 +140,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         )
         schema_text = self._registry.get_schema_text(schema_meta)
         schema = SchemaDescription(text=schema_text)
-        # performance tradeoff: message may be long and we don't want to:
+        # performance tradeoff: a message may be long, and we don't want to:
         # - copy the whole tail
         # - have implicit offset as if we read buffer when extracting header
         # so dealing with implicit offset and the whole binary string
