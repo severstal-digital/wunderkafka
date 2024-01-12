@@ -1,5 +1,11 @@
 # Wunderkafka
 
+## Unreleased
+
+### Added
+
+- Support for JSON/JSONCSchema for (de)serialization. This functionality requires `jsonschema` package to be installed. 
+
 ## v0.15.0 (2024-01-12) 
 
 ### Added
