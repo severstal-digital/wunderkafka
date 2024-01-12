@@ -4,6 +4,7 @@ BytesConsumer
 .. autoclass:: wunderkafka.BytesConsumer
    :members:
 
+
 BytesProducer
 =============
 
