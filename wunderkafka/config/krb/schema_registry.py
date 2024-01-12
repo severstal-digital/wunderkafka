@@ -23,10 +23,10 @@ else:
         OPTIONAL = 2
         DISABLED = 3
 
-    class HTTPKerberosAuth(AuthBase):                                                       # noqa: F811  # type: ignore
+    class HTTPKerberosAuth(AuthBase):                                                        # type: ignore # noqa: F811
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             message = ' '.join([
                 'Something went wrong: trying to use HTTPKerberosAuth while missing requests-kerberos.',
-                'Maybe it is unexpected manual usage. Please, install requests-kerberos.'
+                'Maybe it is unexpected manual usage. Please, install requests-kerberos.',
             ])
             raise ImportError(message)

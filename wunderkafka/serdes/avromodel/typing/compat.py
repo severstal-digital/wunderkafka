@@ -4,6 +4,7 @@ import typing
 from types import MappingProxyType
 from typing import Any, List, Type, Union, get_origin
 
+# We check it via import to avoid using nested imports in implementation in `is_union_type() function`
 HAS_UNION_TYPE = True
 try:
     from types import UnionType  # type: ignore[attr-defined]
@@ -16,8 +17,9 @@ def create_annotation(generic: Any, types_list: List[Type[object]]) -> Type[obje
     return generic[tuple(types_list)]
 
 
-if sys.version_info <= (3, 10):
-    def is_union_type(_: Any) -> bool:
+# Same as `sys.version_info <= (3, 10)`
+if HAS_UNION_TYPE is False:
+    def is_union_type(generic: Any) -> bool:
         return False
 else:
     def is_union_type(generic: Any) -> bool:

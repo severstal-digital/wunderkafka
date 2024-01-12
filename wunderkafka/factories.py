@@ -34,6 +34,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         Init consumer from pre-defined blocks.
 
         :param config:      configuration for:
+
                                 - librdkafka consumer.
                                 - schema registry client (conventional options for HTTP).
 
@@ -80,6 +81,7 @@ class AvroProducer(HighLevelSerializingProducer):
         :param mapping:     Topic-to-Schemas mapping.
                             Mapping's value should contain at least message's value schema to be used fo serialization.
         :param config:      configuration for:
+
                                 - librdkafka producer.
                                 - schema registry client (conventional options for HTTP).
 
@@ -131,6 +133,7 @@ class AvroModelProducer(HighLevelSerializingProducer):
                             Mapping's value should contain at least message's value model to derive schema which will
                             be used fo serialization.
         :param config:      configuration for:
+
                                 - librdkafka producer.
                                 - schema registry client (conventional options for HTTP).
 
