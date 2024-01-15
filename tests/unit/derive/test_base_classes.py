@@ -122,13 +122,12 @@ class Image(BaseModel):
     path: Optional[str] = None
 
 
-class IMG(BaseModel):
+class Item(BaseModel):
     id: UUID4
-    path: Optional[str] = None
 
 
-class ImagesList(BaseModel):
-    images: Optional[List[IMG]] = []
+class ItemList(BaseModel):
+    items: Optional[List[Item]] = None
 
 
 def test_dataclass() -> None:
@@ -482,34 +481,34 @@ def test_pydantic_annotated() -> None:
 
 
 def test_pydantic_annotated_items() -> None:
-    schema = derive(Image, topic='test_data_1')
+    schema = derive(ItemList, topic='test_data_1')
     assert json.loads(schema) == {
-        'type': 'record',
-        'name': 'test_data_1',
-        'fields': [
+        "type": "record",
+        "name": "ItemList",
+        "fields": [
             {
-                'name': 'items',
-                'type': [
-                    'null',
+                "name": "items",
+                "type": [
+                    "null",
                     {
-                        'type': 'array',
-                        'items': {
-                            'type': 'record',
-                            'name': 'Item',
-                            'fields': [
+                        "type": "array",
+                        "items": {
+                            "type": "record",
+                            "name": "Item",
+                            "fields": [
                                 {
-                                    'name': 'id',
-                                    'type': {
-                                        'type': 'string',
-                                        'logicalType': 'uuid',
+                                    "name": "id",
+                                    "type": {
+                                        "type": "string",
+                                        "logicalType": "uuid",
                                     }
                                 }
                             ]
                         },
-                        'name': 'item',
-                    },
+                        "name": "item"
+                    }
                 ],
-                'default': None,
+                "default": None
             }
         ]
     }

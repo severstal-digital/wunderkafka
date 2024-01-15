@@ -11,6 +11,11 @@ try:
 except ImportError:
     HAS_UNION_TYPE = False
 
+try:
+    from typing import Annotated
+except ImportError:
+    from typing_extensions import Annotated
+
 
 def create_annotation(generic: Any, types_list: List[Type[object]]) -> Type[object]:
     # return generic[Union[types_list]]
@@ -28,6 +33,9 @@ else:
 if sys.version_info >= (3, 9):
     def get_generic(annotation: Any) -> Any:
         return get_origin(annotation)
+
+    def is_annotated_type(annotation: Any) -> bool:
+        return get_origin(annotation) is Annotated
 else:
     _TYPE_MAPPING = MappingProxyType({
         getattr(t, '__origin__', None): t for t in typing.__dict__.values() if hasattr(t, '__origin__')
@@ -38,3 +46,6 @@ else:
         if origin is Union:
             return Union
         return _TYPE_MAPPING.get(origin)
+
+    def is_annotated_type(annotation: Any) -> bool:
+        return hasattr(annotation, '__metadata__') and hasattr(annotation, '__origin__')

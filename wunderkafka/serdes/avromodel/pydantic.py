@@ -13,12 +13,12 @@ from pydantic import BaseModel, create_model, ConfigDict
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel.typing import is_generic_type
-from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type, create_annotation
+from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type, create_annotation, is_annotated_type
 
 PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
     'model_config',
     'model_fields',
-    # even the latest ones are properties, we don't want to shadow them too
+    # even the latest ones are properties, we don't want to shadow them either
     'model_computed_fields',
     'model_extra',
     'model_fields_set',
@@ -63,7 +63,8 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
                 if is_generic_type(annotation_type):
                     types_list = []
                     for arg in get_args(annotation_type):
-                        if get_origin(arg) is Annotated:
+                        print(arg, is_annotated_type(arg))
+                        if is_annotated_type(arg):
                             # As `Annotated` should be `Annotated[T, x]`, only first arg should be a type,
                             # x is a metadata
                             arg = get_args(arg)[0]
