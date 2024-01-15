@@ -6,7 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import Field, BaseModel, ValidationError, ConfigDict
+from pydantic import Field, BaseModel, ValidationError, ConfigDict, UUID4
 from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
@@ -114,6 +114,11 @@ class User2(BaseModel):
 class User3(BaseModel):
     model_config: int = ConfigDict(extra='ignore')                                       # type: ignore[assignment,misc]
     name: str
+
+
+class Image(BaseModel):
+    id: Optional[UUID4] = None
+    path: Optional[str] = None
 
 
 def test_dataclass() -> None:
@@ -433,3 +438,33 @@ def test_pydantic_v2_wrong_model_config_annotated() -> None:
     # Maybe we should not raise an error here and check if field value, not the annotation, is ConfigDict?
     with pytest.raises(ValueError):
         derive(User3, topic='test_data_1')
+
+
+def test_pydantic_annotated() -> None:
+    schema = derive(Image, topic='test_data_1')
+    assert json.loads(schema) == {
+        "type": "record",
+        "name": "test_data_1",
+        "fields": [
+            {
+                "name": "id",
+                "type": [
+                    "null",
+                    {
+                        "type": "string",
+                        "logicalType": "uuid",
+                        "pydantic-class": "UUID4"
+                    }
+                ],
+                "default": None
+            },
+            {
+                "name": "path",
+                "type": [
+                    "null",
+                    "string"
+                ],
+                "default": None
+            }
+        ]
+    }

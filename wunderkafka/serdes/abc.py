@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Union, Optional
 
@@ -23,6 +25,15 @@ class AbstractDeserializer(ABC):
 
 
 class AbstractSerializer(ABC):
+    # We allow to nest store in serialized to avoid the necessity of passing it as tuples,
+    # cause in general we want to split schema storing and message serialization,
+    # and it's easier to compose like this.
+    # Therefore, we can use Producer's single store, which was the single one on the old API,
+    # but if serializer has its own store, it will be used instead.
+    # Moreover, as for every serializer store may be passed manually,
+    # it may be the same object or different if there is such a need.
+    store: Optional[AbstractDescriptionStore] = None
+
     @abstractmethod
     def serialize(
         self,
@@ -32,7 +43,8 @@ class AbstractSerializer(ABC):
         topic: Optional[str] = None,
         *,
         is_key: Optional[bool] = None,
-    ) -> bytes: ...
+    ) -> bytes:
+        ...
 
 
 class AbstractDescriptionStore(ABC):
@@ -53,4 +65,5 @@ class AbstractDescriptionStore(ABC):
             return self._values.get(topic)
 
     @abstractmethod
-    def add(self, topic: TopicName, value: Any, key: Any) -> None: ...
+    def add(self, topic: TopicName, value: Any, key: Any) -> None:
+        ...

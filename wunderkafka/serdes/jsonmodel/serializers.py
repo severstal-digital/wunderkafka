@@ -6,7 +6,8 @@ from confluent_kafka.schema_registry.json_schema import JSONSerializer
 from confluent_kafka.serialization import SerializationContext, MessageField
 from pydantic import BaseModel
 
-from wunderkafka.serdes.abc import AbstractSerializer
+from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
+from wunderkafka.serdes.store import JSONModelRepo
 
 
 def pydantic_to_dict(model: BaseModel, _: SerializationContext) -> dict:
@@ -16,9 +17,14 @@ def pydantic_to_dict(model: BaseModel, _: SerializationContext) -> dict:
 
 
 class JSONModelSerializer(AbstractSerializer):
-    def __init__(self, schema_registry_client: SchemaRegistryClient) -> None:
+    def __init__(
+        self,
+        schema_registry_client: SchemaRegistryClient,
+        store: Optional[AbstractDescriptionStore] = None,
+    ) -> None:
         self._cache: Dict[str, JSONSerializer] = {}
         self._sr_client = schema_registry_client
+        self.store = store or JSONModelRepo()
 
     def serialize(
         self,

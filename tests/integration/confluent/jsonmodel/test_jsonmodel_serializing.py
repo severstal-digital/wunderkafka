@@ -22,7 +22,8 @@ class Image(BaseModel):
     path: Optional[str] = None
 
 
-def test_json_producer_create_schema(sr_root_existing: Path, topic: str) -> None:
+def test_json_producer_create_schema(sr_root_existing: Path) -> None:
+    topic = 'testing_json_str_producer'
     test_producer = TestProducer()
     sr_client = ConfluentSRClient(TestHTTPClient(sr_root_existing), SimpleCache())
     producer = HighLevelSerializingProducer(

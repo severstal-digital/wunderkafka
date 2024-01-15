@@ -5,6 +5,7 @@ from typing import Dict, Type, Union, Optional
 from wunderkafka import ConsumerConfig, ProducerConfig
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.structures import SchemaType
 from wunderkafka.types import TopicName, MessageDescription
 from wunderkafka.serdes.avro import (
     FastAvroSerializer,
@@ -109,7 +110,7 @@ class AvroProducer(HighLevelSerializingProducer):
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=FastAvroSerializer(),
-            store=SchemaTextRepo(),
+            store=SchemaTextRepo(schema_type=SchemaType.AVRO),
             mapping=mapping,
             protocol_id=protocol_id
         )

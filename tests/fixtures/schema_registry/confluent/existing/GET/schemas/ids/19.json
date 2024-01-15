@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "Image",
+  "fields": [
+    {
+      "name": "id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid",
+        "pydantic-class": "UUID4"
+      }
+    },
+    {
+      "name": "path",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    }
+  ]
+}

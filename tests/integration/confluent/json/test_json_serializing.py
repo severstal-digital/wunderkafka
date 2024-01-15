@@ -16,7 +16,8 @@ from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 
 
-def test_json_producer_create_schema(sr_root_existing: Path, topic: str) -> None:
+def test_json_producer_create_schema(sr_root_existing: Path) -> None:
+    topic = 'testing_json_str_producer'
     schema_str = '{"properties": {"id": {"anyOf": [{"format": "uuid4", "type": "string"}, {"type": "null"}], "default": null, "title": "Id"}, "path": {"anyOf": [{"type": "string"}, {"type": "null"}], "default": null, "title": "Path"}}, "title": "Image", "type": "object", "additionalProperties": false}'
     test_producer = TestProducer()
     sr_client = ConfluentSRClient(TestHTTPClient(sr_root_existing), SimpleCache())

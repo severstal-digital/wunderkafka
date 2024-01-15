@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from typing import Optional, Any
+from typing import Any, Optional
 from typing_extensions import Protocol
 from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSchemaRegistryClient, Schema
 
 from wunderkafka.schema_registry import SimpleCache
-from wunderkafka.structures import SRMeta, SchemaMeta
+from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
+from wunderkafka.schema_registry.clients.compat import ParamSpec
+
+P = ParamSpec('P')
 
 
 class ConfluentRestClient(Protocol):
@@ -56,9 +59,9 @@ class Adapter(object):
 class SchemaRegistryClient(ConfluentSchemaRegistryClient):
 
     @classmethod
-    def from_client(cls, http_client: AbstractHTTPClient) -> SchemaRegistryClient:
-        # Minimal initialization as we will override client with our own
-        client = cls({'url': http_client.base_url})
+    def from_client(cls, http_client: AbstractHTTPClient, **kwargs: ParamSpec.kwargs) -> SchemaRegistryClient:
+        # Minimal initialization as we will override a client with our own
+        client = cls({'url': http_client.base_url, **kwargs})
         client._rest_client = Adapter(http_client)
         return client
 
@@ -72,8 +75,8 @@ class ConfluentSRClient(AbstractSchemaRegistry):
         schema = self.client.get_schema(meta.header.schema_id)
         return schema.schema_str
 
-    def register_schema(self, topic: str, schema_text: str, *, is_key: bool = True) -> SRMeta:
+    def register_schema(self, topic: str, schema_text: str, schema_type: SchemaType, *, is_key: bool = True) -> SRMeta:
         # FixMe (tribunsky.kir): lack of symmetry here - SchemaMeta knows about different vendors, but not vice versa.
-        subject = '{0}{1}'.format(topic, '_key' if is_key else '_value')
-        schema_id = self.client.register_schema(subject, Schema(schema_text, schema_type='AVRO'))
+        subject = '{0}-{1}'.format(topic, 'key' if is_key else 'value')
+        schema_id = self.client.register_schema(subject, Schema(schema_text, schema_type=schema_type))
         return SRMeta(schema_id, schema_version=None)

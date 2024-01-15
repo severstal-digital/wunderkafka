@@ -3,14 +3,15 @@ from dataclasses import asdict, is_dataclass
 
 from pydantic import BaseModel
 
-from wunderkafka.serdes.abc import AbstractSerializer
+from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
 from wunderkafka.serdes.avro import FastAvroSerializer
 
 
 class AvroModelSerializer(AbstractSerializer):
 
-    def __init__(self) -> None:
+    def __init__(self, store: Optional[AbstractDescriptionStore] = None) -> None:
         self._serializer = FastAvroSerializer()
+        self.store = store
 
     def serialize(self, schema: str, payload: Any, header: Optional[bytes] = None, *args, **kwargs) -> bytes:
         if isinstance(payload, BaseModel):

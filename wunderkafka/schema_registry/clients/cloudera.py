@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Union, Optional
 
 from wunderkafka.errors import SchemaRegistryLookupException
 from wunderkafka.logger import logger
-from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader
+from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader, SchemaType
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
 from wunderkafka.serdes.headers import PROTOCOLS
 from wunderkafka.schema_registry.cache import SimpleCache, AlwaysEmptyCache
@@ -111,7 +111,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
     # ToDo (tribunsky.kir): here and in producers/constructor:
     #                       - make hypothetical meta + prop for subject
     #                       - symmetry with get_schema_text
-    def register_schema(self, topic: str, schema_text: str, *, is_key: bool = True) -> SRMeta:
+    def register_schema(self, topic: str, schema_text: str, schema_type: SchemaType, *, is_key: bool = True) -> SRMeta:
         uid = (topic, schema_text, is_key)
         meta = self._cache.get(uid)
         if meta is None:

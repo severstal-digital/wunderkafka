@@ -1,4 +1,9 @@
-from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional
+from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, get_origin
+
+try:
+    from typing import Annotated
+except ImportError:
+    from typing_extensions import Annotated
 
 try:
     from dataclasses_avroschema.avrodantic import AvroBaseModel
@@ -44,7 +49,7 @@ def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseMode
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
     attributes: Dict[str, Any] = {}
     for field_name, field_info in model_type.model_fields.items():
-        # Here we are changing original model just for schema derivation, so we can override almost everything
+        # Here we are changing the original model just for schema derivation, so we can override almost everything
         # https://github.com/marcosschroh/dataclasses-avroschema/issues/400
         if field_info.default_factory is not None:
             field_info.default_factory = None
@@ -58,6 +63,10 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
                 if is_generic_type(annotation_type):
                     types_list = []
                     for arg in get_args(annotation_type):
+                        if get_origin(arg) is Annotated:
+                            # As `Annotated` should be `Annotated[T, x]`, only first arg should be a type,
+                            # x is a metadata
+                            arg = get_args(arg)[0]
                         if issubclass(arg, BaseModel):
                             types_list.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
                         else:

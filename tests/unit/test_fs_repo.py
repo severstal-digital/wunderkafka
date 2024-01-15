@@ -5,11 +5,12 @@ from pathlib import Path
 import pytest
 
 from wunderkafka.serdes.store import SchemaFSRepo
+from wunderkafka.structures import SchemaType
 
 
 @pytest.fixture
 def repo() -> SchemaFSRepo:
-    return SchemaFSRepo()
+    return SchemaFSRepo(schema_type=SchemaType.AVRO)
 
 
 @pytest.fixture

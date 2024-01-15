@@ -16,10 +16,16 @@ def passer(obj: Any, _: SerializationContext) -> Dict:
 
 
 class JSONSerializer(AbstractSerializer):
-    def __init__(self, schema_registry_client: SchemaRegistryClient, to_dict: ConfluentAPI = passer) -> None:
+    def __init__(
+        self,
+        schema_registry_client: SchemaRegistryClient,
+        store: Optional[AbstractSerializer] = None,
+        to_dict: ConfluentAPI = passer,
+    ) -> None:
         self._cache: Dict[str, JSONSchemaSerializer] = {}
         self._sr_client = schema_registry_client
         self._to_dict = to_dict
+        self.store = store
 
     def serialize(
         self,
