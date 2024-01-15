@@ -1,7 +1,7 @@
 import json
 import sys
 import time
-from typing import Optional, Union
+from typing import Optional, Union, List
 from datetime import datetime
 from dataclasses import dataclass
 
@@ -11,6 +11,7 @@ from pydantic_settings import BaseSettings
 
 from dataclasses_avroschema import AvroModel
 from wunderkafka.serdes.avromodel import derive
+
 
 # ToDo (tribunsky.kir): review some tests. As pydantic V2 changes it's behaviour, some tests are useless:
 #                       we still can derive correct model, but we will be unable to actually populate it in runtime.
@@ -49,7 +50,7 @@ class MetricV2(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: str                                                                                     # type: ignore
+    model_config: str  # type: ignore
 
 
 class MetricV21(BaseModel):
@@ -57,7 +58,7 @@ class MetricV21(BaseModel):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: str                                                                    # type: ignore[assignment,misc]
+    model_config: str  # type: ignore[assignment,misc]
 
     class Config:
         extra = 'allow'
@@ -107,18 +108,27 @@ class User1(BaseModel):
 
 
 class User2(BaseModel):
-    model_config: ConfigDict = ConfigDict(extra='ignore')                                # type: ignore[assignment,misc]
+    model_config: ConfigDict = ConfigDict(extra='ignore')  # type: ignore[assignment,misc]
     name: str
 
 
 class User3(BaseModel):
-    model_config: int = ConfigDict(extra='ignore')                                       # type: ignore[assignment,misc]
+    model_config: int = ConfigDict(extra='ignore')  # type: ignore[assignment,misc]
     name: str
 
 
 class Image(BaseModel):
     id: Optional[UUID4] = None
     path: Optional[str] = None
+
+
+class IMG(BaseModel):
+    id: UUID4
+    path: Optional[str] = None
+
+
+class ImagesList(BaseModel):
+    images: Optional[List[IMG]] = []
 
 
 def test_dataclass() -> None:
@@ -164,38 +174,38 @@ def test_pydantic_with_defaults() -> None:
     schema = derive(Metrics, topic='some_topic')
 
     assert json.loads(schema) == {
-      "type": "record",
-      "name": "some_topic_value",
-      "fields": [
-        {
-          "name": "line_speed",
-          "type": [
-            "long",
-            "null"
-          ]
-        },
-        {
-          "name": "defect_detected",
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "default": False
-        },
-        {
-          "name": "model_on",
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "default": False
-        },
-        {
-          "name": "squad_number",
-          "type": "long",
-          "default": 0,
-        }
-      ]
+        "type": "record",
+        "name": "some_topic_value",
+        "fields": [
+            {
+                "name": "line_speed",
+                "type": [
+                    "long",
+                    "null"
+                ]
+            },
+            {
+                "name": "defect_detected",
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "default": False
+            },
+            {
+                "name": "model_on",
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "default": False
+            },
+            {
+                "name": "squad_number",
+                "type": "long",
+                "default": 0,
+            }
+        ]
     }
 
 
@@ -301,38 +311,38 @@ def test_pydantic_base_settings_with_defaults() -> None:
     schema = derive(Metric, topic='some_topic')
 
     assert json.loads(schema) == {
-      "type": "record",
-      "name": "some_topic_value",
-      "fields": [
-        {
-          "name": "line_speed",
-          "type": [
-            "long",
-            "null"
-          ]
-        },
-        {
-          "name": "defect_detected",
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "default": False
-        },
-        {
-          "name": "model_on",
-          "type": [
-            "boolean",
-            "null"
-          ],
-          "default": False
-        },
-        {
-          "name": "squad_number",
-          "type": "long",
-          "default": 0,
-        }
-      ]
+        "type": "record",
+        "name": "some_topic_value",
+        "fields": [
+            {
+                "name": "line_speed",
+                "type": [
+                    "long",
+                    "null"
+                ]
+            },
+            {
+                "name": "defect_detected",
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "default": False
+            },
+            {
+                "name": "model_on",
+                "type": [
+                    "boolean",
+                    "null"
+                ],
+                "default": False
+            },
+            {
+                "name": "squad_number",
+                "type": "long",
+                "default": 0,
+            }
+        ]
     }
 
 
@@ -341,7 +351,7 @@ def test_pydantic_base_settings_v2_with_defaults() -> None:
         derive(MetricV2, topic='some_topic')
 
     with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, model_config='str')                                              # type: ignore[call-arg]
+        MetricV2(line_speed=2, model_config='str')  # type: ignore[call-arg]
 
 
 def test_pydantic_base_settings_v21_with_defaults() -> None:
@@ -349,13 +359,14 @@ def test_pydantic_base_settings_v21_with_defaults() -> None:
         derive(MetricV21, topic='some_topic')
 
     # https://github.com/pydantic/pydantic/issues/8469
-    MetricV21(line_speed=2, model_config='str')                                                           # type: ignore
+    MetricV21(line_speed=2, model_config='str')  # type: ignore
 
 
 if sys.version_info <= (3, 10):
     class ParentOptional(BaseModel):
         volume: float = Field(description='...')
         weight: Optional[float] = Field(description='...')
+
 
     class ParentUnion(BaseModel):
         payload: Union[bytes, str]
@@ -364,6 +375,7 @@ else:
     class ParentOptional(BaseModel):
         volume: float = Field(description='...')
         weight: float | None = Field(description='...')
+
 
     class ParentUnion(BaseModel):
         payload: bytes | str
@@ -444,7 +456,7 @@ def test_pydantic_annotated() -> None:
     schema = derive(Image, topic='test_data_1')
     assert json.loads(schema) == {
         "type": "record",
-        "name": "test_data_1",
+        "name": "test_data_1_value",
         "fields": [
             {
                 "name": "id",
@@ -453,7 +465,6 @@ def test_pydantic_annotated() -> None:
                     {
                         "type": "string",
                         "logicalType": "uuid",
-                        "pydantic-class": "UUID4"
                     }
                 ],
                 "default": None
@@ -465,6 +476,40 @@ def test_pydantic_annotated() -> None:
                     "string"
                 ],
                 "default": None
+            }
+        ]
+    }
+
+
+def test_pydantic_annotated_items() -> None:
+    schema = derive(Image, topic='test_data_1')
+    assert json.loads(schema) == {
+        'type': 'record',
+        'name': 'test_data_1',
+        'fields': [
+            {
+                'name': 'items',
+                'type': [
+                    'null',
+                    {
+                        'type': 'array',
+                        'items': {
+                            'type': 'record',
+                            'name': 'Item',
+                            'fields': [
+                                {
+                                    'name': 'id',
+                                    'type': {
+                                        'type': 'string',
+                                        'logicalType': 'uuid',
+                                    }
+                                }
+                            ]
+                        },
+                        'name': 'item',
+                    },
+                ],
+                'default': None,
             }
         ]
     }
