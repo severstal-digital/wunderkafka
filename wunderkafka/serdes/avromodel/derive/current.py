@@ -14,14 +14,14 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
             # https://github.com/python/mypy/issues/14941
             model_schema = model_type.avro_schema_to_python()                                             # type: ignore
         else:
-            # non-dataclasses objects may allow mixing defaults and non-default fields order,
+            # Non-dataclasses objects may allow mixing defaults and non-default fields order,
             # so to still reuse dataclasses_avroschema, we extract fields and reorder them to satisfy dataclasses
             # restrictions, than reorder them back.
-            # All this hacks will work only for flat schemas:
+            # All these hacks will work only for flat schemas:
             #   we avoid describing objects via nested types for HDFS's sake.
             attributes = _extract_attributes(model_type)
             ordering = list(attributes['__annotations__'])
-            crafted_model: AvroModel = type(model_type.__name__, (AvroModel,), attributes)    # type: ignore[assignment]
+            crafted_model: Type[AvroModel] = type(model_type.__name__, (AvroModel,), attributes)
             model_schema = crafted_model.avro_schema_to_python()
             fields_map = {field_data['name']: field_data for field_data in model_schema['fields']}
             reordered_fields = [fields_map[attr] for attr in ordering]
