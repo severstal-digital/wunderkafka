@@ -3,11 +3,9 @@ from pathlib import Path
 
 from pydantic import BaseModel, UUID4
 
-from wunderkafka.serdes.store import JSONModelRepo
 from wunderkafka.serdes.string.serializers import StringSerializer
 
 
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestProducer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 

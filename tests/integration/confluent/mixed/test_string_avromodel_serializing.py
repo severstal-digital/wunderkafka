@@ -43,4 +43,4 @@ def test_avro_producer_string_key_create_schema(sr_root_existing: Path) -> None:
     [message] = test_producer.sent
 
     assert message.key == b'714fc713-37ff-4477-9157-cb4f14b63e1a'
-    assert message.value == b'\x00\x00\x00\x00\x13H714fc713-37ff-4477-9157-cb4f14b63e1a\x02x/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3'
+    assert message.value == b'\x00\x00\x00\x00\x13H714fc713-37ff-4477-9157-cb4f14b63e1a\x02x/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3'  # noqa: E501

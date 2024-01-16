@@ -1,11 +1,6 @@
 from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, TypeVar
 
 try:
-    from typing import Annotated
-except ImportError:
-    from typing_extensions import Annotated
-
-try:
     from dataclasses_avroschema.avrodantic import AvroBaseModel
 except ImportError:
     from dataclasses_avroschema.pydantic import AvroBaseModel

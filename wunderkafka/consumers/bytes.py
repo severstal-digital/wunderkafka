@@ -90,7 +90,7 @@ class BytesConsumer(AbstractConsumer):
 
         This method overrides original `subscribe()` method of `confluent-kafka.Consumer` and allows to subscribe
         to topic via specific offset or timestamp.
-        
+
         .. warning::
             Currently this method doesn't allow to pass callbacks and uses it's own to reset partitions.
         """  # noqa: E501

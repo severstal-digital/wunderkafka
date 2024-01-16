@@ -5,12 +5,14 @@ from dataclasses import dataclass
 
 from wunderkafka.time import ts2dt
 
+
 class SchemaType(str, Enum):
     AVRO = 'AVRO'
     JSON = 'JSON'
     PROTOBUF = 'PROTOBUF'
     # Strings, doubles, integers
     PRIMITIVES = 'PRIMITIVES'
+
 
 @dataclass(frozen=True)
 class Timestamp(object):

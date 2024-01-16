@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
 
