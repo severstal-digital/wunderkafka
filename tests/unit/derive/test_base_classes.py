@@ -484,7 +484,7 @@ def test_pydantic_annotated_items() -> None:
     schema = derive(ItemList, topic='test_data_1')
     assert json.loads(schema) == {
         "type": "record",
-        "name": "ItemList",
+        "name": "test_data_1_value",
         "fields": [
             {
                 "name": "items",

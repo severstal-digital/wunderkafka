@@ -1,4 +1,4 @@
-from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, get_origin
+from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, get_origin, TypeVar
 
 try:
     from typing import Annotated
@@ -13,7 +13,9 @@ from pydantic import BaseModel, create_model, ConfigDict
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel.typing import is_generic_type
-from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type, create_annotation, is_annotated_type
+from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type
+
+A = TypeVar('A', bound=Any)
 
 PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
     'model_config',
@@ -46,6 +48,28 @@ def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseMode
     return None
 
 
+def replace_type_in_annotation(annotation: A) -> A:
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+
+    if origin is None:
+        # Base case: the annotation is a type itself, not a special typing construct
+        # Check if the type is a subclass of the original parent type
+
+        if isinstance(annotation, type) and issubclass(annotation, BaseModel):
+            return create_model(annotation.__name__, __base__=(annotation, AvroBaseModel))
+        else:
+            return annotation
+
+    new_args = tuple(replace_type_in_annotation(arg) for arg in args)
+
+    # Handling Union separately
+    if is_union_type(origin):
+        return Union[new_args]
+    else:
+        return origin[new_args]
+
+
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
     attributes: Dict[str, Any] = {}
     for field_name, field_info in model_type.model_fields.items():
@@ -61,26 +85,7 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
                 attributes[field_name] = (annotation_type, field_info)
             else:
                 if is_generic_type(annotation_type):
-                    types_list = []
-                    for arg in get_args(annotation_type):
-                        print(arg, is_annotated_type(arg))
-                        if is_annotated_type(arg):
-                            # As `Annotated` should be `Annotated[T, x]`, only first arg should be a type,
-                            # x is a metadata
-                            arg = get_args(arg)[0]
-                        if issubclass(arg, BaseModel):
-                            types_list.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
-                        else:
-                            types_list.append(arg)
-                    generic = get_generic(annotation_type)
-                    # already checked in is_generic_type
-                    # so this is just for mypy only
-                    assert generic is not None
-                    # https://bugs.python.org/issue45418
-                    union_type = is_union_type(generic)
-                    if union_type:
-                        generic = Union
-                    new_annotation = create_annotation(generic, types_list)
+                    new_annotation = replace_type_in_annotation(annotation_type)
                     field_info.annotation = new_annotation
                     attributes[field_name] = (new_annotation, field_info)
                 else:
