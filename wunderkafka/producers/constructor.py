@@ -64,12 +64,18 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         self._producer = producer
         self._header_packer = header_packer
         self._protocol_id = protocol_id
-        self._value_serializer = value_serializer
-        if self._value_serializer is None:
-            self._value_serializer = serializer
-        self._key_serializer = key_serializer
-        if self._key_serializer is None:
-            self._key_serializer = serializer
+
+        chosen_value_serializer = value_serializer if value_serializer else serializer
+        if chosen_value_serializer is None:
+            msg = 'Value serializer is not specified, should be passed via value_serializer or serializer at least.'
+            raise ValueError(msg)
+        self._value_serializer = chosen_value_serializer
+
+        chosen_key_serializer = key_serializer if value_serializer else serializer
+        if chosen_key_serializer is None:
+            msg = 'Key serializer is not specified, should be passed via key_serializer or serializer at least.'
+            raise ValueError(msg)
+        self._key_serializer = chosen_key_serializer
 
         for topic, description in self._mapping.items():
             if isinstance(description, (tuple, list)):
@@ -104,6 +110,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
             self._check_schema(topic, value_descr)
             if key is not None:
                 key_descr = key_store.get(topic, is_key=True)
+                assert key_descr is not None
                 if not key_descr.empty:
                     self._check_schema(topic, key_descr, is_key=True)
 
@@ -157,7 +164,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         """
         if self._sr is None:
             logger.warning('Schema registry is not passed, skipping schema check for {0}'.format(topic))
-            return
+            return None
         if schema is None:
             raise ValueError("Couldn't check schema from store.")
         uid = (topic, schema.text, is_key)
@@ -167,6 +174,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
             if meta is not None:
                 return meta
 
+        assert schema.type is not None
         meta = self._sr.register_schema(topic, schema.text, schema.type, is_key=is_key)
         self._checked[uid] = meta
         return meta
@@ -188,11 +196,26 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
             return serializer.serialize(schema.text, obj, None, topic, is_key=is_key)
         else:
             available_meta = self._check_schema(topic, schema, is_key=is_key)
+            # ToDo (tribunsky.kir): `_check_schema()` for now return Optional cause it is used when setting
+            #                       producer per topic and should not push schema to on schemaless serializers.
+            assert available_meta is not None
+            # ToDo (tribunsky.kir): looks like header handler should be also placed per-payload or per-topic,
+            #                       because some serializers doesn't use it (e.g. confluent string serializer)
+            assert self._header_packer is not None
+            # ToDo (tribunsky.kir): check if old client uses
+            #                       '{"schema": "{\"type\": \"string\"}"}'
+            #                       https://docs.confluent.io/platform/current/schema-registry/develop/using.html#common-sr-api-usage-examples  # noqa: E501
+            #                       Looks like the new one doesn't publish string schema at all
+            #                       (no type in library for that)
             header = self._header_packer(protocol_id, available_meta)
             return serializer.serialize(schema.text, obj, header, topic, is_key=is_key)
 
     def _get_store(self, serializer: AbstractSerializer) -> AbstractDescriptionStore:
-        return getattr(serializer, 'store', None) or self._store
+        serializers_store = getattr(serializer, 'store', None)
+        if serializers_store is not None:
+            return serializers_store
+        assert self._store is not None
+        return self._store
 
     def _get_serializer(self, is_key: bool) -> AbstractSerializer:
         return self._key_serializer if is_key else self._value_serializer

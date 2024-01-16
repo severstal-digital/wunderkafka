@@ -43,7 +43,7 @@ def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseMode
     return None
 
 
-def replace_type_in_annotation(annotation: A) -> A:
+def replace_type_in_annotation(annotation: Any) -> Any:
     origin = get_generic(annotation)
     args = get_args(annotation)
 

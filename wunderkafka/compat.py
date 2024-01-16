@@ -1,4 +1,6 @@
-try:
+import sys
+
+if sys.version_info > (3, 8):
     from typing import ParamSpec
-except ImportError:
+else:
     from typing_extensions import ParamSpec

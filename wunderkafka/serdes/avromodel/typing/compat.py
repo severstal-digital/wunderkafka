@@ -11,9 +11,9 @@ try:
 except ImportError:
     HAS_UNION_TYPE = False
 
-try:
+if sys.version_info > (3, 8):
     from typing import Annotated
-except ImportError:
+else:
     from typing_extensions import Annotated
 
 

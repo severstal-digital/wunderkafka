@@ -4,7 +4,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.json_schema import JSONSerializer as JSONSchemaSerializer
 from confluent_kafka.serialization import SerializationContext, MessageField
 
-from wunderkafka.serdes.abc import AbstractSerializer
+from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 
 ConfluentAPI = Callable[[Any, SerializationContext], Dict]
 
@@ -19,7 +19,7 @@ class JSONSerializer(AbstractSerializer):
     def __init__(
         self,
         schema_registry_client: SchemaRegistryClient,
-        store: Optional[AbstractSerializer] = None,
+        store: Optional[AbstractDescriptionStore] = None,
         to_dict: ConfluentAPI = passer,
     ) -> None:
         self._cache: Dict[str, JSONSchemaSerializer] = {}

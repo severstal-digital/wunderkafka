@@ -1,5 +1,6 @@
 from typing import Optional
 from pathlib import Path
+from uuid import UUID
 
 from pydantic import BaseModel, UUID4
 
@@ -34,7 +35,7 @@ def test_avro_producer_string_key_create_schema(sr_root_existing: Path) -> None:
 
     key = "714fc713-37ff-4477-9157-cb4f14b63e1a"
     value = Image(
-        id="714fc713-37ff-4477-9157-cb4f14b63e1a",
+        id=UUID("714fc713-37ff-4477-9157-cb4f14b63e1a"),
         path="/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3",
     )
 

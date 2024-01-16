@@ -7,7 +7,7 @@ from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSch
 from wunderkafka.schema_registry import SimpleCache
 from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
-from wunderkafka.schema_registry.clients.compat import ParamSpec
+from wunderkafka.compat import ParamSpec
 
 P = ParamSpec('P')
 
@@ -59,7 +59,7 @@ class Adapter(object):
 class SchemaRegistryClient(ConfluentSchemaRegistryClient):
 
     @classmethod
-    def from_client(cls, http_client: AbstractHTTPClient, **kwargs: ParamSpec.kwargs) -> SchemaRegistryClient:
+    def from_client(cls, http_client: AbstractHTTPClient, *args: P.args, **kwargs: P.kwargs) -> SchemaRegistryClient:
         # Minimal initialization as we will override a client with our own
         client = cls({'url': http_client.base_url, **kwargs})
         client._rest_client = Adapter(http_client)
@@ -68,8 +68,14 @@ class SchemaRegistryClient(ConfluentSchemaRegistryClient):
 
 class ConfluentSRClient(AbstractSchemaRegistry):
 
-    def __init__(self, http_client: AbstractHTTPClient, _: Optional[SimpleCache] = None) -> None:
-        self.client = SchemaRegistryClient.from_client(http_client)
+    def __init__(
+        self,
+        http_client: AbstractHTTPClient,
+        _: Optional[SimpleCache] = None,
+        *args: P.args,
+        **kwargs: P.kwargs,
+    ) -> None:
+        self.client = SchemaRegistryClient.from_client(http_client, *args, **kwargs)
 
     def get_schema_text(self, meta: SchemaMeta) -> str:
         schema = self.client.get_schema(meta.header.schema_id)

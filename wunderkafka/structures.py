@@ -81,6 +81,8 @@ class SchemaDescription(object):
     """
 
     text: str
+    # None - is for deserializers
+    # ToDo (tribunsky.kir): split it to separate schemas for deserializer and serialized?
     type: Optional[SchemaType] = None
 
     @property
