@@ -1,4 +1,4 @@
-from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, get_origin, TypeVar
+from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, TypeVar
 
 try:
     from typing import Annotated
@@ -13,7 +13,7 @@ from pydantic import BaseModel, create_model, ConfigDict
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel.typing import is_generic_type
-from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type
+from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type, create_annotation
 
 A = TypeVar('A', bound=Any)
 
@@ -49,25 +49,22 @@ def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseMode
 
 
 def replace_type_in_annotation(annotation: A) -> A:
-    origin = get_origin(annotation)
+    origin = get_generic(annotation)
     args = get_args(annotation)
 
     if origin is None:
-        # Base case: the annotation is a type itself, not a special typing construct
-        # Check if the type is a subclass of the original parent type
-
         if isinstance(annotation, type) and issubclass(annotation, BaseModel):
             return create_model(annotation.__name__, __base__=(annotation, AvroBaseModel))
         else:
             return annotation
 
-    new_args = tuple(replace_type_in_annotation(arg) for arg in args)
+    new_args = [replace_type_in_annotation(arg) for arg in args]
 
-    # Handling Union separately
+    # https://bugs.python.org/issue45418
     if is_union_type(origin):
-        return Union[new_args]
-    else:
-        return origin[new_args]
+        origin = Union
+
+    return create_annotation(origin, new_args)
 
 
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
