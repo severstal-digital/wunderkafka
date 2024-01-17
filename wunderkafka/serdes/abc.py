@@ -19,6 +19,7 @@ class AbstractProtocolHandler(ABC):
 
 # ToDo (tribunsky.kir): make it parametrized generic?
 class AbstractDeserializer(ABC):
+    schemaless: bool = False
 
     @abstractmethod
     def deserialize(self, schema: str, payload: bytes, seek_pos: Optional[int] = None) -> Any: ...

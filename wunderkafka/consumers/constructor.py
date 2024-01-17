@@ -17,7 +17,7 @@ from pydantic import ValidationError
 from wunderkafka.consumers.types import StreamResult, PayloadError
 from wunderkafka.types import HeaderParser
 from wunderkafka.logger import logger
-from wunderkafka.serdes.abc import AbstractDeserializer
+from wunderkafka.serdes.abc import AbstractDeserializer, AbstractSerializer
 from wunderkafka.structures import SchemaMeta, SchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
@@ -34,7 +34,9 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         consumer: AbstractConsumer,
         headers_handler: HeaderParser,
         schema_registry: AbstractSchemaRegistry,
-        deserializer: AbstractDeserializer,
+        deserializer: Optional[AbstractDeserializer] = None,
+        value_deserializer: Optional[AbstractDeserializer] = None,
+        key_deserializer: Optional[AbstractDeserializer] = None,
         *,
         stream_result: bool = False,
     ):
@@ -51,6 +53,25 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         self._header_parser = headers_handler
         self._registry = schema_registry
         self._deserializer = deserializer
+
+        chosen_value_deserializer = value_deserializer if value_deserializer else deserializer
+        if chosen_value_deserializer is None:
+            msg = [
+                'Value deserializer is not specified,'
+                'it should be passed via value_deserializer or deserializer at least.'
+            ]
+            raise ValueError(' '.join(msg))
+        self._value_deserializer = chosen_value_deserializer
+
+        chosen_key_deserializer = key_deserializer if key_deserializer else deserializer
+        if chosen_key_deserializer is None:
+            msg = [
+                'key deserializer is not specified,'
+                'it should be passed via key_deserializer or deserializer at least.'
+            ]
+            raise ValueError(' '.join(msg))
+        self._key_deserializer = chosen_key_deserializer
+
         self._stream_result = stream_result
 
     def subscribe(  # noqa: D102,WPS211 # docstring inherited from superclass.
@@ -169,6 +190,9 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         if blob is None:
             return None
 
+        deserializer = self._get_deserializer(is_key)
+        if deserializer.schemaless:
+            return deserializer.deserialize('', blob)
         # Header is separate in the sake of customization, e.g., we don't have SR and put schema directly in a message
         parsed_header = self._header_parser(blob)
         schema_meta = SchemaMeta(
@@ -182,4 +206,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         # - copy the whole tail
         # - have implicit offset as if we read buffer when extracting header
         # so dealing with implicit offset and the whole binary string
-        return self._deserializer.deserialize(schema.text, blob, seek_pos=parsed_header.size)
+        return deserializer.deserialize(schema.text, blob, seek_pos=parsed_header.size)
+
+    def _get_deserializer(self, is_key: bool) -> AbstractDeserializer:
+        return self._key_deserializer if is_key else self._value_deserializer
