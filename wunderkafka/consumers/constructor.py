@@ -46,8 +46,10 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         :param consumer:            Consumer implementation to receive messages.
         :param headers_handler:     Callable to parse binary headers.
         :param schema_registry:     Schema registry client.
-        :param deserializer:        Message deserializer.
-        :param stream_result:       If True, return complicated StreamResult object instead of just a model.
+        :param deserializer:        Common message deserializer for value and key, if set.
+        :param value_deserializer:  Message deserializer for value, if set.
+        :param key_deserializer:    Message deserializer for the key, if set.
+        :param stream_result:       If True, return a complex StreamResult object instead of just a model.
         """
         self.consumer = consumer
         self._header_parser = headers_handler

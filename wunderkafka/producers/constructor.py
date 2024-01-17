@@ -45,11 +45,15 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         :param producer:            Producer implementation to send messages.
         :param schema_registry:     Schema registry client.
         :param header_packer:       Callable to form binary headers.
-        :param serializer:          Message serializer.
+        :param serializer:          Common message serializer for the key and value.
+                                    If specific value_deserializer/key_deserializer defined, it will be used instead.
         :param store:               Specific store to provide schema text extraction from schema description.
         :param mapping:             Per-topic definition of value and/or key schema descriptions.
+        :param value_serializer:    Message serializer for value, if set.
+        :param key_serializer:      Message serializer for the key, if set.
         :param protocol_id:         Protocol id for producer (1 - Cloudera, 0 - Confluent, etc.)
-        :param lazy:                If True, defer schema registry publication, otherwise schema will be registered
+        :param lazy:                If True,
+                                    defer schema registry publication, otherwise schema will be registered
                                     before the first message sending.
         """
         self._mapping = mapping or {}
