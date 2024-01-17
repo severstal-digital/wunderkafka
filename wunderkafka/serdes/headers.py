@@ -6,6 +6,8 @@ from wunderkafka.serdes.abc import AbstractProtocolHandler
 from wunderkafka.structures import SRMeta, ParsedHeader
 from wunderkafka.serdes.structures import Mask, Protocol
 
+# FixMe (tribunsky.kir): Get rid of AbstractProtocolHandler?
+
 # see: https://git.io/JvYyC
 PROTOCOLS = MappingProxyType({
     # public static final byte CONFLUENT_VERSION_PROTOCOL = 0x0;

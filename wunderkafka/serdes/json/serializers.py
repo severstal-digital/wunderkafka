@@ -9,7 +9,7 @@ from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 ConfluentAPI = Callable[[Any, SerializationContext], Dict]
 
 
-def passer(obj: Any, _: SerializationContext) -> Dict:
+def any_to_dict(obj: Any, _: SerializationContext) -> Dict:
     if isinstance(obj, dict):
         return obj
     return dict(obj)
@@ -20,7 +20,7 @@ class JSONSerializer(AbstractSerializer):
         self,
         schema_registry_client: SchemaRegistryClient,
         store: Optional[AbstractDescriptionStore] = None,
-        to_dict: ConfluentAPI = passer,
+        to_dict: ConfluentAPI = any_to_dict,
     ) -> None:
         self._cache: Dict[str, JSONSchemaSerializer] = {}
         self._sr_client = schema_registry_client
