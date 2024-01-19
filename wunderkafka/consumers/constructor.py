@@ -12,18 +12,32 @@ from typing import Any, List, Union, Optional, TypeVar
 
 from confluent_kafka import Message, TopicPartition
 from confluent_kafka.serialization import SerializationError
-from pydantic import ValidationError
 
 from wunderkafka.consumers.types import StreamResult, PayloadError
 from wunderkafka.types import HeaderParser
 from wunderkafka.logger import logger
-from wunderkafka.serdes.abc import AbstractDeserializer, AbstractSerializer
+from wunderkafka.serdes.abc import AbstractDeserializer
 from wunderkafka.structures import SchemaMeta, SchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
 from wunderkafka.consumers.subscription import TopicSubscription
 
 T = TypeVar("T")
+
+
+def choose_one_of(
+    common_deserializer: Optional[AbstractDeserializer],
+    specific_deserializer: Optional[AbstractDeserializer],
+    what: str,
+) -> AbstractDeserializer:
+    chosen_deserializer = specific_deserializer if specific_deserializer else common_deserializer
+    if chosen_deserializer is None:
+        msg = [
+            '{0} deserializer is not specified,'.format(what.capitalize()),
+            'it should be passed via {0}_deserializer or deserializer at least.'.format(what),
+        ]
+        raise ValueError(' '.join(msg))
+    return chosen_deserializer
 
 
 class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
@@ -56,23 +70,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         self._registry = schema_registry
         self._deserializer = deserializer
 
-        chosen_value_deserializer = value_deserializer if value_deserializer else deserializer
-        if chosen_value_deserializer is None:
-            msg = [
-                'Value deserializer is not specified,'
-                'it should be passed via value_deserializer or deserializer at least.'
-            ]
-            raise ValueError(' '.join(msg))
-        self._value_deserializer = chosen_value_deserializer
-
-        chosen_key_deserializer = key_deserializer if key_deserializer else deserializer
-        if chosen_key_deserializer is None:
-            msg = [
-                'key deserializer is not specified,'
-                'it should be passed via key_deserializer or deserializer at least.'
-            ]
-            raise ValueError(' '.join(msg))
-        self._key_deserializer = chosen_key_deserializer
+        self._value_deserializer = choose_one_of(deserializer, value_deserializer, 'value')
+        self._key_deserializer = choose_one_of(deserializer, key_deserializer, 'key')
 
         self._stream_result = stream_result
 
@@ -145,7 +144,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             if kafka_error is not None:
                 logger.error(kafka_error)
                 if raise_on_error:
-                    # Even PyCharm stubs show that it is inherited from object, in fact it is valid Exception
+                    # Even PyCharm stubs show that it is inherited from an object, in fact it is a valid Exception
                     raise kafka_error
 
             topic = msg.topic()
@@ -162,6 +161,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
                 # KeyDeserializationError is inherited from SerializationError
                 except SerializationError:
                     decode_key_ok = False
+                    logger.error("Unable to decode key from bytes: {0}".format(raw_key_value))
                     if not ignore_keys:
                         raise
                 else:
@@ -169,7 +169,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
 
             try:
                 decoded_value = self._decode(topic, msg.value())
-            except (SerializationError, ValueError, ValidationError) as exc:
+            except (SerializationError, ValueError) as exc:
+                logger.error("Unable to decode value from bytes: {0}".format(msg.value()))
                 if not self._stream_result:
                     raise
                 value_error = str(exc)
