@@ -28,11 +28,11 @@ def test_avro_model() -> None:
         'fields': [
             {
                 'name': 'id',
-                 'type': {
-                     'type': 'string',
-                     'logicalType': 'uuid'
-                 }
-             }
+                'type': {
+                    'type': 'string',
+                    'logicalType': 'uuid'
+                }
+            }
         ]
     }
 
@@ -72,4 +72,3 @@ def test_avro_base_model() -> None:
             }
         ]
     }
-

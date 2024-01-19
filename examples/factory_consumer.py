@@ -3,7 +3,7 @@ from typing import Optional
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.schema_registry import ClouderaSRClient
 from wunderkafka.hotfixes.watchdog import check_watchdog
-from wunderkafka.serdes.avro.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.schema_registry.cache import SimpleCache
 from wunderkafka.schema_registry.transport import KerberizableHTTPClient

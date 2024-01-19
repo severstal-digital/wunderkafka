@@ -4,12 +4,13 @@ from typing import Dict, Type, Union, Optional
 
 from wunderkafka import ConsumerConfig, ProducerConfig
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.structures import SchemaType
 from wunderkafka.types import TopicName, MessageDescription
 from wunderkafka.serdes.avro import (
     FastAvroSerializer,
     AvroModelSerializer,
     FastAvroDeserializer,
-    ConfluentClouderaHeadersHandler,
 )
 from wunderkafka.serdes.store import AvroModelRepo, SchemaTextRepo
 from wunderkafka.consumers.bytes import BytesConsumer
@@ -33,16 +34,16 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         """
         Init consumer from pre-defined blocks.
 
-        :param config:      configuration for:
+        :param config:      Configuration for:
 
-                                - librdkafka consumer.
-                                - schema registry client (conventional options for HTTP).
+                                - Librdkafka consumer.
+                                - Schema registry client (conventional options for HTTP).
 
                             Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
 
         :param sr_client:   Client for schema registry
 
-        :raises ValueError: if schema registry configuration is missing.
+        :raises ValueError: If schema registry configuration is missing.
         """
         sr = config.sr
         self._default_timeout: int = 60
@@ -79,18 +80,18 @@ class AvroProducer(HighLevelSerializingProducer):
         Init producer from pre-defined blocks.
 
         :param mapping:     Topic-to-Schemas mapping.
-                            Mapping's value should contain at least message's value schema to be used fo serialization.
-        :param config:      configuration for:
+                            Mapping's value should contain at least message's value schema to be used for serialization.
+        :param config:      Configuration for:
 
-                                - librdkafka producer.
-                                - schema registry client (conventional options for HTTP).
+                                - Librdkafka producer.
+                                - Schema registry client (conventional options for HTTP).
 
                             Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
 
         :param sr_client:   Client for schema registry
         :param protocol_id: Protocol id for producer (1 - Cloudera, 0 - Confluent, etc.)
 
-        :raises ValueError: if schema registry configuration is missing.
+        :raises ValueError: If schema registry configuration is missing.
         """
         sr = config.sr
         if sr is None:
@@ -109,7 +110,7 @@ class AvroProducer(HighLevelSerializingProducer):
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=FastAvroSerializer(),
-            store=SchemaTextRepo(),
+            store=SchemaTextRepo(schema_type=SchemaType.AVRO),
             mapping=mapping,
             protocol_id=protocol_id
         )
@@ -131,18 +132,18 @@ class AvroModelProducer(HighLevelSerializingProducer):
 
         :param mapping:     Topic-to-Schemas mapping.
                             Mapping's value should contain at least message's value model to derive schema which will
-                            be used fo serialization.
-        :param config:      configuration for:
+                            be used for serialization.
+        :param config:      Configuration for:
 
-                                - librdkafka producer.
-                                - schema registry client (conventional options for HTTP).
+                                - Librdkafka producer.
+                                - Schema registry client (conventional options for HTTP).
 
                             Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
 
         :param sr_client:   Client for schema registry
         :param protocol_id: Protocol id for producer (1 - Cloudera, 0 - Confluent, etc.)
 
-        :raises ValueError: if schema registry configuration is missing.
+        :raises ValueError: If schema registry configuration is missing.
         """
         sr = config.sr
         if sr is None:

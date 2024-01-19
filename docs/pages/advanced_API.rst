@@ -17,21 +17,3 @@ Producer
 
 .. automodule:: wunderkafka.producers.constructor
    :members:
-
-Message Headers
-===============
-
-Packing
--------
-
-Unpacking
----------
-
-Schema Description Store
-========================
-
-(De)serialization
-=================
-
-AVRO
-----

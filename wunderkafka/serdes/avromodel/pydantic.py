@@ -1,4 +1,4 @@
-from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional
+from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, TypeVar
 
 try:
     from dataclasses_avroschema.avrodantic import AvroBaseModel
@@ -10,10 +10,12 @@ from pydantic_settings import BaseSettings
 from wunderkafka.serdes.avromodel.typing import is_generic_type
 from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type, create_annotation
 
+A = TypeVar('A', bound=Any)
+
 PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
     'model_config',
     'model_fields',
-    # even the latest ones are properties, we don't want to shadow them too
+    # even the latest ones are properties, we don't want to shadow them either
     'model_computed_fields',
     'model_extra',
     'model_fields_set',
@@ -41,10 +43,29 @@ def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseMode
     return None
 
 
+def replace_type_in_annotation(annotation: Any) -> Any:
+    origin = get_generic(annotation)
+    args = get_args(annotation)
+
+    if origin is None:
+        if isinstance(annotation, type) and issubclass(annotation, BaseModel):
+            return create_model(annotation.__name__, __base__=(annotation, AvroBaseModel))
+        else:
+            return annotation
+
+    new_args = [replace_type_in_annotation(arg) for arg in args]
+
+    # https://bugs.python.org/issue45418
+    if is_union_type(origin):
+        origin = Union
+
+    return create_annotation(origin, new_args)
+
+
 def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
     attributes: Dict[str, Any] = {}
     for field_name, field_info in model_type.model_fields.items():
-        # Here we are changing original model just for schema derivation, so we can override almost everything
+        # Here we are changing the original model just for schema derivation, so we can override almost everything
         # https://github.com/marcosschroh/dataclasses-avroschema/issues/400
         if field_info.default_factory is not None:
             field_info.default_factory = None
@@ -56,21 +77,7 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
                 attributes[field_name] = (annotation_type, field_info)
             else:
                 if is_generic_type(annotation_type):
-                    types_list = []
-                    for arg in get_args(annotation_type):
-                        if issubclass(arg, BaseModel):
-                            types_list.append(create_model(arg.__name__, __base__=(arg, AvroBaseModel)))
-                        else:
-                            types_list.append(arg)
-                    generic = get_generic(annotation_type)
-                    # already checked in is_generic_type
-                    # so this is just for mypy only
-                    assert generic is not None
-                    # https://bugs.python.org/issue45418
-                    union_type = is_union_type(generic)
-                    if union_type:
-                        generic = Union
-                    new_annotation = create_annotation(generic, types_list)
+                    new_annotation = replace_type_in_annotation(annotation_type)
                     field_info.annotation = new_annotation
                     attributes[field_name] = (new_annotation, field_info)
                 else:

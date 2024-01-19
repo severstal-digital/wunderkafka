@@ -1,5 +1,22 @@
 # Wunderkafka
 
+## v0.16.0 (2024-01-19) 
+
+### Added
+
+- Support for `confluent`-like JSON Schema (de)serialization. This functionality requires `jsonschema` package to be installed.
+- Now consumer may return `StreamResult`. It is useful to handle deserialization errors in user's code without raising exceptions in the middle of already consumed batch.
+
+### Changed
+
+- `HighLevelSerializingProducer` now accepts separate value and key serializers. This allows usage of mixed serialization protocols for the key and value per producer.
+- `Serializer`s now may be configured via specific `Store` instance to handle its own type of schemas correctly (`Store` may be shared or not be shared for some reason).
+
+### Fixed
+
+- Nested models are now derived more correctly (e.g., deep nested `Annotated` fields)
+- Subject naming strategy for `confluent` is now 'topic-{key|value}' instead of 'topic_{key|value}'
+
 ## v0.15.0 (2024-01-12) 
 
 ### Added

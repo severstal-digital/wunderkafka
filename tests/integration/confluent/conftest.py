@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Dict, Any
 
 import pytest
 
@@ -9,15 +11,29 @@ def topic() -> str:
 
 
 @pytest.fixture
-def sr_root_create(fixtures_root: Path) -> Path:
-    return fixtures_root / 'schema_registry' / 'confluent' / 'create'
+def sr_root(fixtures_root: Path) -> Path:
+    return fixtures_root / 'schema_registry' / 'confluent'
 
 
 @pytest.fixture
-def sr_root_existing(fixtures_root: Path) -> Path:
-    return fixtures_root / 'schema_registry' / 'confluent' / 'existing'
+def sr_root_create(sr_root: Path) -> Path:
+    return sr_root / 'create'
 
 
 @pytest.fixture
-def sr_root_update(fixtures_root: Path) -> Path:
-    return fixtures_root / 'schema_registry' / 'confluent' / 'update'
+def sr_root_existing(sr_root: Path) -> Path:
+    return sr_root / 'existing'
+
+
+@pytest.fixture
+def sr_root_update(sr_root: Path) -> Path:
+    return sr_root / 'update'
+
+
+@dataclass
+class Msg(object):
+    payload: bytes
+    deserialized: Dict[str, Any]
+
+    def serialized(self, header: bytes) -> bytes:
+        return header + self.payload

@@ -3,8 +3,9 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestProducer, TestHTTPClient
-from wunderkafka.serdes.avro import AvroModelSerializer, ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.avro import AvroModelSerializer
 from wunderkafka.serdes.store import AvroModelRepo
 from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer

@@ -126,14 +126,14 @@ class Row(NamedTuple):
         # logger.debug(self.property_description.split('Type: '))
         return self.property_description.split('Type: ')[-1].strip('*')
 
-    def __str__(self) -> str:
+    def render(self, *, indented: bool = False) -> str:
         if self.property_name == GROUP_ID:
             return '    {0}: str'.format(self.name)
         if self.property_name == SASL_MECHANISMS:
             return '    # {0}: {1} = {2}'.format(self.name, self.annotation, self.default)
         if self.property_name == 'builtin.features':
             lines = ["', '.join(["]
-            spaces = ' ' * 8
+            spaces = ' ' * (8 + int(indented) * 4)
             for feat in self.default.strip('"').strip("'").split(','):                                    # type: ignore
                 stripped = feat.strip()
                 if stripped:
@@ -142,7 +142,7 @@ class Row(NamedTuple):
             return '    {0}: {1} = {2}'.format(self.name, self.annotation, '\n'.join(lines))
         if self.comment:
             left = '    {0}: {1} = {2}'.format(self.name, self.annotation, self.default)
-            ws = 120 - len(left) - len(IGNORE_PYDANTIC_TYPE)
+            ws = 120 - len(left) - len(IGNORE_PYDANTIC_TYPE) - int(indented) * 4
             if ws < 1:
                 ws = 1
             return left + ws * ' ' + IGNORE_PYDANTIC_TYPE
@@ -166,7 +166,7 @@ def read_markdown(filename: Union[str, Path] = 'CONFIGURATION.md', *, cut: bool 
 def write_python(lines: List[str], file_name: str) -> None:
     with open(file_name, 'w') as fl:
         for line in lines:
-            fl.write('{0}\n'.format(line))
+            fl.write('{0}\n'.format(line if line.strip() else ''))
 
 
 def parse_line(line: str) -> Optional[Row]:
@@ -205,7 +205,7 @@ def group(rows: List[Row]) -> Dict[str, List[Row]]:
     return grps
 
 
-def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
+def generate_models(groups: Dict[str, List[Row]], indented: bool = False) -> List[str]:
     properties = [
         '# I am not gonna to generate single type for every single range of conint/confloat.',
         '# https://github.com/samuelcolvin/pydantic/issues/156',
@@ -235,12 +235,12 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
                 else:
                     uniq.append(row)
                 already_generated.add(row.property_name)
-        properties += [str(row) for row in sorted(pre, key=operator.attrgetter('name'))]
+        properties += [row.render(indented=indented) for row in sorted(pre, key=operator.attrgetter('name'))]
         for prop in sorted(uniq, key=operator.attrgetter('name')):
             if prop.property_name == SASL_MECHANISMS:
                 properties.append('    # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()')
                 properties.append('    # It is just alias, but when setting it manually it may misbehave with current defaults.')
-            properties.append(str(prop))
+            properties.append(prop.render(indented=indented))
 
     return properties
 
@@ -334,6 +334,11 @@ def generate(lines: Dict[Version, Files]) -> Dict[Name, Lines]:
 def main() -> None:
     lines: Dict[Version, Files] = {}
     root_dir = Path(__file__).parent / 'versions'
+    rev = '1.4.0'
+    for sub_path in os.listdir(root_dir):
+        path = root_dir / sub_path
+        if path.is_dir():
+            rev = min(rev, sub_path)
     for sub_path in os.listdir(root_dir):
         path = root_dir / sub_path
         if path.is_dir():
@@ -341,7 +346,7 @@ def main() -> None:
             configuration_md = path / 'CONFIGURATION.md'
             grouped = group(parse(read_markdown(filename=configuration_md)))
             files = {
-                'models.py': generate_models(grouped),
+                'models.py': generate_models(grouped, sub_path != rev),
                 'fields.py': generate_fields(grouped),
                 'enums.py': generate_enums(grouped),
             }

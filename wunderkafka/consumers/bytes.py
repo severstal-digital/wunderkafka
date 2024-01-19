@@ -28,7 +28,7 @@ class BytesConsumer(AbstractConsumer):
         Init consumer.
 
         :param config:          Pydantic BaseSettings model with librdkafka consumer's configuration.
-        :param sasl_watchdog:   Callable to handle global state of kerberos auth (see Watchdog).
+        :param sasl_watchdog:   Callable to handle the global state of kerberos auth (see Watchdog).
         """
         try:
             super().__init__(config.dict())
@@ -51,7 +51,7 @@ class BytesConsumer(AbstractConsumer):
         """
         return '{0}:{1}'.format(self.__class__.__name__, self._config.group_id)
 
-    def batch_poll(  # noqa: D102  # inherited from superclass.
+    def batch_poll(  # noqa: D102 # inherited from superclass.
         self,
         timeout: float = 1.0,
         num_messages: int = 1000000,
@@ -90,7 +90,7 @@ class BytesConsumer(AbstractConsumer):
 
         This method overrides original `subscribe()` method of `confluent-kafka.Consumer` and allows to subscribe
         to topic via specific offset or timestamp.
-        
+
         .. warning::
             Currently this method doesn't allow to pass callbacks and uses it's own to reset partitions.
         """  # noqa: E501
@@ -102,7 +102,7 @@ class BytesConsumer(AbstractConsumer):
                 )
             subscriptions[tpc.topic] = tpc.how
 
-        # We have specific subscription at least once
+        # We have a specific subscription at least once
         if any(subscriptions.values()):
             self.subscription_offsets = subscriptions
             # ToDo (tribunsky.kir): avoid mutation of self.subscription_offset and remove it as a field

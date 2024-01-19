@@ -83,12 +83,12 @@ from wunderkafka.config.generated import enums
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.schema_registry import ClouderaSRClient
 from wunderkafka.hotfixes.watchdog import check_watchdog
-from wunderkafka.serdes.avro.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.schema_registry.cache import SimpleCache
 from wunderkafka.schema_registry.transport import KerberizableHTTPClient
 from wunderkafka.serdes.avro.deserializers import FastAvroDeserializer
-from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
+from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol
 
 
 class SRConfig(SRConfig):
@@ -141,7 +141,7 @@ for a topic `topic_name` will become
 ```json
 {
       "type": "record",
-      "name": "test_data_1_value",
+      "name": "topic_name_value",
       "fields": [
           {
               "name": "field1",
@@ -172,7 +172,7 @@ for a topic `topic_name` will become
 ```json
 {
       "type": "record",
-      "name": "topic_name",
+      "name": "topic_name_value",
       "namespace": "any.data",
       "fields": [
           {

@@ -1,5 +1,3 @@
-from typing import Any, Dict
-
 from confluent_kafka import KafkaError
 
 from wunderkafka.config.generated import enums
