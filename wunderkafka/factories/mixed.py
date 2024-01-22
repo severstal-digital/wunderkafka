@@ -1,6 +1,6 @@
 """This module contains some ready-to-go combinations of the Consumer/Producer."""
 
-from typing import Type
+from typing import Type, Optional
 
 from wunderkafka import BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
@@ -30,7 +30,7 @@ class AvroStringConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Type[ConfluentSRClient] | None = None,
+        sr_client: Optional[Type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -72,10 +72,10 @@ class AvroModelStringProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: dict[TopicName, MessageDescription] | None,
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Type[ConfluentSRClient] | None = None,
+        sr_client: Optional[Type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init producer from pre-defined blocks.
@@ -127,7 +127,7 @@ class JSONStringConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Type[ConfluentSRClient] | None = None,
+        sr_client: Optional[Type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -169,10 +169,10 @@ class JSONModelStringProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: dict[TopicName, MessageDescription] | None,
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Type[ConfluentSRClient] | None = None,
+        sr_client: Optional[ConfluentSRClient] = None,
     ) -> None:
         """
         Init producer from pre-defined blocks.
