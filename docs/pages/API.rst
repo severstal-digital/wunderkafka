@@ -61,6 +61,48 @@ JSONModelProducer
    :members:
    :inherited-members:
 
+Mixed
+=====
+
+These pre-configured consumers and producers are provided for convenience and as explicit example of how to define own factories with mixed (de)serializers.
+
+.. note::
+   The naming follow producer API, where the key follows the value. That's why the classes are called `{Value(de)Serializer`+`{Key(de)Serializer`}.
+
+AVRO + String
+-------------
+
+AvroModelStringProducer
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: wunderkafka.factories.mixed.AvroModelStringProducer
+   :members:
+   :inherited-members:
+
+AvroStringConsumer
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: wunderkafka.factories.mixed.AvroStringConsumer
+   :members:
+   :inherited-members:
+
+JSON + String
+-------------
+
+JSONModelStringProducer
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: wunderkafka.factories.mixed.JSONModelStringProducer
+   :members:
+   :inherited-members:
+
+JSONStringConsumer
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: wunderkafka.factories.mixed.JSONStringConsumer
+   :members:
+   :inherited-members:
+
 TopicSubscription
 =================
 

@@ -1,5 +1,11 @@
 # Wunderkafka
 
+## Unreleased
+
+### Added
+
+- pre-configured consumers and producers for Avro-value/string-key and JSON-value/string-key
+
 ## v0.16.0 (2024-01-19) 
 
 ### Added
