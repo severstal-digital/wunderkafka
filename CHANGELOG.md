@@ -1,6 +1,6 @@
 # Wunderkafka
 
-## Unreleased
+## v0.16.1 (2024-01-23) 
 
 ### Added
 
