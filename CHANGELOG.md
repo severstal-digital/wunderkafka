@@ -4,7 +4,11 @@
 
 ### Added
 
-- pre-configured consumers and producers for Avro-value/string-key and JSON-value/string-key
+- pre-configured consumers and producers for avro-value/string-key and JSON-value/string-key
+
+### Fixed
+
+- avro: disallow deriving schemas with names which are not valid [avro names](https://avro.apache.org/docs/1.11.1/specification/#names)
 
 ## v0.16.0 (2024-01-19) 
 
