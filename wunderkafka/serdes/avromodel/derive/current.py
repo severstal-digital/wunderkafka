@@ -1,9 +1,11 @@
 import json
+import re
 from typing import Any, Dict, Type
 from dataclasses import is_dataclass
 
 from dataclasses_avroschema import AvroModel
 
+from wunderkafka.logger import logger
 from wunderkafka.serdes.avromodel.pydantic import derive_from_pydantic, exclude_pydantic_class
 
 
@@ -33,7 +35,10 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
     if hasattr(model_type, 'Meta') and hasattr(model_type.Meta, 'name'):
         model_schema['name'] = model_type.Meta.name
     else:
-        model_schema['name'] = '{0}_{1}'.format(topic, suffix)
+        model_schema['name'] = '{0}_{1}'.format(re.sub('[^\w_]','_', topic), suffix)
+    if model_schema['name'].startswith('_'):
+        logger.warning('Topic name {0} starts with underscore, which is not allowed for Avro schema names.')
+        model_schema['name'] = model_schema['name'][1:]
     if pydantic_model:
         # I would not prefer to just override PydanticParser because it always may be broken or thrown-out
         model_schema = exclude_pydantic_class(model_schema)
