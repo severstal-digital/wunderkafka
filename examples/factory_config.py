@@ -1,12 +1,12 @@
 import os
 from functools import partial
 
-from pydantic import field_validator, AnyHttpUrl, Field
+from pydantic import field_validator, Field
 from wunderkafka.time import now
 from wunderkafka import SRConfig, ConsumerConfig, SecurityProtocol, AvroConsumer
 
 
-# If you are the fan of 12 factors, you may want to config via env variables
+# If you are a fan of 12 factors, you may want to config via env variables
 class OverridenSRConfig(SRConfig):
     url: str = Field(alias='SCHEMA_REGISTRY_URL')
 
@@ -38,5 +38,5 @@ class OverridenConfig(ConsumerConfig):
         return str(v)
 
 
-# After this you can partial your own Producer/Consumer, something like...
+# After this, you can `partial` your own Producer/Consumer, something like...
 MyConsumer = partial(AvroConsumer, config=OverridenConfig())

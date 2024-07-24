@@ -1,0 +1,3 @@
+{
+  "schema": "{\"type\": \"record\", \"name\": \"SignalsTest\", \"fields\": [{\"name\": \"source\", \"type\": \"string\"}, {\"name\": \"type\", \"type\": \"string\"}, {\"name\": \"id\", \"type\": \"string\"}, {\"name\": \"value\", \"type\": \"string\"}, {\"name\": \"ts\", \"type\": \"long\"}]}"
+}

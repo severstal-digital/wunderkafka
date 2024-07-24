@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from wunderkafka.structures import SRMeta, SchemaMeta
+from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
 
 
 class AbstractHTTPClient(ABC):
@@ -23,4 +23,5 @@ class AbstractSchemaRegistry(ABC):
     def get_schema_text(self, schema_meta: SchemaMeta) -> str: ...
 
     @abstractmethod
-    def register_schema(self, topic: str, schema_text: str, *, is_key: bool = True) -> SRMeta: ...
+    def register_schema(self, topic: str, schema_text: str, schema_type: SchemaType, *, is_key: bool = True) -> SRMeta:
+        ...

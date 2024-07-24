@@ -1,11 +1,12 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 from pathlib import Path
 from dataclasses import dataclass
 
 import pytest
 
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestConsumer, TestHTTPClient
-from wunderkafka.serdes.avro import FastAvroDeserializer, ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.avro import FastAvroDeserializer
 from wunderkafka.tests.consumer import Message
 from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
@@ -50,7 +51,7 @@ def test_consume_moving_parts(sr_root: Path, topic: str, header: bytes) -> None:
 
     consumer.subscribe([topic], from_beginning=True)
 
-    msgs = consumer.consume()
+    msgs: List[Message] = consumer.consume()
     [message] = msgs
     assert message.key() is None
     assert message.value() == SIGNAL_MESSAGE.deserialized

@@ -17,7 +17,6 @@ if sys.version_info <= (3, 10):
     class GrandsonOptional(ChildOptional):
         ...
 
-
     def test_dataclass() -> None:
         schema = derive(GrandsonOptional, topic='test_data_1')
         assert json.loads(schema) == {
@@ -44,10 +43,8 @@ else:
         volume: float = Field(description='...')
         weight: float | None = Field(description='...')
 
-
     class Child(Parent):
         ts: int = Field(description='...')
-
 
     class Grandson(Child):
         ...

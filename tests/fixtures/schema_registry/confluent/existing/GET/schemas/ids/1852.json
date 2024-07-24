@@ -1,0 +1,4 @@
+{
+  "schemaType": "JSON",
+  "schema": "{\"properties\": {\"id\": {\"anyOf\": [{\"format\": \"uuid4\", \"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null, \"title\": \"Id\"}, \"path\": {\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"null\"}], \"default\": null, \"title\": \"Path\"}}, \"title\": \"Image\", \"type\": \"object\", \"additionalProperties\": false}"
+}

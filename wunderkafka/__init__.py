@@ -10,7 +10,7 @@ Module contains handful re-imports (public API) from the package.
 from confluent_kafka import Message
 
 from wunderkafka.config import ConsumerConfig, ProducerConfig
-from wunderkafka.factories import (
+from wunderkafka.factories.avro import (
     AvroConsumer,
     AvroProducer,
     AvroModelProducer,

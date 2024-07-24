@@ -40,13 +40,15 @@ def remap_properties(
 def sanitize(dct: Dict[str, ConfigValues]) -> Dict[str, ConfigValues]:
     # cimpl.KafkaException: KafkaError{
     #   ...
-    #   "Configuration property "ssl.ca.certificate.stores" not supported in this build: configuration only valid on Windows"
-    #   }
+    #   "Configuration property "ssl.ca.certificate.stores" not supported in this build: configuration only valid on Windows"  # noqa: E501
+    #  }
     if os.name != 'nt':
         property_name = 'ssl.ca.certificate.stores'
         property_value = dct.pop(property_name, None)
         if property_value is not None:
-            logger.warning('Excluding {0}={1} as windows-only even it was set to default'.format(property_name, property_value))
+            logger.warning('Excluding {0}={1} as windows-only even it was set to default'.format(
+                property_name, property_value,
+            ))
     return dct
 
 

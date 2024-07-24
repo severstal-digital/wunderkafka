@@ -1,7 +1,7 @@
 import pytest
 
 from wunderkafka.structures import SRMeta
-from wunderkafka.serdes.avro.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 
 parse = ConfluentClouderaHeadersHandler().parse
 pack = ConfluentClouderaHeadersHandler().pack
