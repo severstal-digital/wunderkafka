@@ -1,10 +1,11 @@
-from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, TypeVar
+from typing import Any, Dict, Type, Final, Union, TypeVar, Optional, FrozenSet, get_args
 
 try:
     from dataclasses_avroschema.avrodantic import AvroBaseModel
 except ImportError:
     from dataclasses_avroschema.pydantic import AvroBaseModel
-from pydantic import BaseModel, create_model, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, create_model
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel.typing import is_generic_type
@@ -22,15 +23,15 @@ PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
 })
 
 
-def exclude_pydantic_class(schema: Dict[str, Any]) -> Dict[str, Any]:
-    schema.pop('pydantic-class', None)
+def exclude_pydantic_key(schema: Dict[str, Any], key: str) -> Dict[str, Any]:
+    schema.pop(key, None)
     for value in schema.values():
         if isinstance(value, dict):
-            exclude_pydantic_class(value)
+            exclude_pydantic_key(value, key)
         elif isinstance(value, list):
             for item in value:
                 if isinstance(item, dict):
-                    exclude_pydantic_class(item)
+                    exclude_pydantic_key(item, key)
     return schema
 
 

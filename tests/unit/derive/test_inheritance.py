@@ -11,11 +11,14 @@ if sys.version_info <= (3, 10):
         volume: float = Field(description='...')
         weight: Optional[float] = Field(description='...')
 
+
     class ChildOptional(ParentOptional):
         ts: int = Field(description='...')
 
+
     class GrandsonOptional(ChildOptional):
         ...
+
 
     def test_dataclass() -> None:
         schema = derive(GrandsonOptional, topic='test_data_1')
@@ -43,11 +46,14 @@ else:
         volume: float = Field(description='...')
         weight: float | None = Field(description='...')
 
+
     class Child(Parent):
         ts: int = Field(description='...')
 
+
     class Grandson(Child):
         ...
+
 
     def test_dataclass_pipe_annotation() -> None:
         schema = derive(Grandson, topic='test_data_1')

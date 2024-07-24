@@ -1,6 +1,6 @@
 import json
-from pathlib import Path
 from typing import Any, Union
+from pathlib import Path
 from urllib.parse import urlparse
 
 from wunderkafka.schema_registry.abc import AbstractHTTPClient

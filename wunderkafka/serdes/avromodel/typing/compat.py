@@ -1,6 +1,6 @@
-import inspect
 import sys
 import typing
+import inspect
 from types import MappingProxyType
 from typing import Any, List, Type, Union, get_origin
 

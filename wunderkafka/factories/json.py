@@ -3,20 +3,19 @@
 from typing import Dict, Type, Union, Optional
 
 from wunderkafka import ConsumerConfig, ProducerConfig
-from wunderkafka.config.krb.rdkafka import config_requires_kerberos
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.serdes.json.deserializers import JSONDeserializer
-from wunderkafka.serdes.json.serializers import JSONSerializer
-from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
-from wunderkafka.structures import SchemaType
 from wunderkafka.types import TopicName, MessageDescription
+from wunderkafka.structures import SchemaType
 from wunderkafka.serdes.store import JSONModelRepo, SchemaTextRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.producers.bytes import BytesProducer
 from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient, KerberizableHTTPClient
-from wunderkafka.hotfixes.watchdog import check_watchdog
+from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.serdes.json.serializers import JSONSerializer
+from wunderkafka.serdes.json.deserializers import JSONDeserializer
+from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
 from wunderkafka.schema_registry.clients.confluent import ConfluentSRClient
 
 
@@ -50,14 +49,13 @@ class JSONConsumer(HighLevelDeserializingConsumer):
         if sr_client is None:
             sr_client = ClouderaSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, watchdog),
+            consumer=BytesConsumer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(
                     sr,
                     requires_kerberos=config_requires_kerberos(config),
-                    cmd_kinit=config.sasl_kerberos_kinit_cmd,
+                    cmd_kerberos=config.sasl_kerberos_kinit_cmd,
                 ),
                 SimpleCache(),
             ),
@@ -101,15 +99,14 @@ class JSONProducer(HighLevelSerializingProducer):
             sr_client = ConfluentSRClient
         self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
         schema_registry = sr_client(
             KerberizableHTTPClient(
-                sr, requires_kerberos=config_requires_kerberos(config), cmd_kinit=config.sasl_kerberos_kinit_cmd,
+                sr, requires_kerberos=config_requires_kerberos(config), cmd_kerberos=config.sasl_kerberos_kinit_cmd,
             ),
             SimpleCache(),
         )
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=schema_registry,
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=JSONSerializer(schema_registry.client),
@@ -156,17 +153,16 @@ class JSONModelProducer(HighLevelSerializingProducer):
             sr_client = ConfluentSRClient
         self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
         schema_registry = sr_client(
             KerberizableHTTPClient(
                 sr,
                 requires_kerberos=config_requires_kerberos(config),
-                cmd_kinit=config.sasl_kerberos_kinit_cmd,
+                cmd_kerberos=config.sasl_kerberos_kinit_cmd,
             ),
             SimpleCache(),
         )
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=schema_registry,
             header_packer=ConfluentClouderaHeadersHandler().pack,
             serializer=JSONModelSerializer(schema_registry.client),

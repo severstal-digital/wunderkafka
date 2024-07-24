@@ -4,7 +4,7 @@ from dataclasses import asdict, is_dataclass
 from pydantic import BaseModel
 
 from wunderkafka.compat import ParamSpec
-from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
+from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 from wunderkafka.serdes.avro import FastAvroSerializer
 
 P = ParamSpec('P')
@@ -27,5 +27,5 @@ class AvroModelSerializer(AbstractSerializer):
         if isinstance(payload, BaseModel):
             dct = payload.model_dump()
         else:
-            dct = asdict(payload) if is_dataclass(payload) else dict(payload)
+            dct = asdict(payload) if is_dataclass(payload) else dict(payload)  # type: ignore[call-overload]
         return self._serializer.serialize(schema, dct, header)

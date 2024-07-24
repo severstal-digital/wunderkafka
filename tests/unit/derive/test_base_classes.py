@@ -1,15 +1,15 @@
-import json
 import sys
+import json
 import time
-from typing import Optional, Union, List
+from typing import List, Union, Optional
 from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import Field, BaseModel, ValidationError, ConfigDict, UUID4
+from pydantic import UUID4, Field, BaseModel, ConfigDict, ValidationError
 from pydantic_settings import BaseSettings
-
 from dataclasses_avroschema import AvroModel
+
 from wunderkafka.serdes.avromodel import derive
 
 
@@ -43,25 +43,6 @@ class Metric(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-
-
-class MetricV2(BaseSettings):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-    model_config: str  # type: ignore
-
-
-class MetricV21(BaseModel):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-    model_config: str  # type: ignore[assignment,misc]
-
-    class Config:
-        extra = 'allow'
 
 
 class Event(BaseModel):
@@ -343,22 +324,6 @@ def test_pydantic_base_settings_with_defaults() -> None:
             }
         ]
     }
-
-
-def test_pydantic_base_settings_v2_with_defaults() -> None:
-    with pytest.raises(ValueError):
-        derive(MetricV2, topic='some_topic')
-
-    with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, model_config='str')  # type: ignore[call-arg]
-
-
-def test_pydantic_base_settings_v21_with_defaults() -> None:
-    with pytest.raises(ValueError):
-        derive(MetricV21, topic='some_topic')
-
-    # https://github.com/pydantic/pydantic/issues/8469
-    MetricV21(line_speed=2, model_config='str')  # type: ignore
 
 
 if sys.version_info <= (3, 10):

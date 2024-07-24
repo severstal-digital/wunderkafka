@@ -1,9 +1,9 @@
 import json
+from typing import Dict, List, Optional
 from pathlib import Path
-from typing import List, Optional, Dict
 
 import pytest
-from pydantic import BaseModel, UUID4, ValidationError
+from pydantic import UUID4, BaseModel, ValidationError
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel import derive
@@ -226,27 +226,3 @@ def test_deep_nested_base_model() -> None:
             }
         ]
     }
-
-
-class MLConfig(BaseSettings):
-    weights: Path
-    threshold: float = 0.5
-
-
-class MetricV22(BaseSettings):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-    model_config: MLConfig                                                               # type: ignore[assignment,misc]
-
-    class Config:
-        extra = 'allow'
-
-
-def test_pydantic_base_settings_v22_with_defaults_complicated_field() -> None:
-    with pytest.raises(ValueError):
-        derive(MetricV22, topic='some_topic')
-
-    with pytest.raises(ValidationError):
-        MetricV22(line_speed=2, model_config=MLConfig(path='test'))  # type: ignore

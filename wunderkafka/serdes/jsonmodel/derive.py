@@ -2,8 +2,8 @@ import json
 from typing import Type
 
 from pydantic import BaseModel
-from pydantic.json_schema import GenerateJsonSchema, DEFAULT_REF_TEMPLATE, JsonSchemaMode, JsonSchemaValue
 from pydantic_core import CoreSchema
+from pydantic.json_schema import DEFAULT_REF_TEMPLATE, JsonSchemaMode, JsonSchemaValue, GenerateJsonSchema
 
 
 class JSONClosedModelGenerator(GenerateJsonSchema):

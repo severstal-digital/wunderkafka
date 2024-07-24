@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from wunderkafka.serdes.store import SchemaFSRepo
 from wunderkafka.structures import SchemaType
+from wunderkafka.serdes.store import SchemaFSRepo
 
 
 @pytest.fixture

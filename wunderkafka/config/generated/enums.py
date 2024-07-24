@@ -2,9 +2,9 @@
 #                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.
 # mypy: disable-error-code="no-redef"
 
-from wunderkafka import librdkafka
-
 from enum import Enum
+
+from wunderkafka import librdkafka
 
 
 class BrokerAddressFamily(str, Enum):

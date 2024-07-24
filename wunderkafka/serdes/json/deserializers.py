@@ -1,8 +1,9 @@
 import json
 from typing import Any, Dict, Optional
 
-from wunderkafka.serdes.abc import AbstractDeserializer
 from confluent_kafka.schema_registry.json_schema import JSONDeserializer as JSONDSchemaDeserializer
+
+from wunderkafka.serdes.abc import AbstractDeserializer
 
 
 class JSONDeserializer(AbstractDeserializer):

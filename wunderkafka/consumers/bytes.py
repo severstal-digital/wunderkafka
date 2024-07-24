@@ -3,32 +3,30 @@
 import time
 import atexit
 import datetime
-from typing import Dict, List, Union, Optional, TypeVar, Callable
+from typing import Dict, List, Union, TypeVar, Callable, Optional
 
 import confluent_kafka
-from confluent_kafka import KafkaException, Consumer
+from confluent_kafka import Consumer, KafkaException
 
-from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.errors import ConsumerException
 from wunderkafka.logger import logger
 from wunderkafka.callbacks import reset_partitions
 from wunderkafka.consumers.abc import Message, AbstractConsumer
+from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.consumers.subscription import TopicSubscription
-from wunderkafka.hotfixes.watchdog.types import Watchdog
 
 
 class BytesConsumer(AbstractConsumer):
     """Consumer implementation of extended interface for raw messages."""
 
     # FixMe (tribunsky.kir): add watchdog page reference
-    def __init__(self, config: ConsumerConfig, sasl_watchdog: Optional[Watchdog] = None) -> None:
+    def __init__(self, config: ConsumerConfig) -> None:
         """
         Init consumer.
 
         :param config:          Pydantic BaseSettings model with librdkafka consumer's configuration.
-        :param sasl_watchdog:   Callable to handle the global state of kerberos auth (see Watchdog).
         """
         try:
             super().__init__(config.dict())
@@ -39,7 +37,6 @@ class BytesConsumer(AbstractConsumer):
 
         self._config = config
         self._last_poll_ts = time.perf_counter()
-        self._sasl_watchdog = sasl_watchdog
         # ToDo (tribunsky-kir): make it configurable
         atexit.register(self.close)
 

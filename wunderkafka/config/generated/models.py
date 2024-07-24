@@ -2,19 +2,21 @@
 #                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.
 # mypy: disable-error-code="no-redef"
 
-from wunderkafka import librdkafka
-
-# I am not gonna to generate single type for every single range of conint/confloat.
-# https://github.com/samuelcolvin/pydantic/issues/156
-
 from typing import Callable, Optional
 
 from pydantic import conint, confloat
 from pydantic_settings import BaseSettings
 
+from wunderkafka import librdkafka
 # Enums because we can't rely that client code uses linters.
 # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
 from wunderkafka.config.generated import enums
+
+# I am not gonna to generate single type for every single range of conint/confloat.
+# https://github.com/samuelcolvin/pydantic/issues/156
+
+
+
 
 
 class RDKafkaConfig(BaseSettings):

@@ -1,17 +1,16 @@
+from uuid import UUID
 from typing import Optional
 from pathlib import Path
-from uuid import UUID
 
-from pydantic import BaseModel, UUID4
+from pydantic import UUID4, BaseModel
 
-from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
-from wunderkafka.serdes.store import AvroModelRepo
-
-from wunderkafka.serdes.string.serializers import StringSerializer
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestProducer, TestHTTPClient
+from wunderkafka.serdes.store import AvroModelRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.serdes.string.serializers import StringSerializer
+from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
 
 
 class Image(BaseModel):

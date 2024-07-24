@@ -1,26 +1,21 @@
 """This module contains some ready-to-go combinations of the Consumer/Producer."""
 
-from typing import Type, Optional, Dict
+from typing import Dict, Type, Optional
 
 from wunderkafka import BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
+from wunderkafka.types import TopicName, MessageDescription
+from wunderkafka.serdes.avro import FastAvroDeserializer
+from wunderkafka.serdes.store import AvroModelRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient, KerberizableHTTPClient
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
-from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
-from wunderkafka.schema_registry import (
-    ConfluentSRClient,
-    KerberizableHTTPClient,
-    SimpleCache,
-)
-from wunderkafka.serdes.avro import FastAvroDeserializer
-from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.serdes.json.deserializers import JSONDeserializer
-from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
-from wunderkafka.serdes.store import AvroModelRepo
-from wunderkafka.serdes.string.deserializers import StringDeserializer
 from wunderkafka.serdes.string.serializers import StringSerializer
-from wunderkafka.types import MessageDescription, TopicName
+from wunderkafka.serdes.string.deserializers import StringDeserializer
+from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
+from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
 
 
 class AvroStringConsumer(HighLevelDeserializingConsumer):
@@ -53,9 +48,8 @@ class AvroStringConsumer(HighLevelDeserializingConsumer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, None),
+            consumer=BytesConsumer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(sr),
                 SimpleCache(),
@@ -102,14 +96,13 @@ class AvroModelStringProducer(HighLevelSerializingProducer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(
                     sr,
                     requires_kerberos=config_requires_kerberos(config),
-                    cmd_kinit=config.sasl_kerberos_kinit_cmd,
+                    cmd_kerberos=config.sasl_kerberos_kinit_cmd,
                 ),
                 SimpleCache()),
             header_packer=ConfluentClouderaHeadersHandler().pack,
@@ -150,9 +143,8 @@ class JSONStringConsumer(HighLevelDeserializingConsumer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, watchdog),
+            consumer=BytesConsumer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(sr),
                 SimpleCache(),
@@ -200,17 +192,16 @@ class JSONModelStringProducer(HighLevelSerializingProducer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         schema_registry = sr_client(
             KerberizableHTTPClient(
                 sr,
                 requires_kerberos=config_requires_kerberos(config),
-                cmd_kinit=config.sasl_kerberos_kinit_cmd,
+                cmd_kerberos=config.sasl_kerberos_kinit_cmd,
             ),
             SimpleCache(),
         )
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=schema_registry,
             header_packer=ConfluentClouderaHeadersHandler().pack,
             value_serializer=JSONModelSerializer(schema_registry.client),
