@@ -41,6 +41,8 @@ jobs:
   deploy:
     needs: [version]
     runs-on: ubuntu-latest
+    permissions:
+       id-token: write
     steps:
     - name: Install packaging dependencies
       run: pip install build
@@ -54,6 +56,3 @@ jobs:
       run: python -m build
     - name: Publish package to real PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
