@@ -50,7 +50,6 @@ class MetricV2(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: str  # type: ignore
 
 
 class MetricV21(BaseModel):
@@ -58,7 +57,7 @@ class MetricV21(BaseModel):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: str  # type: ignore[assignment,misc]
+    ml_config: str
 
     class Config:
         extra = 'allow'
@@ -346,19 +345,13 @@ def test_pydantic_base_settings_with_defaults() -> None:
 
 
 def test_pydantic_base_settings_v2_with_defaults() -> None:
-    with pytest.raises(ValueError):
-        derive(MetricV2, topic='some_topic')
-
     with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, model_config='str')  # type: ignore[call-arg]
+        MetricV2(line_speed=2, ml_config='str')  # type: ignore[call-arg]
 
 
 def test_pydantic_base_settings_v21_with_defaults() -> None:
-    with pytest.raises(ValueError):
-        derive(MetricV21, topic='some_topic')
-
     # https://github.com/pydantic/pydantic/issues/8469
-    MetricV21(line_speed=2, model_config='str')  # type: ignore
+    MetricV21(line_speed=2, ml_config='str')  # type: ignore
 
 
 if sys.version_info <= (3, 10):

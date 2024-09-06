@@ -238,7 +238,7 @@ class MetricV22(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-    model_config: MLConfig                                                               # type: ignore[assignment,misc]
+    ml_config: MLConfig                                                               # type: ignore[assignment,misc]
 
     class Config:
         extra = 'allow'
@@ -249,4 +249,4 @@ def test_pydantic_base_settings_v22_with_defaults_complicated_field() -> None:
         derive(MetricV22, topic='some_topic')
 
     with pytest.raises(ValidationError):
-        MetricV22(line_speed=2, model_config=MLConfig(path='test'))  # type: ignore
+        MetricV22(line_speed=2, ml_config=MLConfig(path='test'))  # type: ignore
