@@ -42,6 +42,8 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
     if pydantic_model:
         # I would not prefer to just override PydanticParser because it always may be broken or thrown-out
         model_schema = exclude_pydantic_class(model_schema)
+    for field in model_schema.get('fields', []):
+        field.pop('doc', None)
     return json.dumps(model_schema)
 
 
