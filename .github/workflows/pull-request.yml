@@ -13,7 +13,7 @@ jobs:
         pydantic-settings-version: [ '~=2.0.0', '']
         # ToDo (tribunsky.kir): make avro extra too but do not forget to require requests in the sake of SRs
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '']
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     container: python:${{ matrix.python-version }}-slim-bookworm
     steps:
       - name: Checkout
@@ -49,8 +49,8 @@ jobs:
       matrix:
         pydantic-settings-version: ['~=2.0.0', '']
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '']
-        python-version: ['3.9', '3.10', '3.11']
-    container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.5
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.6
     steps:
     - name: Checkout
       uses: actions/checkout@v3
