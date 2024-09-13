@@ -35,7 +35,7 @@ jobs:
             exit 1
           else
             echo "Got revision number for a current build: ${VERSION_TAG}"
-            echo tag="${VERSION_TAG}" >> $GITHUB_OUTPUT            
+            echo tag="${VERSION_TAG}" >> $GITHUB_OUTPUT
           fi
 
   deploy:
