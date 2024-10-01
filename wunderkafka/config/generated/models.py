@@ -18,9 +18,7 @@ from wunderkafka.config.generated import enums
 
 
 class RDKafkaConfig(BaseSettings):
-    api_version_fallback_ms: Annotated[
-        int, *(meta for meta in conint(ge=0, le=604800000).__metadata__)
-    ] = 0
+    api_version_fallback_ms: Annotated[conint(ge=0, le=604800000), ...] = 0
     api_version_request: bool = True
     api_version_request_timeout_ms: conint(ge=1, le=300000) = 10000                           # type: ignore[valid-type]
     background_event_cb: Optional[Callable] = None
