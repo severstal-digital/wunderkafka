@@ -52,7 +52,7 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         requests-kerberos-version: ['==0.13.0']
         confluent-kafka-version: ['~=2.3.0']
-    container: python:${{ matrix.python-version }}-slim-bullseye
+    container: python:${{ matrix.python-version }}-slim-bookworm
     steps:
     - name: Checkout
       uses: actions/checkout@v3
