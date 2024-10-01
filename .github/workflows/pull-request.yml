@@ -50,19 +50,37 @@ jobs:
         pydantic-settings-version: ['~=2.0.0', '']
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0','']
         python-version: ['3.9', '3.10', '3.11', '3.12']
-    container: severstaldigital/python-librdkafka:${{ matrix.python-version }}-librdkafka-1.6.0-v0.6
+        requests-kerberos-version: ['==0.13.0']
+        confluent-kafka-version: ['==1.7.0']
+    container: python:${{ matrix.python-version }}-slim-bullseye
     steps:
     - name: Checkout
       uses: actions/checkout@v3
+    - name: Install system dependencies
+      run: |
+        apt-get update && \
+        apt-get install -y librdkafka1 \
+                           krb5-user \
+                           libsasl2-modules-gssapi-mit \
+                           librdkafka-dev \
+                           libsasl2-dev \
+                           libkrb5-dev \
+                           libssl-dev \
+                           g++ && \
+        apt-get -y remove libkrb5-dev libsasl2-dev librdkafka-dev libssl-dev g++ && \
+        apt-get -y autoremove && \
+        apt-get -y clean
     - name: Install testing dependencies
       run: | 
-        if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
+        if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }} --no-binary=confluent-kafka; then
             echo "Installed dependencies simultaneously"     
         else
             echo "Error resolving dependencies... Installing consequently"
             python -m pip install pytest 
             python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
             python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
+            python -m pip install requests-kerberos${{ matrix.requests-kerberos-version }}
+            python -m pip install confluent-kafka[avro]${{ matrix.confluent-kafka-version }} --no-binary=confluent-kafka
         fi
     - name: run pytest
       run: pytest -s tests/
