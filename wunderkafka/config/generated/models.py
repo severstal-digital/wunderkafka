@@ -7,7 +7,7 @@ from wunderkafka import librdkafka
 # I am not gonna to generate single type for every single range of conint/confloat.
 # https://github.com/samuelcolvin/pydantic/issues/156
 
-from typing import Callable, Optional, Type
+from typing import Callable, Optional, Annotated
 
 from pydantic import conint, confloat
 from pydantic_settings import BaseSettings
@@ -16,10 +16,9 @@ from pydantic_settings import BaseSettings
 # Of course, it will fail with cimpl.KafkaException, but later, when Consumer/Producer are really initiated
 from wunderkafka.config.generated import enums
 
-conint: Type[int]
 
 class RDKafkaConfig(BaseSettings):
-    api_version_fallback_ms: conint(ge=0, le=604800000) = 0
+    api_version_fallback_ms: Annotated[int, conint(ge=0, le=604800000).__metadata__[1]] = 0
     api_version_request: bool = True
     api_version_request_timeout_ms: conint(ge=1, le=300000) = 10000                           # type: ignore[valid-type]
     background_event_cb: Optional[Callable] = None
