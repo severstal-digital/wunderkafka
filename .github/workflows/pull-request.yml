@@ -51,7 +51,7 @@ jobs:
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0','']
         python-version: ['3.9', '3.10', '3.11', '3.12']
         requests-kerberos-version: ['==0.13.0']
-        confluent-kafka-version: ['~=2.3.0']
+        confluent-kafka-version: ['~=2.5.3']
     container: python:${{ matrix.python-version }}-slim-bookworm
     steps:
     - name: Checkout
@@ -69,7 +69,7 @@ jobs:
                            g++
     - name: Install testing dependencies
       run: | 
-        if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }} --no-binary=confluent-kafka; then
+        if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
             echo "Installed dependencies simultaneously"     
         else
             echo "Error resolving dependencies... Installing consequently"
@@ -77,7 +77,7 @@ jobs:
             python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
             python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
             python -m pip install requests-kerberos${{ matrix.requests-kerberos-version }}
-            python -m pip install confluent-kafka[avro]${{ matrix.confluent-kafka-version }} --no-binary=confluent-kafka
+            python -m pip install confluent-kafka[avro]${{ matrix.confluent-kafka-version }}
         fi
     - name: run pytest
       run: pytest -s tests/
