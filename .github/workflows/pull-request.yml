@@ -66,10 +66,7 @@ jobs:
                            libsasl2-dev \
                            libkrb5-dev \
                            libssl-dev \
-                           g++ && \
-        apt-get -y remove libkrb5-dev libsasl2-dev librdkafka-dev libssl-dev g++ && \
-        apt-get -y autoremove && \
-        apt-get -y clean
+                           g++
     - name: Install testing dependencies
       run: | 
         if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }} --no-binary=confluent-kafka; then
