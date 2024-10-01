@@ -6,16 +6,32 @@ from wunderkafka import librdkafka
 
 
 if librdkafka.__version__ >= (2, 2, 0):
-    from wunderkafka.config.generated.confluent_2_2_0.models import *
+    from wunderkafka.config.generated.confluent_2_2_0.models import (
+        RDKafkaConfig,
+        RDConsumerConfig,
+        RDProducerConfig
+    )
 
 elif librdkafka.__version__ >= (2, 1, 0):
-    from wunderkafka.config.generated.confluent_2_1_0.models import *
+    from wunderkafka.config.generated.confluent_2_1_0.models import (
+        RDKafkaConfig,
+        RDConsumerConfig,
+        RDProducerConfig
+    )
 
 elif librdkafka.__version__ >= (2, 0, 0):
-    from wunderkafka.config.generated.confluent_2_0_0.models import *
+    from wunderkafka.config.generated.confluent_2_0_0.models import (
+        RDKafkaConfig,
+        RDConsumerConfig,
+        RDProducerConfig
+    )
 
 elif librdkafka.__version__ >= (1, 9, 0):
-    from wunderkafka.config.generated.confluent_1_9_0.models import *
+    from wunderkafka.config.generated.confluent_1_9_0.models import (
+        RDKafkaConfig,
+        RDConsumerConfig,
+        RDProducerConfig
+    )
 
 elif librdkafka.__version__ >= (1, 8, 0):
     from wunderkafka.config.generated.confluent_1_8_0.models import *
