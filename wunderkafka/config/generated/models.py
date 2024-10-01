@@ -1,4 +1,5 @@
 from wunderkafka import librdkafka
+from wunderkafka.config.generated.default.models import *
 
 # ToDo (tribunsky.kir): looks like that idea of dynamic import via imp depending on librdkafka
 #                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.
@@ -29,5 +30,3 @@ elif librdkafka.__version__ >= (2, 1, 0):
 elif librdkafka.__version__ >= (2, 2, 0):
     from wunderkafka.config.generated.confluent_2_2_0.models import *
 
-else:
-    from wunderkafka.config.generated.default.models import *
