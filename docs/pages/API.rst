@@ -109,3 +109,4 @@ TopicSubscription
 .. autoclass:: wunderkafka.TopicSubscription
    :members:
    :inherited-members:
+   :noindex:

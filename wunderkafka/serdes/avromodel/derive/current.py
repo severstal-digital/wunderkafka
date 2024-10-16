@@ -35,7 +35,7 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
     if hasattr(model_type, 'Meta') and hasattr(model_type.Meta, 'name'):
         model_schema['name'] = model_type.Meta.name
     else:
-        model_schema['name'] = '{0}_{1}'.format(re.sub('[^\w_]','_', topic), suffix)
+        model_schema['name'] = '{0}_{1}'.format(re.sub(r'[^\w_]', '_', topic), suffix)
     if model_schema['name'].startswith('_'):
         logger.warning('Topic name {0} starts with underscore, which is not allowed for Avro schema names.')
         model_schema['name'] = model_schema['name'][1:]
