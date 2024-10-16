@@ -131,7 +131,7 @@ jobs:
   deploy:
     needs: [checks, version]
     runs-on: ubuntu-latest
-    environment: release
+    environment: test-release
     permissions:
       id-token: write
     steps:
