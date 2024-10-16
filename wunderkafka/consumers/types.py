@@ -29,8 +29,9 @@ class StreamResult(BaseModel, Generic[M]):
 
     @model_validator(mode="after")
     def verify_mutually_exclusive(self) -> StreamResult:
-        if self.payload is None and self.error is None:
-            raise ValueError("payload and error cannot both be None")
+        # The payload may be None due to Kafka tombstones:
+        # https://docs.confluent.io/kafka/design/log_compaction.html
+        # In short, these are messages with a null value, used to indicate that their key has been deleted.
         if self.payload is not None and self.error is not None:
             raise ValueError("payload and error cannot both be not None")
         return self
