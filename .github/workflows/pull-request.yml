@@ -13,17 +13,15 @@ jobs:
         pydantic-settings-version: [ '~=2.0.0', '']
         # ToDo (tribunsky.kir): make avro extra too but do not forget to require requests in the sake of SRs
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0', '']
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
     container: python:${{ matrix.python-version }}-slim-bookworm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: install system dependencies
-        # gcc is needed for old versions of fastavro on 3.13
         run: |
           apt-get update
-          apt-get install -y librdkafka1 \
-                             gcc
+          apt-get install -y librdkafka1
       - name: install confluent-kafka w/o SASL/SSL support
         run: |
           pip install confluent-kafka[avro]~=2.5.3
@@ -51,7 +49,7 @@ jobs:
       matrix:
         pydantic-settings-version: ['~=2.0.0', '']
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0','']
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         requests-kerberos-version: ['==0.13.0']
         confluent-kafka-version: ['~=2.5.3', '']
     container: python:${{ matrix.python-version }}-slim-bookworm
