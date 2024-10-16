@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'Wunderkafka'
-copyright = '2021-2022, Severstal Digital'
+copyright = '2021-2024, Severstal Digital'
 author = 'Kirill Tribunsky'
 
 cfg = ConfigParser()
