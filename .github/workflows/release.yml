@@ -14,7 +14,7 @@ jobs:
     outputs:
       tag: ${{ steps.get_tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: '0'
       - name: Get git tag.
@@ -46,7 +46,7 @@ jobs:
     steps:
     - name: Install packaging dependencies
       run: pip install build
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: sed version
       run: |
         echo "Got version from vcs: ${{ needs.version.outputs.tag }}"
