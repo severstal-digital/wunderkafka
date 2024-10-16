@@ -19,9 +19,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: install system dependencies
+        # gcc is needed for old versions of fastavro on 3.13
         run: |
           apt-get update
-          apt-get install -y librdkafka1
+          apt-get install -y librdkafka1 \
+                             gcc
       - name: install confluent-kafka w/o SASL/SSL support
         run: |
           pip install confluent-kafka[avro]~=2.5.3
