@@ -131,6 +131,9 @@ jobs:
   deploy:
     needs: [checks, version]
     runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
     steps:
     - name: Install packaging dependencies
       run: pip install build
@@ -145,6 +148,4 @@ jobs:
     - name: Publish package to TestPyPI
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        user: __token__
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
         repository-url: https://test.pypi.org/legacy/
