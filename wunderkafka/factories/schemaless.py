@@ -13,11 +13,25 @@ from wunderkafka.types import TopicName, MessageDescription
 
 
 class SchemaLessJSONStringProducer(HighLevelSerializingProducer):
+    """Kafka Producer client to serialize and send any value as JSON without any schema."""
+
     def __init__(
-            self,
-            mapping: Optional[Dict[TopicName, MessageDescription]],
-            config: ProducerConfig,
+        self,
+        mapping: Optional[Dict[TopicName, MessageDescription]],
+        config: ProducerConfig,
     ) -> None:
+        """
+        Init producer from pre-defined blocks.
+
+        :param mapping:     Topic-to-Schemas mapping.
+                            Mapping's value should contain at least message's value schema to be used for serialization.
+        :param config:      Configuration for:
+
+                                - Librdkafka producer.
+                                - Schema registry client (conventional options for HTTP).
+
+                            Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
+        """
         config, watchdog = check_watchdog(config)
         super().__init__(
             producer=BytesProducer(config, watchdog),
@@ -30,11 +44,26 @@ class SchemaLessJSONStringProducer(HighLevelSerializingProducer):
 
 
 class SchemaLessJSONModelStringProducer(HighLevelSerializingProducer):
+    """Kafka Producer client to serialize and send any instance of pydantic model as JSON without any schema."""
+
     def __init__(
         self,
         mapping: Optional[Dict[TopicName, MessageDescription]],
         config: ProducerConfig,
     ) -> None:
+        """
+        Init producer from pre-defined blocks.
+
+        :param mapping:     Topic-to-Schemas mapping.
+                            Mapping's value should contain at least message's value schema to be used for serialization.
+        :param config:      Configuration for:
+
+                                - Librdkafka producer.
+                                - Schema registry client (conventional options for HTTP).
+
+                            Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
+        """
+
         config, watchdog = check_watchdog(config)
         super().__init__(
             producer=BytesProducer(config, watchdog),
@@ -47,11 +76,20 @@ class SchemaLessJSONModelStringProducer(HighLevelSerializingProducer):
 
 
 class SchemaLessJSONStringConsumer(HighLevelDeserializingConsumer):
+    """Kafka Consumer client to get JSON-serialized messages without any schema."""
 
-    def __init__(
-        self,
-        config: ConsumerConfig,
-    ) -> None:
+    def __init__(self, config: ConsumerConfig) -> None:
+        """
+        Init consumer from pre-defined blocks.
+
+        :param config:      Configuration for:
+
+                                - Librdkafka consumer.
+                                - Schema registry client (conventional options for HTTP).
+
+                            Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
+        """
+
         self._default_timeout: int = 60
 
         config, watchdog = check_watchdog(config)
@@ -63,4 +101,3 @@ class SchemaLessJSONStringConsumer(HighLevelDeserializingConsumer):
             key_deserializer=StringDeserializer(),
             stream_result=False,
         )
-
