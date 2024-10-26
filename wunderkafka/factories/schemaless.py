@@ -57,7 +57,7 @@ class SchemaLessJSONStringConsumer(HighLevelDeserializingConsumer):
         super().__init__(
             consumer=BytesConsumer(config, watchdog),
             schema_registry=None,
-            headers_handler=print,
+            headers_handler=None,
             value_deserializer=SchemaLessJSONDeserializer(),
             key_deserializer=StringDeserializer(),
             stream_result=False,

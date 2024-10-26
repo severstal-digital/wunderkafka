@@ -28,6 +28,8 @@ def test_consume_moving_parts(topic: str) -> None:
     msg = Message(topic, value=MESSAGE.serialized(b''), key=b'714fc713-37ff-4477-9157-cb4f14b63e1a')
     consumer = HighLevelDeserializingConsumer(
         consumer=TestConsumer([msg]),
+        schema_registry=None,
+        headers_handler=None,
         value_deserializer=SchemaLessJSONDeserializer(),
         key_deserializer=StringDeserializer(),
     )

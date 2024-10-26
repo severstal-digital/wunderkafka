@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 from uuid import UUID
 
@@ -37,7 +38,7 @@ def test_json_producer_string_key_create_schema() -> None:
 
     key = "714fc713-37ff-4477-9157-cb4f14b63e1a"
     value = Image(
-        id=key,
+        id=uuid.UUID(key),
         path="/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3",
     )
 
