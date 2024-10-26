@@ -5,7 +5,8 @@ from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 from wunderkafka.serdes.schemaless.json.deserializers import SchemaLessJSONDeserializer
-from wunderkafka.serdes.schemaless.json.serializers import SchemaLessJSONSerializer, SchemaLessJSONModelSerializer
+from wunderkafka.serdes.schemaless.json.serializers import SchemaLessJSONSerializer
+from wunderkafka.serdes.schemaless.jsonmodel.serializers import SchemaLessJSONModelSerializer
 from wunderkafka.serdes.schemaless.string.deserializers import StringDeserializer
 from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
 from wunderkafka.types import TopicName, MessageDescription

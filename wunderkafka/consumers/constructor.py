@@ -197,6 +197,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         if deserializer.schemaless:
             return deserializer.deserialize('', blob)
         # Header is separate in the sake of customization, e.g., we don't have SR and put schema directly in a message
+        assert self._header_parser is not None
+        assert self._registry is not None
         parsed_header = self._header_parser(blob)
         schema_meta = SchemaMeta(
             topic=topic,
