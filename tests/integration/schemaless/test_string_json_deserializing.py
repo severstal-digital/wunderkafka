@@ -1,20 +1,18 @@
 from typing import List
-from pathlib import Path
 
 import pytest
 
-from wunderkafka.serdes.json import HAS_JSON_SCHEMA
-from wunderkafka.serdes.schemaless.json.deserializers import SchemaLessJSONDeserializer
-from wunderkafka.serdes.schemaless.string.deserializers import StringDeserializer
 
+from wunderkafka.serdes.json import HAS_JSON_SCHEMA
 if not HAS_JSON_SCHEMA:
     pytest.skip("skipping json-schema-only tests", allow_module_level=True)
-from tests.integration.confluent.conftest import Msg
 
-
+from wunderkafka.serdes.schemaless.json.deserializers import SchemaLessJSONDeserializer
+from wunderkafka.serdes.schemaless.string.deserializers import StringDeserializer
 from wunderkafka.tests import TestConsumer
 from wunderkafka.tests.consumer import Message
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
+from tests.integration.confluent.conftest import Msg
 
 MESSAGE = Msg(
     payload=b'{"id": "714fc713-37ff-4477-9157-cb4f14b63e1a", "path": "/var/folders/x5/zlpmj3915pqfj5lhnlq5qwkm0000gn/T/tmprq2rktq3"}',
