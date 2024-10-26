@@ -46,8 +46,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
     def __init__(
         self,
         consumer: AbstractConsumer,
-        headers_handler: HeaderParser,
-        schema_registry: AbstractSchemaRegistry,
+        headers_handler: Optional[HeaderParser] = None,
+        schema_registry: Optional[AbstractSchemaRegistry] = None,
         deserializer: Optional[AbstractDeserializer] = None,
         value_deserializer: Optional[AbstractDeserializer] = None,
         key_deserializer: Optional[AbstractDeserializer] = None,

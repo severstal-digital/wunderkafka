@@ -5,9 +5,10 @@ from uuid import UUID
 from pydantic import BaseModel, UUID4
 
 from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
+from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
 from wunderkafka.serdes.store import AvroModelRepo
 
-from wunderkafka.serdes.string.serializers import StringSerializer
+
 from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestProducer, TestHTTPClient
 from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient

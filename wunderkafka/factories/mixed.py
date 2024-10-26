@@ -18,8 +18,8 @@ from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.serdes.json.deserializers import JSONDeserializer
 from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
 from wunderkafka.serdes.store import AvroModelRepo
-from wunderkafka.serdes.string.deserializers import StringDeserializer
-from wunderkafka.serdes.string.serializers import StringSerializer
+from wunderkafka.serdes.schemaless.string import StringDeserializer
+from wunderkafka.serdes.schemaless.string import StringSerializer
 from wunderkafka.types import MessageDescription, TopicName
 
 

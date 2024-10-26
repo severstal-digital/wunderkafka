@@ -5,7 +5,8 @@ import pytest
 
 from tests.integration.confluent.conftest import Msg
 from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.serdes.string.deserializers import StringDeserializer
+from wunderkafka.serdes.schemaless.string.deserializers import StringDeserializer
+
 from wunderkafka.tests import TestConsumer, TestHTTPClient
 from wunderkafka.serdes.avro import FastAvroDeserializer
 from wunderkafka.tests.consumer import Message

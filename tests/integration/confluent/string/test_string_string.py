@@ -3,9 +3,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, UUID4
 
-from wunderkafka.serdes.string.serializers import StringSerializer
-
-
+from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
 from wunderkafka.tests import TestProducer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 
