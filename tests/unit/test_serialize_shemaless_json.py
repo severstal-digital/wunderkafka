@@ -1,10 +1,10 @@
-import datetime
-import string
 import uuid
+import random
+import string
+import datetime
 from uuid import UUID
 
 import pytest
-from faker.generator import random
 from pydantic import BaseModel, Field
 
 from wunderkafka.serdes.schemaless.jsonmodel.serializers import SchemaLessJSONModelSerializer
