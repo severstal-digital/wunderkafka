@@ -13,6 +13,29 @@ BytesProducer
 .. autoclass:: wunderkafka.BytesProducer
    :members:
 
+
+Schemaless
+==========
+
+SchemaLessJSONStringConsumer
+----------------------------
+
+.. autoclass:: wunderkafka.factories.schemaless.SchemaLessJSONStringConsumer
+   :members:
+
+SchemaLessJSONStringProducer
+----------------------------
+
+.. autoclass:: wunderkafka.factories.schemaless.SchemaLessJSONStringProducer
+   :members:
+
+
+SchemaLessJSONModelStringProducer
+---------------------------------
+
+.. autoclass:: wunderkafka.factories.schemaless.SchemaLessJSONModelStringProducer
+   :members:
+
 Avro
 ====
 

@@ -30,14 +30,16 @@ def _load_from_file(filename: Path) -> str:
 
 
 # FixMe (tribunsky.kir): for now it looks like a crutch, but much better than just `if StringSerializer`
-class StringRepo(AbstractDescriptionStore):
-
+class DummyRepo(AbstractDescriptionStore):
     def add(self, topic: TopicName, value: Union[str, Path], key: Union[str, Path]) -> None:
         # schema = '{"schema": "{\"type\": \"string\"}"}'
         schema = ''
         self._values[topic] = ValueSchemaDescription(text=schema, type=SchemaType.PRIMITIVES)
         if key is not None:
             self._keys[topic] = KeySchemaDescription(text=schema, type=SchemaType.PRIMITIVES)
+
+class StringRepo(DummyRepo):
+    ...
 
 
 # ToDo (tribunsky.kir): refactor it, maybe add hooks to parent class.
