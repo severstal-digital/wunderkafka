@@ -1,6 +1,6 @@
 # Wunderkafka
 
-## v.0.18.0 (XXXX-XX-XX)
+## v.0.18.0 (2024-11-29)
 
 ### Added
 
