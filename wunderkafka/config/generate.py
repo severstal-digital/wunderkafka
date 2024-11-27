@@ -1,3 +1,12 @@
+"""
+How to generate configs:
+
+1. Go to confluent-kafka repository.
+2. Open needed version
+3. Copy CONFIGURATION.md to wunderkafka/config/versions/<version>/CONFIGURATION.md
+4. `cd wunderkafka/config`
+5. `python generate.py`
+"""
 import os
 import logging
 import operator
