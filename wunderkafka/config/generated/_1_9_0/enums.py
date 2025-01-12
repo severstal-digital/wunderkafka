@@ -27,6 +27,11 @@ class SslEndpointIdentificationAlgorithm(str, Enum):
     https = 'https'
 
 
+class SaslOauthbearerMethod(str, Enum):
+    default = 'default'
+    oidc = 'oidc'
+
+
 class IsolationLevel(str, Enum):
     read_uncommitted = 'read_uncommitted'
     read_committed = 'read_committed'

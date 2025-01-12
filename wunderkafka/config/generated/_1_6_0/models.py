@@ -95,6 +95,7 @@ class RDKafkaConfig(BaseSettings):
     socket_send_buffer_bytes: conint(ge=0, le=100000000) = 0                                  # type: ignore[valid-type]
     socket_timeout_ms: conint(ge=10, le=300000) = 60000                                       # type: ignore[valid-type]
     ssl_ca: Optional[Callable] = None
+    ssl_ca_certificate_stores: str = 'Root'
     ssl_ca_location: Optional[str] = None
     ssl_certificate: Optional[Callable] = None
     ssl_certificate_location: Optional[str] = None
@@ -166,7 +167,7 @@ class RDProducerConfig(RDKafkaConfig):
     enable_gapless_guarantee: bool = False
     enable_idempotence: bool = False
     linger_ms: confloat(ge=0, le=900000) = 5.0                                                # type: ignore[valid-type]
-    message_send_max_retries: conint(ge=0, le=10000000) = 2                                   # type: ignore[valid-type]
+    message_send_max_retries: conint(ge=0, le=2147483647) = 2147483647                        # type: ignore[valid-type]
     message_timeout_ms: conint(ge=0, le=2147483647) = 300000                                  # type: ignore[valid-type]
     msg_order_cmp: Optional[Callable] = None
     partitioner: str = 'consistent_random'
@@ -177,8 +178,9 @@ class RDProducerConfig(RDKafkaConfig):
     queue_buffering_max_ms: confloat(ge=0, le=900000) = 5.0                                   # type: ignore[valid-type]
     queuing_strategy: enums.QueuingStrategy = enums.QueuingStrategy.fifo
     request_required_acks: conint(ge=-1, le=1000) = -1                                        # type: ignore[valid-type]
-    request_timeout_ms: conint(ge=1, le=900000) = 5000                                        # type: ignore[valid-type]
-    retries: conint(ge=0, le=10000000) = 2                                                    # type: ignore[valid-type]
+    request_timeout_ms: conint(ge=1, le=900000) = 30000                                       # type: ignore[valid-type]
+    retries: conint(ge=0, le=2147483647) = 2147483647                                         # type: ignore[valid-type]
     retry_backoff_ms: conint(ge=1, le=300000) = 100                                           # type: ignore[valid-type]
+    sticky_partitioning_linger_ms: conint(ge=0, le=900000) = 10                               # type: ignore[valid-type]
     transaction_timeout_ms: conint(ge=1000, le=2147483647) = 60000                            # type: ignore[valid-type]
     transactional_id: Optional[str] = None

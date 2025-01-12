@@ -69,6 +69,7 @@ COMMON_FIELDS = (
     'socket.send.buffer.bytes',
     'socket.timeout.ms',
     'socket_cb',
+    'ssl.ca.certificate.stores',
     'ssl.ca.location',
     'ssl.certificate.location',
     'ssl.certificate.pem',
@@ -153,6 +154,7 @@ PRODUCER_FIELDS = (
     'request.timeout.ms',
     'retries',
     'retry.backoff.ms',
+    'sticky.partitioning.linger.ms',
     'transaction.timeout.ms',
     'transactional.id',
 )

@@ -48,7 +48,6 @@ class RDKafkaConfig(BaseSettings):
     connect_cb: Optional[Callable] = None
     debug: Optional[str] = None
     default_topic_conf: Optional[Callable] = None
-    enable_random_seed: bool = True
     enable_sasl_oauthbearer_unsecure_jwt: bool = False
     enable_ssl_certificate_verification: bool = True
     enabled_events: conint(ge=0, le=2147483647) = 0                                           # type: ignore[valid-type]
@@ -115,7 +114,6 @@ class RDKafkaConfig(BaseSettings):
     stats_cb: Optional[Callable] = None
     throttle_cb: Optional[Callable] = None
     topic_blacklist: Optional[str] = None
-    topic_metadata_propagation_max_ms: conint(ge=0, le=3600000) = 30000                       # type: ignore[valid-type]
     topic_metadata_refresh_fast_interval_ms: conint(ge=1, le=60000) = 250                     # type: ignore[valid-type]
     topic_metadata_refresh_interval_ms: conint(ge=-1, le=3600000) = 300000                    # type: ignore[valid-type]
     topic_metadata_refresh_sparse: bool = True
@@ -123,7 +121,6 @@ class RDKafkaConfig(BaseSettings):
 
 class RDConsumerConfig(RDKafkaConfig):
     group_id: str
-    allow_auto_create_topics: bool = False
     auto_commit_interval_ms: conint(ge=0, le=86400000) = 5000                                 # type: ignore[valid-type]
     auto_offset_reset: enums.AutoOffsetReset = enums.AutoOffsetReset.largest
     check_crcs: bool = False
@@ -137,7 +134,7 @@ class RDConsumerConfig(RDKafkaConfig):
     fetch_max_bytes: conint(ge=0, le=2147483135) = 52428800                                   # type: ignore[valid-type]
     fetch_message_max_bytes: conint(ge=1, le=1000000000) = 1048576                            # type: ignore[valid-type]
     fetch_min_bytes: conint(ge=1, le=100000000) = 1                                           # type: ignore[valid-type]
-    fetch_wait_max_ms: conint(ge=0, le=300000) = 500                                          # type: ignore[valid-type]
+    fetch_wait_max_ms: conint(ge=0, le=300000) = 100                                          # type: ignore[valid-type]
     group_instance_id: Optional[str] = None
     group_protocol_type: str = 'consumer'
     heartbeat_interval_ms: conint(ge=1, le=3600000) = 3000                                    # type: ignore[valid-type]
@@ -146,7 +143,7 @@ class RDConsumerConfig(RDKafkaConfig):
     max_poll_interval_ms: conint(ge=1, le=86400000) = 300000                                  # type: ignore[valid-type]
     offset_commit_cb: Optional[Callable] = None
     partition_assignment_strategy: str = 'range,roundrobin'
-    queued_max_messages_kbytes: conint(ge=1, le=2097151) = 65536                              # type: ignore[valid-type]
+    queued_max_messages_kbytes: conint(ge=1, le=2097151) = 1048576                            # type: ignore[valid-type]
     queued_min_messages: conint(ge=1, le=10000000) = 100000                                   # type: ignore[valid-type]
     rebalance_cb: Optional[Callable] = None
     session_timeout_ms: conint(ge=1, le=3600000) = 10000                                      # type: ignore[valid-type]
@@ -155,7 +152,6 @@ class RDConsumerConfig(RDKafkaConfig):
 class RDProducerConfig(RDKafkaConfig):
     acks: conint(ge=-1, le=1000) = -1                                                         # type: ignore[valid-type]
     batch_num_messages: conint(ge=1, le=1000000) = 10000                                      # type: ignore[valid-type]
-    batch_size: conint(ge=1, le=2147483647) = 1000000                                         # type: ignore[valid-type]
     compression_codec: enums.CompressionCodec = enums.CompressionCodec.none
     compression_level: conint(ge=-1, le=12) = -1                                              # type: ignore[valid-type]
     compression_type: enums.CompressionType = enums.CompressionType.none
@@ -165,7 +161,7 @@ class RDProducerConfig(RDKafkaConfig):
     dr_msg_cb: Optional[Callable] = None
     enable_gapless_guarantee: bool = False
     enable_idempotence: bool = False
-    linger_ms: confloat(ge=0, le=900000) = 5.0                                                # type: ignore[valid-type]
+    linger_ms: confloat(ge=0, le=900000) = 0.5                                                # type: ignore[valid-type]
     message_send_max_retries: conint(ge=0, le=10000000) = 2                                   # type: ignore[valid-type]
     message_timeout_ms: conint(ge=0, le=2147483647) = 300000                                  # type: ignore[valid-type]
     msg_order_cmp: Optional[Callable] = None
@@ -174,7 +170,7 @@ class RDProducerConfig(RDKafkaConfig):
     queue_buffering_backpressure_threshold: conint(ge=1, le=1000000) = 1                      # type: ignore[valid-type]
     queue_buffering_max_kbytes: conint(ge=1, le=2147483647) = 1048576                         # type: ignore[valid-type]
     queue_buffering_max_messages: conint(ge=1, le=10000000) = 100000                          # type: ignore[valid-type]
-    queue_buffering_max_ms: confloat(ge=0, le=900000) = 5.0                                   # type: ignore[valid-type]
+    queue_buffering_max_ms: confloat(ge=0, le=900000) = 0.5                                   # type: ignore[valid-type]
     queuing_strategy: enums.QueuingStrategy = enums.QueuingStrategy.fifo
     request_required_acks: conint(ge=-1, le=1000) = -1                                        # type: ignore[valid-type]
     request_timeout_ms: conint(ge=1, le=900000) = 5000                                        # type: ignore[valid-type]
