@@ -237,7 +237,6 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
     ]
     already_generated = set()
     for grp in sorted(groups):
-        # TODO: add generated warning
         properties.append('')
         properties.append('')
         properties.append('{0}'.format(CLS_MAPPING[grp]))
