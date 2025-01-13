@@ -355,7 +355,7 @@ def main() -> None:
         write_header_file(versions_formated, kind)
 
 def write_header_file(versions: list[tuple[tuple, str]], kind: str) -> None:
-    tmpl = '\nif librdkafka.__version__ >= {version_tuple}:\n    from wunderkafka.config.generated.{version_dir}.{kind} import *  # noqa'
+    tmpl = '\nif librdkafka.__version__ >= {version_tuple}:\n    from wunderkafka.config.generated.{version_dir}.{kind} import *  # type: ignore[assignment]'
 
     file_tmpl = DEFAULT_HEADER + [
         '',
