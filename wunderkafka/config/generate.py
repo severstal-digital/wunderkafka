@@ -129,9 +129,9 @@ class Row(NamedTuple):
         if '..' in self.property_range:
             ge, le = self.range                                                                           # type: ignore
             if self.type == 'integer':
-                return 'conint(ge={0}, le={1})'.format(ge, le)
+                return 'int'
             elif self.type == 'float':
-                return 'confloat(ge={0}, le={1})'.format(ge, le)
+                return 'float'
         if self.type == 'enum value':
             class_name = ''.join([word.capitalize() for word in self.property_name.split('.')])
             return 'enums.{0}'.format(class_name)
@@ -144,6 +144,10 @@ class Row(NamedTuple):
         return self.property_description.split('Type: ')[-1].strip('*')
 
     def render(self, *, indented: bool = False) -> str:
+        if '..' in self.property_range:
+            ge, le = self.range                                                                           # type: ignore
+            return f'    {self.name}: {self.annotation} = Field(ge={ge}, le={le}, default={self.default})'
+
         if self.property_name == GROUP_ID:
             return '    {0}: str'.format(self.name)
         if self.property_name == SASL_MECHANISMS:
@@ -223,12 +227,9 @@ def group(rows: List[Row]) -> Dict[str, List[Row]]:
 
 def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
     properties = DEFAULT_HEADER + [
-        '# I am not gonna to generate single type for every single range of conint/confloat.',
-        '# https://github.com/samuelcolvin/pydantic/issues/156',
-        '',
         'from typing import Callable, Optional',
         '',
-        'from pydantic import conint, confloat',
+        'from pydantic import Field',
         'from pydantic_settings import BaseSettings',
         '',
         "# Enums because we can't rely that client code uses linters.",
@@ -333,19 +334,19 @@ def main() -> None:
             lines[sub_path] = files
         else:
             logger.info('{0}: skipping...'.format(path))
-    dct = generate(lines)
+    versionized_dcts = generate(lines)
 
     # clean generated dir in order to clean removed versions automatically
     shutil.rmtree("generated/", ignore_errors=True)
 
-    for version, dct in dct.items():
+    for version, dct in versionized_dcts.items():
         for file_name, content in dct.items():
             version_dir = version_to_dir_name(version)
             p = Path(f'generated/{version_dir}/')
             p.mkdir(parents=True, exist_ok=True)
             write_python(content, f'generated/{version_dir}/{file_name}')
 
-    versions = sorted((tuple(int(v) for v in version.split(".")) for version in dct), reverse=True)
+    versions = sorted((tuple(int(v) for v in version.split(".")) for version in versionized_dcts), reverse=True)
     versions_formated = [(version, f'_{"_".join(str(i) for i in version)}') for version in versions]
     for kind in ("models", "enums", "fields"):
         write_module_file(versions_formated, kind)
