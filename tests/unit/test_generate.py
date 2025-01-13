@@ -6,7 +6,6 @@ import pytest
 from wunderkafka.config.generate import (
     Row,
     group,
-    main,
     parse,
     read_markdown,
     generate_enums,
@@ -32,7 +31,7 @@ def configuration_md(fixture_root: Path) -> Path:
 
 @pytest.fixture
 def enums(fixture_root: Path) -> List[str]:
-    return read_answer(fixture_root,  'enums.py')
+    return read_answer(fixture_root, 'enums.py')
 
 
 @pytest.fixture
@@ -65,6 +64,3 @@ def test_models(grouped: Dict[str, List[Row]], models: List[str]) -> None:
     # Multiline for builtin
     assert models == '\n'.join(generated).split('\n')
 
-
-# def test_main():
-#     main()

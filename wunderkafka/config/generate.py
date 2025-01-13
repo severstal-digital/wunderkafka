@@ -333,19 +333,19 @@ def main() -> None:
             lines[sub_path] = files
         else:
             logger.info('{0}: skipping...'.format(path))
-    dct2 = generate(lines)
+    dct = generate(lines)
 
     # clean generated dir in order to clean removed versions automatically
     shutil.rmtree("generated/", ignore_errors=True)
 
-    for version, dct in dct2.items():
+    for version, dct in dct.items():
         for file_name, content in dct.items():
             version_dir = version_to_dir_name(version)
             p = Path(f'generated/{version_dir}/')
             p.mkdir(parents=True, exist_ok=True)
             write_python(content, f'generated/{version_dir}/{file_name}')
 
-    versions = sorted((tuple(int(v) for v in version.split(".")) for version in dct2), reverse=True)
+    versions = sorted((tuple(int(v) for v in version.split(".")) for version in dct), reverse=True)
     versions_formated = [(version, f'_{"_".join(str(i) for i in version)}') for version in versions]
     for kind in ("models", "enums", "fields"):
         write_module_file(versions_formated, kind)
