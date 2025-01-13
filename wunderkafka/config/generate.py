@@ -180,9 +180,9 @@ def read_markdown(filename: Union[str, Path] = 'CONFIGURATION.md', *, cut: bool 
     return lines
 
 
-def write_python(content: Lines, file_name: str) -> None:
+def write_python(lines: Lines, file_name: str) -> None:
     with open(file_name, 'w') as fl:
-        fl.write('\n'.join(content))
+        fl.write('\n'.join(lines))
 
 
 def parse_line(line: str) -> Optional[Row]:
@@ -221,9 +221,7 @@ def group(rows: List[Row]) -> Dict[str, List[Row]]:
     return grps
 
 
-def generate_models(groups: Dict[str, List[Row]], indented: bool = False) -> List[str]:
-    # TODO: remove indented arg from here
-    indented = False
+def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
     properties = DEFAULT_HEADER + [
         '# I am not gonna to generate single type for every single range of conint/confloat.',
         '# https://github.com/samuelcolvin/pydantic/issues/156',
@@ -254,12 +252,12 @@ def generate_models(groups: Dict[str, List[Row]], indented: bool = False) -> Lis
                 else:
                     uniq.append(row)
                 already_generated.add(row.property_name)
-        properties += [row.render(indented=indented) for row in sorted(pre, key=operator.attrgetter('name'))]
+        properties += [row.render() for row in sorted(pre, key=operator.attrgetter('name'))]
         for prop in sorted(uniq, key=operator.attrgetter('name')):
             if prop.property_name == SASL_MECHANISMS:
                 properties.append('    # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()')
                 properties.append('    # It is just alias, but when setting it manually it may misbehave with current defaults.')
-            properties.append(prop.render(indented=indented))
+            properties.append(prop.render())
 
     return properties
 
@@ -329,7 +327,7 @@ def main() -> None:
             configuration_md = path / 'CONFIGURATION.md'
             grouped = group(parse(read_markdown(filename=configuration_md)))
             files = {
-                'models.py': generate_models(grouped, sub_path != rev),
+                'models.py': generate_models(grouped),
                 'fields.py': generate_fields(grouped),
                 'enums.py': generate_enums(grouped),
             }
@@ -346,15 +344,14 @@ def main() -> None:
             version_dir = version_to_dir_name(version)
             p = Path(f'generated/{version_dir}/')
             p.mkdir(parents=True, exist_ok=True)
-            (p / '__init__.py').touch()
             write_python(content, f'generated/{version_dir}/{file_name}')
 
     versions = sorted((tuple(int(v) for v in version.split(".")) for version in dct2), reverse=True)
     versions_formated = [(version, f'_{"_".join(str(i) for i in version)}') for version in versions]
     for kind in ("models", "enums", "fields"):
-        write_header_file(versions_formated, kind)
+        write_module_file(versions_formated, kind)
 
-def write_header_file(versions: list[tuple[tuple, str]], kind: str) -> None:
+def write_module_file(versions: list[tuple[tuple, str]], kind: str) -> None:
     tmpl = '\nif librdkafka.__version__ >= {version_tuple}:\n    from wunderkafka.config.generated.{version_dir}.{kind} import *  # type: ignore[assignment]'
 
     file_tmpl = DEFAULT_HEADER + [
