@@ -63,3 +63,4 @@ def test_models(grouped: Dict[str, List[Row]], models: List[str]) -> None:
     generated = generate_models(grouped)
     # Multiline for builtin
     assert models == '\n'.join(generated).split('\n')
+

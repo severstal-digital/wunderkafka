@@ -27,6 +27,21 @@ class SslEndpointIdentificationAlgorithm(str, Enum):
     https = 'https'
 
 
+class SaslOauthbearerMethod(str, Enum):
+    default = 'default'
+    oidc = 'oidc'
+
+
+class ClientDnsLookup(str, Enum):
+    use_all_dns_ips = 'use_all_dns_ips'
+    resolve_canonical_bootstrap_servers_only = 'resolve_canonical_bootstrap_servers_only'
+
+
+class GroupProtocol(str, Enum):
+    classic = 'classic'
+    consumer = 'consumer'
+
+
 class IsolationLevel(str, Enum):
     read_uncommitted = 'read_uncommitted'
     read_committed = 'read_committed'

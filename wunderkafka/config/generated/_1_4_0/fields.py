@@ -25,7 +25,6 @@ COMMON_FIELDS = (
     'connect_cb',
     'debug',
     'default_topic_conf',
-    'enable.random.seed',
     'enable.sasl.oauthbearer.unsecure.jwt',
     'enable.ssl.certificate.verification',
     'enabled_events',
@@ -90,13 +89,11 @@ COMMON_FIELDS = (
     'stats_cb',
     'throttle_cb',
     'topic.blacklist',
-    'topic.metadata.propagation.max.ms',
     'topic.metadata.refresh.fast.interval.ms',
     'topic.metadata.refresh.interval.ms',
     'topic.metadata.refresh.sparse',
 )
 CONSUMER_FIELDS = (
-    'allow.auto.create.topics',
     'auto.commit.interval.ms',
     'auto.offset.reset',
     'check.crcs',
@@ -128,7 +125,6 @@ CONSUMER_FIELDS = (
 PRODUCER_FIELDS = (
     'acks',
     'batch.num.messages',
-    'batch.size',
     'compression.codec',
     'compression.level',
     'compression.type',

@@ -45,7 +45,6 @@ class RDKafkaConfig(BaseSettings):
     connect_cb: Optional[Callable] = None
     debug: Optional[str] = None
     default_topic_conf: Optional[Callable] = None
-    enable_random_seed: bool = True
     enable_sasl_oauthbearer_unsecure_jwt: bool = False
     enable_ssl_certificate_verification: bool = True
     enabled_events: int = Field(ge=0, le=2147483647, default=0)
@@ -112,7 +111,6 @@ class RDKafkaConfig(BaseSettings):
     stats_cb: Optional[Callable] = None
     throttle_cb: Optional[Callable] = None
     topic_blacklist: Optional[str] = None
-    topic_metadata_propagation_max_ms: int = Field(ge=0, le=3600000, default=30000)
     topic_metadata_refresh_fast_interval_ms: int = Field(ge=1, le=60000, default=250)
     topic_metadata_refresh_interval_ms: int = Field(ge=-1, le=3600000, default=300000)
     topic_metadata_refresh_sparse: bool = True
@@ -120,7 +118,6 @@ class RDKafkaConfig(BaseSettings):
 
 class RDConsumerConfig(RDKafkaConfig):
     group_id: str
-    allow_auto_create_topics: bool = False
     auto_commit_interval_ms: int = Field(ge=0, le=86400000, default=5000)
     auto_offset_reset: enums.AutoOffsetReset = enums.AutoOffsetReset.largest
     check_crcs: bool = False
@@ -134,7 +131,7 @@ class RDConsumerConfig(RDKafkaConfig):
     fetch_max_bytes: int = Field(ge=0, le=2147483135, default=52428800)
     fetch_message_max_bytes: int = Field(ge=1, le=1000000000, default=1048576)
     fetch_min_bytes: int = Field(ge=1, le=100000000, default=1)
-    fetch_wait_max_ms: int = Field(ge=0, le=300000, default=500)
+    fetch_wait_max_ms: int = Field(ge=0, le=300000, default=100)
     group_instance_id: Optional[str] = None
     group_protocol_type: str = 'consumer'
     heartbeat_interval_ms: int = Field(ge=1, le=3600000, default=3000)
@@ -143,7 +140,7 @@ class RDConsumerConfig(RDKafkaConfig):
     max_poll_interval_ms: int = Field(ge=1, le=86400000, default=300000)
     offset_commit_cb: Optional[Callable] = None
     partition_assignment_strategy: str = 'range,roundrobin'
-    queued_max_messages_kbytes: int = Field(ge=1, le=2097151, default=65536)
+    queued_max_messages_kbytes: int = Field(ge=1, le=2097151, default=1048576)
     queued_min_messages: int = Field(ge=1, le=10000000, default=100000)
     rebalance_cb: Optional[Callable] = None
     session_timeout_ms: int = Field(ge=1, le=3600000, default=10000)
@@ -152,7 +149,6 @@ class RDConsumerConfig(RDKafkaConfig):
 class RDProducerConfig(RDKafkaConfig):
     acks: int = Field(ge=-1, le=1000, default=-1)
     batch_num_messages: int = Field(ge=1, le=1000000, default=10000)
-    batch_size: int = Field(ge=1, le=2147483647, default=1000000)
     compression_codec: enums.CompressionCodec = enums.CompressionCodec.none
     compression_level: int = Field(ge=-1, le=12, default=-1)
     compression_type: enums.CompressionType = enums.CompressionType.none
@@ -162,7 +158,7 @@ class RDProducerConfig(RDKafkaConfig):
     dr_msg_cb: Optional[Callable] = None
     enable_gapless_guarantee: bool = False
     enable_idempotence: bool = False
-    linger_ms: float = Field(ge=0, le=900000, default=5.0)
+    linger_ms: float = Field(ge=0, le=900000, default=0.5)
     message_send_max_retries: int = Field(ge=0, le=10000000, default=2)
     message_timeout_ms: int = Field(ge=0, le=2147483647, default=300000)
     msg_order_cmp: Optional[Callable] = None
@@ -171,7 +167,7 @@ class RDProducerConfig(RDKafkaConfig):
     queue_buffering_backpressure_threshold: int = Field(ge=1, le=1000000, default=1)
     queue_buffering_max_kbytes: int = Field(ge=1, le=2147483647, default=1048576)
     queue_buffering_max_messages: int = Field(ge=1, le=10000000, default=100000)
-    queue_buffering_max_ms: float = Field(ge=0, le=900000, default=5.0)
+    queue_buffering_max_ms: float = Field(ge=0, le=900000, default=0.5)
     queuing_strategy: enums.QueuingStrategy = enums.QueuingStrategy.fifo
     request_required_acks: int = Field(ge=-1, le=1000, default=-1)
     request_timeout_ms: int = Field(ge=1, le=900000, default=5000)

@@ -1,9 +1,15 @@
 import os
+import shutil
 import logging
 import operator
 from typing import Dict, List, Tuple, Union, Optional, NamedTuple
 from pathlib import Path
 from collections import defaultdict
+
+Name = str
+Version = str
+Lines = List[str]
+Files = Dict[Name, Lines]
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -38,6 +44,17 @@ TYPES_MAPPING = {
     'CSV flags': 'str',
     'pattern list': 'str',
 }
+
+DEFAULT_HEADER = [
+    '#' * 70,
+    '########### THIS FILE IS GENERATED, DO NOT EDIT MANUALLY!!! ##########',
+    '########### THIS FILE IS GENERATED, DO NOT EDIT MANUALLY!!! ##########',
+    '########### THIS FILE IS GENERATED, DO NOT EDIT MANUALLY!!! ##########',
+    '########### THIS FILE IS GENERATED, DO NOT EDIT MANUALLY!!! ##########',
+    '########### THIS FILE IS GENERATED, DO NOT EDIT MANUALLY!!! ##########',
+    '#' * 70,
+    '',
+]
 
 
 class Row(NamedTuple):
@@ -112,9 +129,9 @@ class Row(NamedTuple):
         if '..' in self.property_range:
             ge, le = self.range                                                                           # type: ignore
             if self.type == 'integer':
-                return 'conint(ge={0}, le={1})'.format(ge, le)
+                return 'int'
             elif self.type == 'float':
-                return 'confloat(ge={0}, le={1})'.format(ge, le)
+                return 'float'
         if self.type == 'enum value':
             class_name = ''.join([word.capitalize() for word in self.property_name.split('.')])
             return 'enums.{0}'.format(class_name)
@@ -127,6 +144,10 @@ class Row(NamedTuple):
         return self.property_description.split('Type: ')[-1].strip('*')
 
     def render(self, *, indented: bool = False) -> str:
+        if '..' in self.property_range:
+            ge, le = self.range                                                                           # type: ignore
+            return f'    {self.name}: {self.annotation} = Field(ge={ge}, le={le}, default={self.default})'
+
         if self.property_name == GROUP_ID:
             return '    {0}: str'.format(self.name)
         if self.property_name == SASL_MECHANISMS:
@@ -163,10 +184,9 @@ def read_markdown(filename: Union[str, Path] = 'CONFIGURATION.md', *, cut: bool 
     return lines
 
 
-def write_python(lines: List[str], file_name: str) -> None:
+def write_python(lines: Lines, file_name: str) -> None:
     with open(file_name, 'w') as fl:
-        for line in lines:
-            fl.write('{0}\n'.format(line if line.strip() else ''))
+        fl.write('\n'.join(lines))
 
 
 def parse_line(line: str) -> Optional[Row]:
@@ -205,14 +225,11 @@ def group(rows: List[Row]) -> Dict[str, List[Row]]:
     return grps
 
 
-def generate_models(groups: Dict[str, List[Row]], indented: bool = False) -> List[str]:
-    properties = [
-        '# I am not gonna to generate single type for every single range of conint/confloat.',
-        '# https://github.com/samuelcolvin/pydantic/issues/156',
-        '',
+def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
+    properties = DEFAULT_HEADER + [
         'from typing import Callable, Optional',
         '',
-        'from pydantic import conint, confloat',
+        'from pydantic import Field',
         'from pydantic_settings import BaseSettings',
         '',
         "# Enums because we can't rely that client code uses linters.",
@@ -235,18 +252,18 @@ def generate_models(groups: Dict[str, List[Row]], indented: bool = False) -> Lis
                 else:
                     uniq.append(row)
                 already_generated.add(row.property_name)
-        properties += [row.render(indented=indented) for row in sorted(pre, key=operator.attrgetter('name'))]
+        properties += [row.render() for row in sorted(pre, key=operator.attrgetter('name'))]
         for prop in sorted(uniq, key=operator.attrgetter('name')):
             if prop.property_name == SASL_MECHANISMS:
                 properties.append('    # ToDo (tribunsky.kir): rethink using aliases? They may need simultaneous valdiation or may be injected via dict()')
                 properties.append('    # It is just alias, but when setting it manually it may misbehave with current defaults.')
-            properties.append(prop.render(indented=indented))
+            properties.append(prop.render())
 
     return properties
 
 
 def generate_fields(groups: Dict[str, List[Row]]) -> List[str]:
-    properties = [
+    properties = DEFAULT_HEADER + [
         "# Why so: not all configuration parameters of librdkafka may be easily replaced from '_' to '.',",
         "#   therefore, we can't convert on-the-fly from  `ssl_ca` without errors",
         "#   and we don't want to have a nice whitelist, which is arguable",
@@ -260,7 +277,7 @@ def generate_fields(groups: Dict[str, List[Row]]) -> List[str]:
 
 
 def generate_enums(groups: Dict[str, List[Row]]) -> List[str]:
-    properties = ['from enum import Enum']
+    properties = DEFAULT_HEADER + ['from enum import Enum']
     already_generated = set()
     for grp in sorted(groups):
         for row in groups[grp]:
@@ -284,50 +301,14 @@ def generate_enum(prop: str, rng: str) -> List[str]:
     return [header] + flds
 
 
-Name = str
-Version = str
-Lines = List[str]
-Files = Dict[Name, Lines]
+def generate(lines: Dict[Version, Files]) -> Dict[Version, Dict[Name, Lines]]:
+    dct: Dict[Version, Dict[Name, Lines]] = {version: {} for version in lines}
 
+    for libversion in lines:
+        for file_name in ('enums.py', 'models.py', 'fields.py'):
+            logger.info(f'Processing {libversion} {file_name}')
 
-def generate(lines: Dict[Version, Files]) -> Dict[Name, Lines]:
-    dct: Dict[Name, Lines] = {}
-    for file_name in ('enums.py', 'models.py', 'fields.py'):
-        logger.info('Processing {0}'.format(file_name))
-        s = set()
-        for libversion in lines:
-            content = '\n'.join(lines[libversion][file_name])
-            s.add(content)
-        if not len(s):
-            raise ValueError('Nothing to compare')
-        if len(s) == 1:
-            logger.info('All generated files for {0} are equal, keeping just one'.format(file_name))
-            dct[file_name] = lines[libversion][file_name]
-        else:
-            logger.warning("Generated files for {0} differs, merging it...".format(file_name))
-            header = '# mypy: disable-error-code="no-redef"'
-            if file_name == 'fields.py':
-                header = '# mypy: disable-error-code="no-redef,assignment"'
-            new_lines = [
-                '# ToDo (tribunsky.kir): looks like that idea of dynamic import via imp depending on librdkafka',
-                "#                       wasn't the worst idea, cause `if`s causes a lot of static checks problems.",
-                header,
-                '',
-                'from wunderkafka import librdkafka',
-                '',
-            ]
-            head, *tail = list(sorted(lines))
-            new_lines.extend(lines[head][file_name])
-            for libversion in tail:
-                tpl = tuple(int(digit) for digit in libversion.split('.'))
-                delimeter = [
-                    '',
-                    'if librdkafka.__version__ >= {0}:'.format(tpl)
-                ]
-                new_lines.extend(delimeter)
-                new_lines.extend('    {0}'.format(line) for line in lines[libversion][file_name])
-            new_lines.append('')
-            dct[file_name] = new_lines
+            dct[libversion][file_name] = lines[libversion][file_name]
     return dct
 
 
@@ -346,17 +327,53 @@ def main() -> None:
             configuration_md = path / 'CONFIGURATION.md'
             grouped = group(parse(read_markdown(filename=configuration_md)))
             files = {
-                'models.py': generate_models(grouped, sub_path != rev),
+                'models.py': generate_models(grouped),
                 'fields.py': generate_fields(grouped),
                 'enums.py': generate_enums(grouped),
             }
             lines[sub_path] = files
         else:
             logger.info('{0}: skipping...'.format(path))
-    dct = generate(lines)
-    for file_name, content in dct.items():
-        write_python(content, 'generated/{0}'.format(file_name))
+    versionized_dcts = generate(lines)
 
+    # clean generated dir in order to clean removed versions automatically
+    shutil.rmtree("generated/", ignore_errors=True)
+
+    for version, dct in versionized_dcts.items():
+        for file_name, content in dct.items():
+            version_dir = version_to_dir_name(version)
+            p = Path(f'generated/{version_dir}/')
+            p.mkdir(parents=True, exist_ok=True)
+            write_python(content, f'generated/{version_dir}/{file_name}')
+
+    versions = sorted((tuple(int(v) for v in version.split(".")) for version in versionized_dcts), reverse=True)
+    versions_formated = [(version, f'_{"_".join(str(i) for i in version)}') for version in versions]
+    for kind in ("models", "enums", "fields"):
+        write_module_file(versions_formated, kind)
+
+def write_module_file(versions: list[tuple[tuple, str]], kind: str) -> None:
+    tmpl = '\nif librdkafka.__version__ >= {version_tuple}:\n    from wunderkafka.config.generated.{version_dir}.{kind} import *  # type: ignore[assignment]'
+
+    file_tmpl = DEFAULT_HEADER + [
+        '',
+        'from wunderkafka import librdkafka\n',
+        '',
+    ]
+    header_file = ''.join(
+        tmpl.format(
+            version_tuple=version_tpl,
+            version_dir=version_dir,
+            kind=kind,
+        )
+        for version_tpl, version_dir in versions
+    )
+    file_tmpl[-1] = header_file
+    with open(f"generated/{kind}.py", "w") as f:
+        f.write('\n'.join(file_tmpl))
+
+
+def version_to_dir_name(version: str) -> str: 
+    return f'_{version.replace(".", "_")}'
 
 def single() -> None:
     grouped = group(parse(read_markdown()))

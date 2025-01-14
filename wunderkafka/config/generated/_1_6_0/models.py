@@ -92,6 +92,7 @@ class RDKafkaConfig(BaseSettings):
     socket_send_buffer_bytes: int = Field(ge=0, le=100000000, default=0)
     socket_timeout_ms: int = Field(ge=10, le=300000, default=60000)
     ssl_ca: Optional[Callable] = None
+    ssl_ca_certificate_stores: str = 'Root'
     ssl_ca_location: Optional[str] = None
     ssl_certificate: Optional[Callable] = None
     ssl_certificate_location: Optional[str] = None
@@ -163,7 +164,7 @@ class RDProducerConfig(RDKafkaConfig):
     enable_gapless_guarantee: bool = False
     enable_idempotence: bool = False
     linger_ms: float = Field(ge=0, le=900000, default=5.0)
-    message_send_max_retries: int = Field(ge=0, le=10000000, default=2)
+    message_send_max_retries: int = Field(ge=0, le=2147483647, default=2147483647)
     message_timeout_ms: int = Field(ge=0, le=2147483647, default=300000)
     msg_order_cmp: Optional[Callable] = None
     partitioner: str = 'consistent_random'
@@ -174,8 +175,9 @@ class RDProducerConfig(RDKafkaConfig):
     queue_buffering_max_ms: float = Field(ge=0, le=900000, default=5.0)
     queuing_strategy: enums.QueuingStrategy = enums.QueuingStrategy.fifo
     request_required_acks: int = Field(ge=-1, le=1000, default=-1)
-    request_timeout_ms: int = Field(ge=1, le=900000, default=5000)
-    retries: int = Field(ge=0, le=10000000, default=2)
+    request_timeout_ms: int = Field(ge=1, le=900000, default=30000)
+    retries: int = Field(ge=0, le=2147483647, default=2147483647)
     retry_backoff_ms: int = Field(ge=1, le=300000, default=100)
+    sticky_partitioning_linger_ms: int = Field(ge=0, le=900000, default=10)
     transaction_timeout_ms: int = Field(ge=1000, le=2147483647, default=60000)
     transactional_id: Optional[str] = None
