@@ -5,7 +5,6 @@ from typing import Type, Optional, Dict
 from wunderkafka import BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
-from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 from wunderkafka.schema_registry import (
     ConfluentSRClient,
@@ -53,9 +52,8 @@ class AvroStringConsumer(HighLevelDeserializingConsumer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, None),
+            consumer=BytesConsumer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(sr),
                 SimpleCache(),
@@ -102,9 +100,8 @@ class AvroModelStringProducer(HighLevelSerializingProducer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(
                     sr,
@@ -150,9 +147,8 @@ class JSONStringConsumer(HighLevelDeserializingConsumer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, watchdog),
+            consumer=BytesConsumer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(sr),
                 SimpleCache(),
@@ -200,7 +196,6 @@ class JSONModelStringProducer(HighLevelSerializingProducer):
         if sr_client is None:
             sr_client = ConfluentSRClient
 
-        config, watchdog = check_watchdog(config)
         schema_registry = sr_client(
             KerberizableHTTPClient(
                 sr,
@@ -210,7 +205,7 @@ class JSONModelStringProducer(HighLevelSerializingProducer):
             SimpleCache(),
         )
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=schema_registry,
             header_packer=ConfluentClouderaHeadersHandler().pack,
             value_serializer=JSONModelSerializer(schema_registry.client),

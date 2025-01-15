@@ -2,7 +2,6 @@ from typing import Optional, Dict
 
 from wunderkafka import ProducerConfig, BytesProducer, ConsumerConfig, BytesConsumer
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
-from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 from wunderkafka.serdes.schemaless.json.deserializers import SchemaLessJSONDeserializer
 from wunderkafka.serdes.schemaless.json.serializers import SchemaLessJSONSerializer
@@ -32,9 +31,8 @@ class SchemaLessJSONStringProducer(HighLevelSerializingProducer):
 
                             Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
         """
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=None,
             header_packer=None,
             value_serializer=SchemaLessJSONSerializer(),
@@ -64,9 +62,8 @@ class SchemaLessJSONModelStringProducer(HighLevelSerializingProducer):
                             Refer original CONFIGURATION.md (https://git.io/JmgCl) or generated config.
         """
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=None,
             header_packer=None,
             value_serializer=SchemaLessJSONModelSerializer(),
@@ -92,9 +89,8 @@ class SchemaLessJSONStringConsumer(HighLevelDeserializingConsumer):
 
         self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, watchdog),
+            consumer=BytesConsumer(config),
             schema_registry=None,
             headers_handler=None,
             value_deserializer=SchemaLessJSONDeserializer(),

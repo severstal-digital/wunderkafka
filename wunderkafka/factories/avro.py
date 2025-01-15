@@ -16,7 +16,6 @@ from wunderkafka.serdes.store import AvroModelRepo, SchemaTextRepo
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.producers.bytes import BytesProducer
 from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient, KerberizableHTTPClient
-from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 from wunderkafka.schema_registry.clients.confluent import ConfluentSRClient
@@ -52,9 +51,8 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         if sr_client is None:
             sr_client = ClouderaSRClient
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            consumer=BytesConsumer(config, watchdog),
+            consumer=BytesConsumer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config),
                                        cmd_kinit=config.sasl_kerberos_kinit_cmd),
@@ -100,9 +98,8 @@ class AvroProducer(HighLevelSerializingProducer):
             sr_client = ClouderaSRClient
         self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=sr_client(
                 KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config),
                                        cmd_kinit=config.sasl_kerberos_kinit_cmd),
@@ -153,12 +150,14 @@ class AvroModelProducer(HighLevelSerializingProducer):
             sr_client = ClouderaSRClient
         self._default_timeout: int = 60
 
-        config, watchdog = check_watchdog(config)
         super().__init__(
-            producer=BytesProducer(config, watchdog),
+            producer=BytesProducer(config),
             schema_registry=sr_client(
-                KerberizableHTTPClient(sr, requires_kerberos=config_requires_kerberos(config),
-                                       cmd_kinit=config.sasl_kerberos_kinit_cmd),
+                KerberizableHTTPClient(
+                    sr, 
+                    requires_kerberos=config_requires_kerberos(config),
+                    cmd_kinit=config.sasl_kerberos_kinit_cmd
+                ),
                 SimpleCache(),
             ),
             header_packer=ConfluentClouderaHeadersHandler().pack,
