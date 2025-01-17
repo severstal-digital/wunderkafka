@@ -1,4 +1,4 @@
-# Welcome to Wunderkafka's documentation (final test)!
+# Welcome to Wunderkafka's documentation!
 
 <br>
 
