@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Install doc dependencies
-        run: pip install -r ./docs/requirements.txt
+        run: pip install -r docs/requirements.txt
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
