@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: 3.x
       - name: Install doc dependencies
-        run: pip install -r docs/requirements.txt
+        run: pip install -r dev_docs/requirements.txt
       - uses: actions/cache@v4
         with:
           key: mkdocs-${{ env.cache_id }}
