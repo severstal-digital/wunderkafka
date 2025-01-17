@@ -17,7 +17,12 @@ nav:
 
 plugins:
   - search
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            annotation_path: brief
 
 markdown_extensions:
   - pymdownx.highlight:
