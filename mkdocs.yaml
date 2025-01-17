@@ -40,4 +40,4 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - markdown_include.include:
-        base_path: docs
+        base_path: dev_docs
