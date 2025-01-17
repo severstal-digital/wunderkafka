@@ -4,6 +4,8 @@ repo_name: severstal-digital/wunderkafka
 
 docs_dir: dev_docs
 site_dir: docs
+watch:
+  - "wunderkafka"
 
 theme:
   name: "material"
