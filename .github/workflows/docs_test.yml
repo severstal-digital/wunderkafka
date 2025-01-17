@@ -22,4 +22,4 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-
-      - run: mkdocs gh-deploy
+      - run: mkdocs gh-deploy --force
