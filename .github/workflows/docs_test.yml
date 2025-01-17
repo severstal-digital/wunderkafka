@@ -7,7 +7,6 @@ on:
 
 jobs:
   docs:
-    needs: [version, deploy]
     runs-on: ubuntu-latest
     environment: release
 
