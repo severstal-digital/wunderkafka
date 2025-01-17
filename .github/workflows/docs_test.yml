@@ -5,6 +5,7 @@ on:
     branches:
       - docs-update
 
+jobs:
   docs:
     needs: [version, deploy]
     runs-on: ubuntu-latest
