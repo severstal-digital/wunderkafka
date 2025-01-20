@@ -4,9 +4,9 @@
 
 Wunderkafka provides a handful of facades for C-powered consumer/producer. It's built on top of the [confluent-kafka](https://pypi.org/project/confluent-kafka/)
 
-For a quick view on what is going on, please check [Quickstart](https://wunderkafka.readthedocs.io/en/stable/pages/quickstart.html) and [Documentation](https://wunderkafka.readthedocs.io/en/stable/)
+For a quick view on what is going on, please check [Quickstart](https://severstal-digital.github.io/wunderkafka/pages/quickstart/) and [Documentation](https://severstal-digital.github.io/wunderkafka/)
 
-Installation process described [here](https://wunderkafka.readthedocs.io/en/stable/pages/install.html)
+Installation process described [here](https://severstal-digital.github.io/wunderkafka/pages/install/)
 
 ## Features
 

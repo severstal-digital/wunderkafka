@@ -1,0 +1,43 @@
+site_name: wunderkafka
+repo_url: https://github.com/severstal-digital/wunderkafka
+repo_name: severstal-digital/wunderkafka
+
+docs_dir: dev_docs
+site_dir: docs
+watch:
+  - "wunderkafka"
+
+theme:
+  name: "material"
+  features:
+   - content.code.copy
+
+nav:
+  - Home: index.md
+  - Installation: pages/install.md
+  - QuickStart: pages/quickstart.md
+  - Advanced: pages/advanced_usage.md
+  - API: pages/API.md
+  - Advanced API: pages/advanced_API.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: sphinx
+            annotation_path: brief
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - markdown_include.include:
+        base_path: dev_docs

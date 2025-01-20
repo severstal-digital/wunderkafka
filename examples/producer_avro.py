@@ -32,11 +32,11 @@ key_schema = """
 
 if __name__ == '__main__':
     config = ProducerConfig(
-            bootstrap_servers=BROKERS_ADDRESSES,
-            security_protocol=SecurityProtocol.sasl_ssl,
-            sasl_kerberos_kinit_cmd='kinit my_user@my_real.com -k -t my_user.keytab',
-            sr=SRConfig(url=SCHEMA_REGISTRY_URL, sasl_username='my_user@my_real.com'),
-        )
+        bootstrap_servers=BROKERS_ADDRESSES,
+        security_protocol=SecurityProtocol.sasl_ssl,
+        sasl_kerberos_kinit_cmd='kinit my_user@my_real.com -k -t my_user.keytab',
+        sr=SRConfig(url=SCHEMA_REGISTRY_URL, sasl_username='my_user@my_real.com'),
+    )
 
     topic = 'test_test_test'
     producer = AvroProducer({topic: (value_schema, key_schema)}, config)

@@ -57,3 +57,24 @@ jobs:
       run: python -m build
     - name: Publish package to real PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+
+
+  docs:
+    needs: [deploy]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: Install doc dependencies
+        run: pip install -r dev_docs/requirements.txt
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-
+      - run: |
+          mkdocs gh-deploy --force
