@@ -16,19 +16,16 @@ from wunderkafka.logger import logger
 from wunderkafka.callbacks import reset_partitions
 from wunderkafka.consumers.abc import Message, AbstractConsumer
 from wunderkafka.consumers.subscription import TopicSubscription
-from wunderkafka.hotfixes.watchdog.types import Watchdog
 
 
 class BytesConsumer(AbstractConsumer):
     """Consumer implementation of extended interface for raw messages."""
 
-    # FixMe (tribunsky.kir): add watchdog page reference
-    def __init__(self, config: ConsumerConfig, sasl_watchdog: Optional[Watchdog] = None) -> None:
+    def __init__(self, config: ConsumerConfig) -> None:
         """
         Init consumer.
 
         :param config:          Pydantic BaseSettings model with librdkafka consumer's configuration.
-        :param sasl_watchdog:   Callable to handle the global state of kerberos auth (see Watchdog).
         """
         try:
             super().__init__(config.dict())
@@ -39,7 +36,6 @@ class BytesConsumer(AbstractConsumer):
 
         self._config = config
         self._last_poll_ts = time.perf_counter()
-        self._sasl_watchdog = sasl_watchdog
         # ToDo (tribunsky-kir): make it configurable
         atexit.register(self.close)
 
@@ -58,8 +54,6 @@ class BytesConsumer(AbstractConsumer):
         *,
         raise_on_lost: bool = False,
     ) -> List[Message]:
-        if self._sasl_watchdog is not None:
-            self._sasl_watchdog()
 
         # ToDo (tribunsky.kir): naybe it better to use on_lost callback within subscribe()
         dt = int((time.perf_counter() - self._last_poll_ts) * 1000)

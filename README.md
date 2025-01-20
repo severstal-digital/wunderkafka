@@ -82,7 +82,6 @@ from pydantic import Field
 from wunderkafka.config.generated import enums
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.schema_registry import ClouderaSRClient
-from wunderkafka.hotfixes.watchdog import check_watchdog
 from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.schema_registry.cache import SimpleCache
@@ -115,9 +114,8 @@ def MyAvroConsumer(
     config: Optional[ConsumerConfig] = None,
 ) -> HighLevelDeserializingConsumer:
     config = config or OverridenConsumerConfig()
-    config, watchdog = check_watchdog(config)
     return HighLevelDeserializingConsumer(
-        consumer=BytesConsumer(config, watchdog),
+        consumer=BytesConsumer(config),
         schema_registry=ClouderaSRClient(KerberizableHTTPClient(config.sr), SimpleCache()),
         headers_handler=ConfluentClouderaHeadersHandler().parse,
         deserializer=FastAvroDeserializer(),
