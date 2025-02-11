@@ -9,7 +9,6 @@
 
 from wunderkafka import librdkafka
 
-
 if librdkafka.__version__ >= (2, 8, 0):
     from wunderkafka.config.generated._2_8_0.enums import *  # type: ignore[assignment]
 if librdkafka.__version__ >= (2, 7, 0):

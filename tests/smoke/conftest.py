@@ -1,11 +1,11 @@
-from typing import Dict, Any
+from typing import Any
 
 import pytest
 from pytest import FixtureRequest
 
 from wunderkafka import SecurityProtocol
 
-RawConfig = Dict[str, Any]
+RawConfig = dict[str, Any]
 
 
 @pytest.fixture

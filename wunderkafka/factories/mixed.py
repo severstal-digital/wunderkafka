@@ -1,25 +1,21 @@
 """This module contains some ready-to-go combinations of the Consumer/Producer."""
 
-from typing import Type, Optional, Dict
+from typing import Optional
 
 from wunderkafka import BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
+from wunderkafka.types import TopicName, MessageDescription
+from wunderkafka.serdes.avro import FastAvroDeserializer
+from wunderkafka.serdes.store import AvroModelRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient, KerberizableHTTPClient
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
-from wunderkafka.schema_registry import (
-    ConfluentSRClient,
-    KerberizableHTTPClient,
-    SimpleCache,
-)
-from wunderkafka.serdes.avro import FastAvroDeserializer
-from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.serdes.json.deserializers import JSONDeserializer
+from wunderkafka.serdes.avromodel.serializers import AvroModelSerializer
 from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
-from wunderkafka.serdes.schemaless.string.deserializers import StringDeserializer
 from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
-from wunderkafka.serdes.store import AvroModelRepo
-from wunderkafka.types import MessageDescription, TopicName
+from wunderkafka.serdes.schemaless.string.deserializers import StringDeserializer
 
 
 class AvroStringConsumer(HighLevelDeserializingConsumer):
@@ -29,7 +25,7 @@ class AvroStringConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Optional[Type[ConfluentSRClient]] = None,
+        sr_client: Optional[type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -48,7 +44,7 @@ class AvroStringConsumer(HighLevelDeserializingConsumer):
         self._default_timeout: int = 60
         sr = config.sr
         if sr is None:
-            raise ValueError("Schema registry config is necessary for {0}".format(self.__class__.__name__))
+            raise ValueError(f"Schema registry config is necessary for {self.__class__.__name__}")
         if sr_client is None:
             sr_client = ConfluentSRClient
 
@@ -70,10 +66,10 @@ class AvroModelStringProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Optional[Type[ConfluentSRClient]] = None,
+        sr_client: Optional[type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init producer from pre-defined blocks.
@@ -95,7 +91,7 @@ class AvroModelStringProducer(HighLevelSerializingProducer):
         self._default_timeout: int = 60
         sr = config.sr
         if sr is None:
-            raise ValueError("Schema registry config is necessary for {0}".format(self.__class__.__name__))
+            raise ValueError(f"Schema registry config is necessary for {self.__class__.__name__}")
 
         if sr_client is None:
             sr_client = ConfluentSRClient
@@ -124,7 +120,7 @@ class JSONStringConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Optional[Type[ConfluentSRClient]] = None,
+        sr_client: Optional[type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -143,7 +139,7 @@ class JSONStringConsumer(HighLevelDeserializingConsumer):
         self._default_timeout: int = 60
         sr = config.sr
         if sr is None:
-            raise ValueError("Schema registry config is necessary for {0}".format(self.__class__.__name__))
+            raise ValueError(f"Schema registry config is necessary for {self.__class__.__name__}")
         if sr_client is None:
             sr_client = ConfluentSRClient
 
@@ -165,10 +161,10 @@ class JSONModelStringProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Optional[Type[ConfluentSRClient]] = None,
+        sr_client: Optional[type[ConfluentSRClient]] = None,
     ) -> None:
         """
         Init producer from pre-defined blocks.
@@ -191,7 +187,7 @@ class JSONModelStringProducer(HighLevelSerializingProducer):
 
         sr = config.sr
         if sr is None:
-            raise ValueError("Schema registry config is necessary for {0}".format(self.__class__.__name__))
+            raise ValueError(f"Schema registry config is necessary for {self.__class__.__name__}")
 
         if sr_client is None:
             sr_client = ConfluentSRClient

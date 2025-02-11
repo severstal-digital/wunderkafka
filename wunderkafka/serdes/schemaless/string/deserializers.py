@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
-
 from confluent_kafka.serialization import StringDeserializer as _StringDeserializer
+
 from wunderkafka.serdes.abc import AbstractDeserializer
 
 

@@ -15,21 +15,21 @@ class SchemaType(str, Enum):
 
 
 @dataclass(frozen=True)
-class Timestamp(object):
+class Timestamp:
     value: int
 
     def __str__(self) -> str:
-        return '{0}: {1:.2f} ({2})'.format(self.__class__.__name__, self.value, ts2dt(self.value))
+        return f'{self.__class__.__name__}: {self.value:.2f} ({ts2dt(self.value)})'
 
 
 @dataclass(frozen=True)
-class Offset(object):
+class Offset:
     value: int
 
 
 # ToDo (ka.tribunskii): compose header & meta in symmetrical way
 @dataclass(frozen=True)
-class ParsedHeader(object):
+class ParsedHeader:
     protocol_id: int
     meta_id: Optional[int]
     schema_id: Optional[int]
@@ -38,7 +38,7 @@ class ParsedHeader(object):
 
 
 @dataclass(frozen=True)
-class SchemaMeta(object):
+class SchemaMeta:
     topic: str
     is_key: bool
     header: ParsedHeader
@@ -57,12 +57,12 @@ class SchemaMeta(object):
         # Cloudera
         else:
             suffix = ':k' if self.is_key else ''
-        return '{0}{1}'.format(self.topic, suffix)
+        return f'{self.topic}{suffix}'
 
 
 # ToDo: (tribunsky.kir): add cross-validation of invariants on the model itself?
 @dataclass(frozen=True)
-class SRMeta(object):
+class SRMeta:
     """Meta, which is retrieved after schema registration."""
     # Confluent always has schema_id, but one of cloudera protocols doesn't use it
     schema_id: Optional[int]
@@ -73,7 +73,7 @@ class SRMeta(object):
 
 
 @dataclass(frozen=True)
-class SchemaDescription(object):
+class SchemaDescription:
     """
     Class to allow a contract extension between moving parts of (de)serialization.
 

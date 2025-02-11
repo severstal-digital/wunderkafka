@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-
 import os
 import time
 import datetime
 import subprocess
-from typing import Set, Optional
+from typing import Optional
 
 try:
     from dateutil import parser
@@ -49,28 +47,28 @@ def check_posix() -> None:
         logger.error(exc.output)
         logger.error(exc.stdout)
         logger.error(exc.stderr)
-        logger.error('locale exit code: {0}'.format(exc.returncode))
+        logger.error(f'locale exit code: {exc.returncode}')
     else:
         lines = {line.strip() for line in proc.stdout.split(b'\n')}
         if b'POSIX' in lines:
             logger.debug('POSIX locale found.')
             return
         if b'posix' in {line.lower() for line in lines}:
-            logger.warning('Found POSIX, but in lower-case. Please, check `locale -a` ({0})'.format(lines))
+            logger.warning(f'Found POSIX, but in lower-case. Please, check `locale -a` ({lines})')
             return
         logger.warning("Couldn't find any POSIX in locales. May misbehave.")
 
 
-def clean_stdout(stdout: str, krb_user: str = '', krb_realm: str = '') -> Set[str]:
+def clean_stdout(stdout: str, krb_user: str = '', krb_realm: str = '') -> set[str]:
     date_lines = set()
     for line in stdout.split('\n'):
         if krb_realm in line and krb_user not in line:
             _, _, dt, tm, *_ = line.split()
-            date_lines.add('{0} {1}'.format(dt, tm))
+            date_lines.add(f'{dt} {tm}')
 
     if not date_lines:
-        raise ValueError('Found no expiration dates. Please, check stdout:\n{0}'.format(stdout))
-    logger.debug('Got {0} expiration dates'.format(len(date_lines)))
+        raise ValueError(f'Found no expiration dates. Please, check stdout:\n{stdout}')
+    logger.debug(f'Got {len(date_lines)} expiration dates')
     return date_lines
 
 
@@ -93,7 +91,7 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
         logger.error(exc.output)
         logger.error(exc.stdout)
         logger.error(exc.stderr)
-        logger.error('klist exit: {0}'.format(str(exc)))
+        logger.error(f'klist exit: {str(exc)}')
         return time.time() + default_timeout
     else:
         expire_dates = []
@@ -101,7 +99,7 @@ def get_expiration_ts(krb_user: str, krb_realm: str, default_timeout: float = 60
             dt = get_datetime(dt_str)
             if dt is not None:
                 expire_dates.append(dt)
-        logger.debug('Parsed dates: {0}'.format(expire_dates))
+        logger.debug(f'Parsed dates: {expire_dates}')
         if not expire_dates:
             logger.warning('Got not expiration dates')
             return time.time() + default_timeout
@@ -119,5 +117,5 @@ def get_datetime(string: str) -> Optional[datetime.datetime]:
     try:
         return parser.parse(string)
     except (ValueError, OverflowError):
-        logger.warning('Unable to parse {0}'.format(string))
+        logger.warning(f'Unable to parse {string}')
     return None

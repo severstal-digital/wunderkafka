@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List, Union, Optional
+from typing import Any, Union, Optional
 
 from confluent_kafka import Message, TopicPartition
 from typing_extensions import Protocol
@@ -19,14 +19,14 @@ class AnyConsumer(Protocol):
     def commit(
         self,
         message: Optional[Message] = None,
-        offsets: Optional[List[TopicPartition]] = None,
+        offsets: Optional[list[TopicPartition]] = None,
         asynchronous: bool = True,
-    ) -> Optional[List[TopicPartition]]:
+    ) -> Optional[list[TopicPartition]]:
         """Just overlap nested 'real' consumer's offset."""
 
     def subscribe(
         self,
-        topics: List[Union[str, TopicSubscription]],
+        topics: list[Union[str, TopicSubscription]],
         *,
         from_beginning: Optional[bool] = None,
         offset: Optional[int] = None,
@@ -42,7 +42,7 @@ class AnyConsumer(Protocol):
         num_messages: int = 1000000,
         *,
         ignore_keys: bool = False,
-    ) -> List[Message]:
+    ) -> list[Message]:
         """Consume as many messages as we can for a given timeout and decode them."""
 
 

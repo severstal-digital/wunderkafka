@@ -1,5 +1,4 @@
 import json
-
 from typing import Any, Optional
 
 from wunderkafka.serdes.abc import AbstractSerializer

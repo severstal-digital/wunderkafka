@@ -1,5 +1,5 @@
-from tests.smoke.conftest import RawConfig
 from wunderkafka import ConsumerConfig, ProducerConfig
+from tests.smoke.conftest import RawConfig
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 
 

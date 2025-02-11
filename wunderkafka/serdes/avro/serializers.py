@@ -1,6 +1,6 @@
 import io
 from json import loads
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from fastavro import parse_schema, schemaless_writer
 
@@ -10,7 +10,7 @@ from wunderkafka.serdes.avro.types import FastAvroParsedSchema
 
 class FastAvroSerializer(AbstractSerializer):
     def __init__(self, store: Optional[AbstractDescriptionStore] = None) -> None:
-        self._cache: Dict[str, FastAvroParsedSchema] = {}
+        self._cache: dict[str, FastAvroParsedSchema] = {}
         self.store = store
 
     def serialize(

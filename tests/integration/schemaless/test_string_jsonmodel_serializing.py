@@ -1,14 +1,13 @@
 import uuid
-from typing import Optional
 from uuid import UUID
+from typing import Optional
 
 import pytest
 from pydantic import BaseModel
 
 from wunderkafka.serdes.json import HAS_JSON_SCHEMA
-from wunderkafka.serdes.schemaless.jsonmodel.serializers import SchemaLessJSONModelSerializer
-
 from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
+from wunderkafka.serdes.schemaless.jsonmodel.serializers import SchemaLessJSONModelSerializer
 
 if not HAS_JSON_SCHEMA:
     pytest.skip("skipping json-schema-only tests", allow_module_level=True)

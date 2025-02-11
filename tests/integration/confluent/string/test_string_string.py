@@ -1,11 +1,11 @@
 from typing import Optional
 from pathlib import Path
 
-from pydantic import BaseModel, UUID4
+from pydantic import UUID4, BaseModel
 
-from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
 from wunderkafka.tests import TestProducer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.serdes.schemaless.string.serializers import StringSerializer
 
 
 class Image(BaseModel):

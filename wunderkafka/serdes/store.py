@@ -1,16 +1,15 @@
-from typing import Type, Union, Optional
+from typing import Union, Optional
 from pathlib import Path
 
 from pydantic import BaseModel
 from pydantic.json_schema import GenerateJsonSchema
-
-from wunderkafka.serdes.jsonmodel.derive import JSONClosedModelGenerator
-from wunderkafka.structures import SchemaType
-from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
-from wunderkafka.serdes.abc import AbstractDescriptionStore
 from dataclasses_avroschema import AvroModel
-from wunderkafka.serdes import avromodel
-from wunderkafka.serdes import jsonmodel
+
+from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
+from wunderkafka.serdes import avromodel, jsonmodel
+from wunderkafka.serdes.abc import AbstractDescriptionStore
+from wunderkafka.structures import SchemaType
+from wunderkafka.serdes.jsonmodel.derive import JSONClosedModelGenerator
 
 
 class SchemaTextRepo(AbstractDescriptionStore):
@@ -58,7 +57,7 @@ class SchemaFSRepo(AbstractDescriptionStore):
 class AvroModelRepo(AbstractDescriptionStore):
 
     # ToDo (tribunsky.kir): change Type[AvroModel] to more general alias + check derivation from python built-ins
-    def add(self, topic: TopicName, value: Type[AvroModel], key: Optional[Type[AvroModel]]) -> None:
+    def add(self, topic: TopicName, value: type[AvroModel], key: Optional[type[AvroModel]]) -> None:
         self._values[topic] = ValueSchemaDescription(text=avromodel.derive(value, topic), type=SchemaType.AVRO)
         if key is not None:
             self._keys[topic] = KeySchemaDescription(
@@ -76,11 +75,11 @@ class JSONRepo(AbstractDescriptionStore):
 
 
 class JSONModelRepo(AbstractDescriptionStore):
-    def __init__(self, schema_generator: Type[GenerateJsonSchema] = JSONClosedModelGenerator) -> None:
+    def __init__(self, schema_generator: type[GenerateJsonSchema] = JSONClosedModelGenerator) -> None:
         super().__init__()
         self._schema_generator = schema_generator
 
-    def add(self, topic: TopicName, value: Type[BaseModel], key: Optional[Type[BaseModel]]) -> None:
+    def add(self, topic: TopicName, value: type[BaseModel], key: Optional[type[BaseModel]]) -> None:
         self._values[topic] = ValueSchemaDescription(
             text=jsonmodel.derive(value, self._schema_generator),
             type=SchemaType.JSON,
