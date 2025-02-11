@@ -1,4 +1,4 @@
-from typing import Any, Tuple, Callable, Optional
+from typing import Any, Callable, Optional
 
 import pytest
 from confluent_kafka import KafkaError

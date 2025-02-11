@@ -1,6 +1,6 @@
 import io
 from json import loads
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from fastavro import parse_schema, schemaless_reader
 

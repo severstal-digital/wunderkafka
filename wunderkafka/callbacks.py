@@ -1,6 +1,6 @@
 """This module contains some predefined callbacks to interact with librdkafka."""
 
-from typing import List, Optional
+from typing import Optional
 
 from confluent_kafka import Message, KafkaError, TopicPartition
 

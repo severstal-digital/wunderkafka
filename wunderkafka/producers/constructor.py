@@ -7,7 +7,7 @@ All moving parts should be interchangeable in terms of schema, header and serial
 (for further overriding^W extending).
 """
 
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Optional
 
 from wunderkafka.types import MsgKey, MsgValue, TopicName, HeaderPacker, DeliveryCallback, MessageDescription
 from wunderkafka.logger import logger

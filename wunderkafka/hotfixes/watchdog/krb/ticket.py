@@ -2,7 +2,7 @@ import os
 import time
 import datetime
 import subprocess
-from typing import Set, Optional
+from typing import Optional
 
 try:
     from dateutil import parser

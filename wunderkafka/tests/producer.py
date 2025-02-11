@@ -1,4 +1,4 @@
-from typing import Any, List, Union, Optional
+from typing import Any, Union, Optional
 from dataclasses import dataclass
 
 from wunderkafka.types import DeliveryCallback

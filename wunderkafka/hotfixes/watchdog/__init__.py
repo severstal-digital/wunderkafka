@@ -1,7 +1,7 @@
 import os
 import time
 import subprocess
-from typing import Any, Set, Dict, Tuple, Optional
+from typing import Any
 from dataclasses import dataclass
 
 from confluent_kafka import libversion
@@ -12,6 +12,12 @@ from wunderkafka.config.generated import enums
 from wunderkafka.hotfixes.watchdog.types import Watchdog
 
 REQUIRES_KERBEROS = frozenset([enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext])
+
+
+__all__ = [
+    'Watchdog',
+    'RDKafkaConfig',
+]
 
 
 class NonRepetitiveLogger:

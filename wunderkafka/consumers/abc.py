@@ -7,7 +7,7 @@ Module contains interface-like skeletons for consumer.
 
 import datetime
 from abc import ABC, abstractmethod
-from typing import Dict, List, Union, Optional
+from typing import Union, Optional
 
 from confluent_kafka import Message, Consumer, TopicPartition
 
