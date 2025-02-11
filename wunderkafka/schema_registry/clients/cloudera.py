@@ -1,10 +1,10 @@
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Union, Optional
 
 from wunderkafka.errors import SchemaRegistryLookupException
 from wunderkafka.logger import logger
-from wunderkafka.structures import SRMeta, SchemaMeta, ParsedHeader, SchemaType
-from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
+from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType, ParsedHeader
 from wunderkafka.serdes.headers import PROTOCOLS
+from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
 from wunderkafka.schema_registry.cache import SimpleCache, AlwaysEmptyCache
 
 

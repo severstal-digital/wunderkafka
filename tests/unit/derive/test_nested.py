@@ -1,9 +1,9 @@
 import json
+from typing import Optional
 from pathlib import Path
-from typing import List, Optional, Dict
 
 import pytest
-from pydantic import BaseModel, UUID4, ValidationError
+from pydantic import UUID4, BaseModel, ValidationError
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel import derive

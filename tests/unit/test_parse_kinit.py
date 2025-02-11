@@ -1,6 +1,6 @@
 import pytest
 
-from wunderkafka.hotfixes.watchdog import parse_kinit, KinitParams
+from wunderkafka.hotfixes.watchdog import KinitParams, parse_kinit
 
 USER = 'my.user'
 REALM = 'MYDOMAIN.COM'

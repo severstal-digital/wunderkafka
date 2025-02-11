@@ -1,8 +1,5 @@
 import inspect
-import sys
-import typing
-from types import MappingProxyType
-from typing import Any, List, Type, Union, get_origin
+from typing import Any, get_origin
 
 # We check it via import to avoid using nested imports in implementation in `is_union_type() function`
 HAS_UNION_TYPE = True

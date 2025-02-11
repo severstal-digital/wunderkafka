@@ -1,8 +1,8 @@
-from typing import Dict, Optional, Any, Callable
+from typing import Any, Callable, Optional
 
+from confluent_kafka.serialization import MessageField, SerializationContext
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.json_schema import JSONSerializer as JSONSchemaSerializer
-from confluent_kafka.serialization import SerializationContext, MessageField
 
 from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 

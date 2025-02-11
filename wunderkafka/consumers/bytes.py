@@ -3,18 +3,18 @@
 import time
 import atexit
 import datetime
-from typing import Dict, List, Union, Optional, TypeVar, Callable
+from typing import Union, TypeVar, Callable, Optional
 
 import confluent_kafka
-from confluent_kafka import KafkaException, Consumer
+from confluent_kafka import Consumer, KafkaException
 
-from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.errors import ConsumerException
 from wunderkafka.logger import logger
 from wunderkafka.callbacks import reset_partitions
 from wunderkafka.consumers.abc import Message, AbstractConsumer
+from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.consumers.subscription import TopicSubscription
 
 

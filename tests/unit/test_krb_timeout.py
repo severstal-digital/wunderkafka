@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from wunderkafka.hotfixes.watchdog.krb.ticket import clean_stdout, get_datetime, HAS_DATEUTIL
+from wunderkafka.hotfixes.watchdog.krb.ticket import HAS_DATEUTIL, clean_stdout, get_datetime
 
 STDOUT1 = """
 Ticket cache: FILE:/tmp/krb5cc_1000

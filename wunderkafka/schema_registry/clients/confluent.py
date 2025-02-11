@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Optional
-from typing_extensions import Protocol
-from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSchemaRegistryClient, Schema
+from typing import Any
 
-from wunderkafka.schema_registry import SimpleCache
-from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
-from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
+from typing_extensions import Protocol
+from confluent_kafka.schema_registry import Schema
+from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSchemaRegistryClient
+
 from wunderkafka.compat import ParamSpec
+from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
+from wunderkafka.schema_registry import SimpleCache
+from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
 
 P = ParamSpec('P')
 

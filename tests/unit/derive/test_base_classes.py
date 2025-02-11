@@ -1,17 +1,16 @@
-import json
 import sys
+import json
 import time
-from typing import Optional, Union, List
+from typing import Union, Optional
 from datetime import datetime
 from dataclasses import dataclass
 
 import pytest
-from pydantic import Field, BaseModel, ValidationError, ConfigDict, UUID4
+from pydantic import UUID4, Field, BaseModel, ConfigDict, ValidationError
 from pydantic_settings import BaseSettings
-
 from dataclasses_avroschema import AvroModel
-from wunderkafka.serdes.avromodel import derive
 
+from wunderkafka.serdes.avromodel import derive
 
 # ToDo (tribunsky.kir): review some tests. As pydantic V2 changes it's behaviour, some tests are useless:
 #                       we still can derive correct model, but we will be unable to actually populate it in runtime.

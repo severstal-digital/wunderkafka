@@ -4,7 +4,7 @@ from dataclasses import asdict, is_dataclass
 from pydantic import BaseModel
 
 from wunderkafka.compat import ParamSpec
-from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
+from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 from wunderkafka.serdes.avro import FastAvroSerializer
 
 P = ParamSpec('P')

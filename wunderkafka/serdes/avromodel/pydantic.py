@@ -1,10 +1,11 @@
-from typing import Final, FrozenSet, Type, Dict, Any, get_args, Union, Optional, TypeVar
+from typing import Any, Final, Union, TypeVar, Optional, get_args
 
 try:
     from dataclasses_avroschema.avrodantic import AvroBaseModel
 except ImportError:
     from dataclasses_avroschema.pydantic import AvroBaseModel
-from pydantic import BaseModel, create_model, ConfigDict
+
+from pydantic import BaseModel, ConfigDict, create_model
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel.typing import is_generic_type

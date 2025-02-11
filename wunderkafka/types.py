@@ -1,7 +1,7 @@
 """This module contains aliases and helper definitions for type hints."""
 
 # ToDo (tribunsky.kir): move it to module with structures
-from typing import Any, Tuple, Union, Callable, Optional, Type
+from typing import Any, Union, Callable, Optional
 
 from confluent_kafka import Message, KafkaError
 

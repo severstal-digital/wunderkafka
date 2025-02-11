@@ -1,8 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
-from tests.smoke.conftest import RawConfig
 from wunderkafka import SRConfig, BytesConsumer, BytesProducer, ConsumerConfig, ProducerConfig
+from tests.smoke.conftest import RawConfig
 
 
 def test_init_consumer(boostrap_servers: str) -> None:

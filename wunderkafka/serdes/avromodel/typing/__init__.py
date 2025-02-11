@@ -1,4 +1,4 @@
-from typing import Optional, Type, get_origin, get_args
+from typing import Optional, get_args, get_origin
 
 
 def is_generic_type(annotation: Optional[type[object]]) -> bool:
