@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
 from typing_extensions import Protocol
 from confluent_kafka.schema_registry import Schema
@@ -16,19 +16,19 @@ P = ParamSpec('P')
 
 class ConfluentRestClient(Protocol):
 
-    def get(self, url: str, query: dict | None = None) -> Any:
+    def get(self, url: str, query: Optional[dict] = None) -> Any:
         ...
 
-    def post(self, url: str, body: str | None, **kwargs: Any) -> Any:
+    def post(self, url: str, body: Optional[str], **kwargs: Any) -> Any:
         ...
 
     def delete(self, url: str) -> Any:
         ...
 
-    def put(self, url: str, body: str | None = None) -> Any:
+    def put(self, url: str, body: Optional[str]= None) -> Any:
         ...
 
-    def send_request(self, url: str, method: str, body: str | None = None, query: dict | None = None) -> Any:
+    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict]= None) -> Any:
         ...
 
     def _close(self) -> None:
@@ -39,19 +39,19 @@ class Adapter:
     def __init__(self, http_client: AbstractHTTPClient) -> None:
         self._client = http_client
 
-    def get(self, url: str, query: dict | None = None) -> Any:
+    def get(self, url: str, query: Optional[dict] = None) -> Any:
         return self._client.make_request(url, query=query)
 
-    def post(self, url: str, body: str | None, **_: Any) -> Any:
+    def post(self, url: str, body: Optional[str], **_: Any) -> Any:
         return self._client.make_request(url, method='POST', body=body)
 
     def delete(self, url: str) -> Any:
         return self._client.make_request(url, method='DELETE')
 
-    def put(self, url: str, body: str | None = None) -> Any:
+    def put(self, url: str, body: Optional[str]= None) -> Any:
         return self._client.make_request(url, method='PUT', body=body)
 
-    def send_request(self, url: str, method: str, body: str | None = None, query: dict | None = None) -> Any:
+    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
         return self._client.make_request(url, method, body=body, query=query)
 
     def _close(self) -> None:
@@ -73,7 +73,7 @@ class ConfluentSRClient(AbstractSchemaRegistry):
     def __init__(
         self,
         http_client: AbstractHTTPClient,
-        _: SimpleCache | None = None,
+        _: Optional[SimpleCache] = None,
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:

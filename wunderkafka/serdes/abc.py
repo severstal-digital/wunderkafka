@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Union, Optional
+from typing import Any, Union, Optional
 
 from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
 from wunderkafka.structures import SRMeta, ParsedHeader
@@ -22,7 +22,7 @@ class AbstractDeserializer(ABC):
     schemaless: bool = False
 
     @abstractmethod
-    def deserialize(self, schema: str, payload: bytes, seek_pos: int | None = None) -> Any: ...
+    def deserialize(self, schema: str, payload: bytes, seek_pos: Optional[int] = None) -> Any: ...
 
 
 class AbstractSerializer(ABC):
@@ -33,17 +33,17 @@ class AbstractSerializer(ABC):
     # but if serializer has its own store, it will be used instead.
     # Moreover, as for every serializer store may be passed manually,
     # it may be the same object or different if there is such a need.
-    store: AbstractDescriptionStore | None = None
+    store: Optional[AbstractDescriptionStore] = None
 
     @abstractmethod
     def serialize(
         self,
         schema: str,
         payload: Any,
-        header: bytes | None = None,
-        topic: str | None = None,
+        header: Optional[bytes] = None,
+        topic: Optional[str] = None,
         *,
-        is_key: bool | None = None,
+        is_key: Optional[bool] = None,
     ) -> bytes:
         ...
 
@@ -59,7 +59,7 @@ class AbstractDescriptionStore(ABC):
         topic: TopicName,
         *,
         is_key: bool = False,
-    ) -> ValueSchemaDescription | KeySchemaDescription | None:
+    ) -> Optional[Union[ValueSchemaDescription, KeySchemaDescription]]:
         if is_key:
             return self._keys.get(topic)
         else:
