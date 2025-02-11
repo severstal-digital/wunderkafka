@@ -9,7 +9,7 @@ from wunderkafka.logger import logger
 from wunderkafka.serdes.avromodel.pydantic import derive_from_pydantic, exclude_pydantic_class
 
 
-def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str:
+def derive(model_type: type[object], topic: str, *, is_key: bool = False) -> str:
     pydantic_model = derive_from_pydantic(model_type)
     if pydantic_model is None:
         if is_dataclass(model_type):
@@ -23,7 +23,7 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
             #   we avoid describing objects via nested types for HDFS's sake.
             attributes = _extract_attributes(model_type)
             ordering = list(attributes['__annotations__'])
-            crafted_model: Type[AvroModel] = type(model_type.__name__, (AvroModel,), attributes)
+            crafted_model: type[AvroModel] = type(model_type.__name__, (AvroModel,), attributes)
             model_schema = crafted_model.avro_schema_to_python()
             fields_map = {field_data['name']: field_data for field_data in model_schema['fields']}
             reordered_fields = [fields_map[attr] for attr in ordering]
@@ -35,7 +35,7 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
     if hasattr(model_type, 'Meta') and hasattr(model_type.Meta, 'name'):
         model_schema['name'] = model_type.Meta.name
     else:
-        model_schema['name'] = '{0}_{1}'.format(re.sub(r'[^\w_]', '_', topic), suffix)
+        model_schema['name'] = '{}_{}'.format(re.sub(r'[^\w_]', '_', topic), suffix)
     if model_schema['name'].startswith('_'):
         logger.warning('Topic name {0} starts with underscore, which is not allowed for Avro schema names.')
         model_schema['name'] = model_schema['name'][1:]
@@ -47,7 +47,7 @@ def derive(model_type: Type[object], topic: str, *, is_key: bool = False) -> str
     return json.dumps(model_schema)
 
 
-def _extract_attributes(type_: Type[object]) -> Dict[str, Any]:
+def _extract_attributes(type_: type[object]) -> dict[str, Any]:
     fields = vars(type_).get('__annotations__', {})
     _, *parents = type_.mro()
     for base in parents:

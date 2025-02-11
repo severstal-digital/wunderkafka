@@ -42,6 +42,6 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
         ]))
         old = config.builtin_features
         new = exclude_gssapi(config.builtin_features)
-        logger.warning('Changing builtin.features: {0} -> {1}'.format(old, new))
+        logger.warning(f'Changing builtin.features: {old} -> {new}')
         config.builtin_features = new
         return config

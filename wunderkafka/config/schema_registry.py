@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 from wunderkafka.config.krb.schema_registry import HTTPKerberosMutualAuth
 
 
-def remap_fields(dct: Dict[str, Any]) -> Dict[str, Any]:
+def remap_fields(dct: dict[str, Any]) -> dict[str, Any]:
     return {f_name.replace('_', '.'): f_value for f_name, f_value in dct.items()}
 
 
@@ -22,6 +22,6 @@ class SRConfig(BaseSettings):
     #                        but it entails writing additional logic for sasl username reuse.
     mutual_auth: Optional[HTTPKerberosMutualAuth] = None
 
-    def dict(self, **kwargs: Any) -> Dict[str, Optional[Union[str, int]]]:
+    def dict(self, **kwargs: Any) -> dict[str, Optional[Union[str, int]]]:
         dct = super().model_dump(**kwargs)
         return remap_fields(dct)

@@ -22,7 +22,7 @@ class JSONModelSerializer(AbstractSerializer):
         schema_registry_client: SchemaRegistryClient,
         store: Optional[AbstractDescriptionStore] = None,
     ) -> None:
-        self._cache: Dict[str, JSONSerializer] = {}
+        self._cache: dict[str, JSONSerializer] = {}
         self._sr_client = schema_registry_client
         self.store = store or JSONModelRepo()
 

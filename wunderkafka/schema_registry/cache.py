@@ -1,9 +1,9 @@
 from typing import Any, Dict
 
 
-class SimpleCache(object):
+class SimpleCache:
     def __init__(self) -> None:
-        self._store: Dict[Any, Any] = {}
+        self._store: dict[Any, Any] = {}
 
     def get(self, key: Any) -> Any:
         return self._store.get(key)

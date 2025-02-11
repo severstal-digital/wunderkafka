@@ -8,7 +8,7 @@ from confluent_kafka.schema_registry.json_schema import JSONDeserializer as JSON
 class JSONDeserializer(AbstractDeserializer):
 
     def __init__(self) -> None:
-        self._cache: Dict[str, JSONDSchemaDeserializer] = {}
+        self._cache: dict[str, JSONDSchemaDeserializer] = {}
 
     def deserialize(self, schema: str, blob: bytes, seek_pos: Optional[int] = None) -> Any:
         if schema not in self._cache:

@@ -19,7 +19,7 @@ def fs_root_dir(fixtures_root: Path) -> Path:
 
 
 @pytest.fixture
-def answer_json() -> Dict[str, Any]:
+def answer_json() -> dict[str, Any]:
     return {
      "type": "record",
      "name": "exampleSchema",
@@ -45,7 +45,7 @@ def test_fs_repo(
     key_schema_path: str,
     value_schema_path: str,
     fs_root_dir: Path,
-    answer_json: Dict[str, Any]
+    answer_json: dict[str, Any]
 ) -> None:
     repo.add(topic, fs_root_dir / value_schema_path, fs_root_dir / key_schema_path)
     key_schema = repo.get(topic, is_key=True)

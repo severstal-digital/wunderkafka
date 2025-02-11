@@ -13,9 +13,9 @@ from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 
 
 @dataclass
-class Msg(object):
+class Msg:
     payload: bytes
-    deserialized: Dict[str, Any]
+    deserialized: dict[str, Any]
 
     def serialized(self, header: bytes) -> bytes:
         return header + self.payload
@@ -51,7 +51,7 @@ def test_consume_moving_parts(sr_root: Path, topic: str, header: bytes) -> None:
 
     consumer.subscribe([topic], from_beginning=True)
 
-    msgs: List[Message] = consumer.consume()
+    msgs: list[Message] = consumer.consume()
     [message] = msgs
     assert message.key() is None
     assert message.value() == SIGNAL_MESSAGE.deserialized

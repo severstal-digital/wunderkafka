@@ -8,8 +8,8 @@ from collections import defaultdict
 
 Name = str
 Version = str
-Lines = List[str]
-Files = Dict[Name, Lines]
+Lines = list[str]
+Files = dict[Name, Lines]
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -93,25 +93,25 @@ class Row(NamedTuple):
         if self.type == 'float':
             return float(self.property_default)
         if self.type in {'string', 'CSV flags'}:
-            return "'{0}'".format(self.property_default)
+            return f"'{self.property_default}'"
         if self.type == 'enum value':
             class_name = ''.join([word.capitalize() for word in self.property_name.split('.')])
-            return 'enums.{0}.{1}'.format(class_name, self.property_default)
+            return f'enums.{class_name}.{self.property_default}'
         return self.property_default
 
     @property
-    def range(self) -> Union[str, Tuple[str, str]]:
+    def range(self) -> Union[str, tuple[str, str]]:
         delim = '..'
         if delim not in self.property_range:
             # search for bool
             pieces = [piece.strip().casefold() for piece in self.property_range.split(',') if piece.strip()]
             if set(pieces) == {'true', 'false'}:
                 return 'bool'
-            logger.warning("Couldn't treat range as bool either: {0}".format(self.property_range))
+            logger.warning(f"Couldn't treat range as bool either: {self.property_range}")
             return self.property_range
         pieces = [piece.strip() for piece in self.property_range.split(delim) if piece.strip()]
         if len(pieces) != 2:
-            logger.warning("Couldn't convert range: {0}".format(self.property_range))
+            logger.warning(f"Couldn't convert range: {self.property_range}")
             return self.property_range
         ge, le = pieces
         return ge, le
@@ -121,7 +121,7 @@ class Row(NamedTuple):
         if self.type == 'boolean':
             return TYPES_MAPPING[self.type]
         if not self.default:
-            return 'Optional[{0}]'.format(TYPES_MAPPING[self.type])
+            return f'Optional[{TYPES_MAPPING[self.type]}]'
         if self.type == 'string':
             return TYPES_MAPPING[self.type]
         if self.type == 'CSV flags':
@@ -134,7 +134,7 @@ class Row(NamedTuple):
                 return 'float'
         if self.type == 'enum value':
             class_name = ''.join([word.capitalize() for word in self.property_name.split('.')])
-            return 'enums.{0}'.format(class_name)
+            return f'enums.{class_name}'
         err_msg = "You missed something, you, stupid! Check: {0} {1} {2}"
         raise ValueError(err_msg.format(self.name, self.property_range, self.default))
 
@@ -149,31 +149,31 @@ class Row(NamedTuple):
             return f'    {self.name}: {self.annotation} = Field(ge={ge}, le={le}, default={self.default})'
 
         if self.property_name == GROUP_ID:
-            return '    {0}: str'.format(self.name)
+            return f'    {self.name}: str'
         if self.property_name == SASL_MECHANISMS:
-            return '    # {0}: {1} = {2}'.format(self.name, self.annotation, self.default)
+            return f'    # {self.name}: {self.annotation} = {self.default}'
         if self.property_name == 'builtin.features':
             lines = ["', '.join(["]
             spaces = ' ' * (8 + int(indented) * 4)
             for feat in self.default.strip('"').strip("'").split(','):                                    # type: ignore
                 stripped = feat.strip()
                 if stripped:
-                    lines.append("{0}'{1}',".format(spaces, stripped))
+                    lines.append(f"{spaces}'{stripped}',")
             lines.append("    ])")
-            return '    {0}: {1} = {2}'.format(self.name, self.annotation, '\n'.join(lines))
+            return '    {}: {} = {}'.format(self.name, self.annotation, '\n'.join(lines))
         if self.comment:
-            left = '    {0}: {1} = {2}'.format(self.name, self.annotation, self.default)
+            left = f'    {self.name}: {self.annotation} = {self.default}'
             ws = 120 - len(left) - len(IGNORE_PYDANTIC_TYPE) - int(indented) * 4
             if ws < 1:
                 ws = 1
             return left + ws * ' ' + IGNORE_PYDANTIC_TYPE
         else:
-            return '    {0}: {1} = {2}'.format(self.name, self.annotation, self.default)
+            return f'    {self.name}: {self.annotation} = {self.default}'
 
 
-def read_markdown(filename: Union[str, Path] = 'CONFIGURATION.md', *, cut: bool = False) -> List[str]:
+def read_markdown(filename: Union[str, Path] = 'CONFIGURATION.md', *, cut: bool = False) -> list[str]:
     lines = []
-    with open(filename, 'r') as fl:
+    with open(filename) as fl:
         all_lines = [ln.strip() for ln in fl.read().split('\n') if ln.strip()]
         if not cut:
             return all_lines
@@ -194,38 +194,38 @@ def parse_line(line: str) -> Optional[Row]:
     for bad_start in not_a_rows:
         if line.startswith(bad_start):
             return None
-    column_data = [piece.strip().replace('\|', '|') for piece in line.split(' | ')]
+    column_data = [piece.strip().replace(r'\|', '|') for piece in line.split(' | ')]
     if len(column_data) != 6:
-        logger.warning("Couldn't parse: {0}".format(column_data))
+        logger.warning(f"Couldn't parse: {column_data}")
         return None
     return Row(*column_data)
 
 
-def parse(lines: List[str], *, allow_deprecated: bool = False) -> List[Row]:
+def parse(lines: list[str], *, allow_deprecated: bool = False) -> list[Row]:
     rows = []
     for line in lines:
         row = parse_line(line)
         if row is not None:
             if row.deprecated:
                 if allow_deprecated is False:
-                    logger.warning('Skipping {0} as deprecated'.format(row.property_name))
+                    logger.warning(f'Skipping {row.property_name} as deprecated')
                 else:
-                    logger.warning('{0} is deprecated'.format(row.property_name))
+                    logger.warning(f'{row.property_name} is deprecated')
                     rows.append(row)
             else:
                 rows.append(row)
-    logger.info('Total properties parsed: {0}'.format(len(rows)))
+    logger.info(f'Total properties parsed: {len(rows)}')
     return rows
 
 
-def group(rows: List[Row]) -> Dict[str, List[Row]]:
+def group(rows: list[Row]) -> dict[str, list[Row]]:
     grps = defaultdict(list)
     for row in rows:
         grps[row.property_belongs].append(row)
     return grps
 
 
-def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
+def generate_models(groups: dict[str, list[Row]]) -> list[str]:
     properties = DEFAULT_HEADER + [
         'from typing import Callable, Optional',
         '',
@@ -240,12 +240,12 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
     for grp in sorted(groups):
         properties.append('')
         properties.append('')
-        properties.append('{0}'.format(CLS_MAPPING[grp]))
+        properties.append(f'{CLS_MAPPING[grp]}')
         pre = []
         uniq = []
         for row in groups[grp]:
             if row.property_name in already_generated:
-                logger.warning('Skipping generating second field ({0})'.format(row))
+                logger.warning(f'Skipping generating second field ({row})')
             else:
                 if row.property_name == GROUP_ID:
                     pre.append(row)
@@ -262,28 +262,28 @@ def generate_models(groups: Dict[str, List[Row]]) -> List[str]:
     return properties
 
 
-def generate_fields(groups: Dict[str, List[Row]]) -> List[str]:
+def generate_fields(groups: dict[str, list[Row]]) -> list[str]:
     properties = DEFAULT_HEADER + [
         "# Why so: not all configuration parameters of librdkafka may be easily replaced from '_' to '.',",
         "#   therefore, we can't convert on-the-fly from  `ssl_ca` without errors",
         "#   and we don't want to have a nice whitelist, which is arguable",
     ]
     for grp in sorted(groups):
-        properties.append('{0}'.format(TPL_MAPPING[grp]))
+        properties.append(f'{TPL_MAPPING[grp]}')
         all_fields = sorted({row.property_name for row in groups[grp]})
-        properties += ["    '{0}',".format(field) for field in all_fields]
+        properties += [f"    '{field}'," for field in all_fields]
         properties.append(')')
     return properties
 
 
-def generate_enums(groups: Dict[str, List[Row]]) -> List[str]:
+def generate_enums(groups: dict[str, list[Row]]) -> list[str]:
     properties = DEFAULT_HEADER + ['from enum import Enum']
     already_generated = set()
     for grp in sorted(groups):
         for row in groups[grp]:
             if row.type == 'enum value':
                 if row.property_name in already_generated:
-                    logger.warning('Skipping second enum for {0}'.format(row.property_name))
+                    logger.warning(f'Skipping second enum for {row.property_name}')
                 else:
                     properties.append('')
                     properties.append('')
@@ -292,17 +292,17 @@ def generate_enums(groups: Dict[str, List[Row]]) -> List[str]:
     return properties
 
 
-def generate_enum(prop: str, rng: str) -> List[str]:
+def generate_enum(prop: str, rng: str) -> list[str]:
     cls_name = ''.join([word.capitalize() for word in prop.split('.')])
-    header = 'class {0}(str, Enum):'.format(cls_name)
+    header = f'class {cls_name}(str, Enum):'
     flds = []
     for field in rng.split(','):
         flds.append("    {0} = '{0}'".format(field.strip()))
     return [header] + flds
 
 
-def generate(lines: Dict[Version, Files]) -> Dict[Version, Dict[Name, Lines]]:
-    dct: Dict[Version, Dict[Name, Lines]] = {version: {} for version in lines}
+def generate(lines: dict[Version, Files]) -> dict[Version, dict[Name, Lines]]:
+    dct: dict[Version, dict[Name, Lines]] = {version: {} for version in lines}
 
     for libversion in lines:
         for file_name in ('enums.py', 'models.py', 'fields.py'):
@@ -313,7 +313,7 @@ def generate(lines: Dict[Version, Files]) -> Dict[Version, Dict[Name, Lines]]:
 
 
 def main() -> None:
-    lines: Dict[Version, Files] = {}
+    lines: dict[Version, Files] = {}
     root_dir = Path(__file__).parent / 'versions'
     rev = '1.4.0'
     for sub_path in os.listdir(root_dir):
@@ -323,7 +323,7 @@ def main() -> None:
     for sub_path in os.listdir(root_dir):
         path = root_dir / sub_path
         if path.is_dir():
-            logger.info('{0}: handling...'.format(path))
+            logger.info(f'{path}: handling...')
             configuration_md = path / 'CONFIGURATION.md'
             grouped = group(parse(read_markdown(filename=configuration_md)))
             files = {
@@ -333,7 +333,7 @@ def main() -> None:
             }
             lines[sub_path] = files
         else:
-            logger.info('{0}: skipping...'.format(path))
+            logger.info(f'{path}: skipping...')
     versionized_dcts = generate(lines)
 
     # clean generated dir in order to clean removed versions automatically

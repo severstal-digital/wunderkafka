@@ -31,9 +31,9 @@ def sr_root_update(sr_root: Path) -> Path:
 
 
 @dataclass
-class Msg(object):
+class Msg:
     payload: bytes
-    deserialized: Dict[str, Any]
+    deserialized: dict[str, Any]
 
     def serialized(self, header: bytes) -> bytes:
         return header + self.payload

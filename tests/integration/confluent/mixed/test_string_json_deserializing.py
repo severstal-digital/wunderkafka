@@ -44,7 +44,7 @@ def test_consume_moving_parts(sr_root_existing: Path, topic: str, header: bytes)
 
     consumer.subscribe([topic], from_beginning=True)
 
-    messages: List[Message] = consumer.consume()
+    messages: list[Message] = consumer.consume()
     [message] = messages
     assert message.key() == '714fc713-37ff-4477-9157-cb4f14b63e1a'
     assert message.value() == MESSAGE.deserialized

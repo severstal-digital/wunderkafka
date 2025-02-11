@@ -19,7 +19,7 @@ MsgKey = Any
 KeySchemaDescription = SchemaDescription
 ValueSchemaDescription = SchemaDescription
 
-MessageDescription = Union[str, Tuple[str, str], Type, Tuple[Type, Type]]
+MessageDescription = Union[str, tuple[str, str], type, tuple[type, type]]
 TopicName = str
 
 HowToSubscribe = Optional[Union[Timestamp, Offset]]

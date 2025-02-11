@@ -33,8 +33,8 @@ def choose_one_of(
     chosen_deserializer = specific_deserializer if specific_deserializer else common_deserializer
     if chosen_deserializer is None:
         msg = [
-            '{0} deserializer is not specified,'.format(what.capitalize()),
-            'it should be passed via {0}_deserializer or deserializer at least.'.format(what),
+            f'{what.capitalize()} deserializer is not specified,',
+            f'it should be passed via {what}_deserializer or deserializer at least.',
         ]
         raise ValueError(' '.join(msg))
     return chosen_deserializer
@@ -77,7 +77,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
 
     def subscribe(  # noqa: D102,WPS211 # docstring inherited from superclass.
         self,
-        topics: List[Union[str, TopicSubscription]],
+        topics: list[Union[str, TopicSubscription]],
         *,
         from_beginning: Optional[bool] = None,
         offset: Optional[int] = None,
@@ -91,9 +91,9 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
     def commit(  # noqa: D102,WPS211 # docstring inherited from superclass.
         self,
         message: Optional[Message] = None,
-        offsets: Optional[List[TopicPartition]] = None,
+        offsets: Optional[list[TopicPartition]] = None,
         asynchronous: bool = True,
-    ) -> Optional[List[TopicPartition]]:
+    ) -> Optional[list[TopicPartition]]:
         if message is None and offsets is not None:
             return self.consumer.commit(offsets=offsets, asynchronous=asynchronous)
         if message is not None and offsets is None:
@@ -109,7 +109,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
         ignore_keys: bool = False,
         raise_on_error: bool = True,
         raise_on_lost: bool = True,
-    ) -> List[T]:
+    ) -> list[T]:
         """
         Consume as many messages as we can for a given timeout and decode them.
 
@@ -132,8 +132,8 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             raise_on_error=raise_on_error,
         )
 
-    def _decoded(self, msgs: List[Message], *, ignore_keys: bool, raise_on_error: bool) -> List[T]:
-        results: List[StreamResult] = []
+    def _decoded(self, msgs: list[Message], *, ignore_keys: bool, raise_on_error: bool) -> list[T]:
+        results: list[StreamResult] = []
         for msg in msgs:
             kafka_error = msg.error()
             # Not sure if there is any need for an option to exclude errored message from the consumed ones,
@@ -161,7 +161,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
                 # KeyDeserializationError is inherited from SerializationError
                 except SerializationError:
                     decode_key_ok = False
-                    logger.error("Unable to decode key from bytes: {0}".format(raw_key_value))
+                    logger.error(f"Unable to decode key from bytes: {raw_key_value}")
                     if not ignore_keys:
                         raise
                 else:
@@ -170,14 +170,14 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             try:
                 decoded_value = self._decode(topic, msg.value())
             except (SerializationError, ValueError) as exc:
-                logger.error("Unable to decode value from bytes: {0}".format(msg.value()))
+                logger.error(f"Unable to decode value from bytes: {msg.value()}")
                 if not self._stream_result:
                     raise
                 value_error = str(exc)
                 if decode_key_ok:
                     error = PayloadError(description=value_error)
                 else:
-                    message = "Unable to decode key (topic: {0}, key payload: {1})".format(topic, raw_key_value)
+                    message = f"Unable to decode key (topic: {topic}, key payload: {raw_key_value})"
                     error = PayloadError(description=message)
                 results.append(StreamResult(payload=None, error=error, msg=msg))
             else:

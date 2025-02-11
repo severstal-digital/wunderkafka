@@ -28,7 +28,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None,
+        sr_client: Optional[Union[type[ClouderaSRClient], type[ConfluentSRClient]]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -47,7 +47,7 @@ class AvroConsumer(HighLevelDeserializingConsumer):
         sr = config.sr
         self._default_timeout: int = 60
         if sr is None:
-            raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
+            raise ValueError(f'Schema registry config is necessary for {self.__class__.__name__}')
         if sr_client is None:
             sr_client = ClouderaSRClient
 
@@ -68,10 +68,10 @@ class AvroProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None,
+        sr_client: Optional[Union[type[ClouderaSRClient], type[ConfluentSRClient]]] = None,
         protocol_id: int = 1
     ) -> None:
         """
@@ -93,7 +93,7 @@ class AvroProducer(HighLevelSerializingProducer):
         """
         sr = config.sr
         if sr is None:
-            raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
+            raise ValueError(f'Schema registry config is necessary for {self.__class__.__name__}')
         if sr_client is None:
             sr_client = ClouderaSRClient
         self._default_timeout: int = 60
@@ -118,10 +118,10 @@ class AvroModelProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None,
+        sr_client: Optional[Union[type[ClouderaSRClient], type[ConfluentSRClient]]] = None,
         protocol_id: int = 1
     ) -> None:
         """
@@ -144,7 +144,7 @@ class AvroModelProducer(HighLevelSerializingProducer):
         """
         sr = config.sr
         if sr is None:
-            raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
+            raise ValueError(f'Schema registry config is necessary for {self.__class__.__name__}')
 
         if sr_client is None:
             sr_client = ClouderaSRClient
@@ -185,12 +185,12 @@ class AvroClouderaConsumer(AvroConsumer):
 class AvroModelConfluentProducer(AvroModelProducer):
     """Kafka Confluent Producer client to serialize and send models or dataclasses as messages."""
 
-    def __init__(self, mapping: Optional[Dict[TopicName, MessageDescription]], config: ProducerConfig):
+    def __init__(self, mapping: Optional[dict[TopicName, MessageDescription]], config: ProducerConfig):
         super().__init__(mapping, config, sr_client=ConfluentSRClient, protocol_id=0)
 
 
 class AvroModelClouderaProducer(AvroModelProducer):
     """Kafka Cloudera Producer client to serialize and send models or dataclasses as messages."""
 
-    def __init__(self, mapping: Optional[Dict[TopicName, MessageDescription]], config: ProducerConfig):
+    def __init__(self, mapping: Optional[dict[TopicName, MessageDescription]], config: ProducerConfig):
         super().__init__(mapping, config, sr_client=ClouderaSRClient, protocol_id=1)

@@ -6,10 +6,10 @@ from confluent_kafka.serialization import SerializationContext, MessageField
 
 from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 
-ConfluentAPI = Callable[[Any, SerializationContext], Dict]
+ConfluentAPI = Callable[[Any, SerializationContext], dict]
 
 
-def any_to_dict(obj: Any, _: SerializationContext) -> Dict:
+def any_to_dict(obj: Any, _: SerializationContext) -> dict:
     if isinstance(obj, dict):
         return obj
     return dict(obj)
@@ -22,7 +22,7 @@ class JSONSerializer(AbstractSerializer):
         store: Optional[AbstractDescriptionStore] = None,
         to_dict: ConfluentAPI = any_to_dict,
     ) -> None:
-        self._cache: Dict[str, JSONSchemaSerializer] = {}
+        self._cache: dict[str, JSONSchemaSerializer] = {}
         self._sr_client = schema_registry_client
         self._to_dict = to_dict
         self.store = store

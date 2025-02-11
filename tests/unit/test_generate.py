@@ -14,7 +14,7 @@ from wunderkafka.config.generate import (
 )
 
 
-def read_answer(root: Path, file_name: str) -> List[str]:
+def read_answer(root: Path, file_name: str) -> list[str]:
     with open(root / 'answers' / file_name) as fl:
         return fl.read().split('\n')[:-1]
 
@@ -30,36 +30,36 @@ def configuration_md(fixture_root: Path) -> Path:
 
 
 @pytest.fixture
-def enums(fixture_root: Path) -> List[str]:
+def enums(fixture_root: Path) -> list[str]:
     return read_answer(fixture_root, 'enums.py')
 
 
 @pytest.fixture
-def fields(fixture_root: Path) -> List[str]:
+def fields(fixture_root: Path) -> list[str]:
     return read_answer(fixture_root, 'fields.py')
 
 
 @pytest.fixture
-def models(fixture_root: Path) -> List[str]:
+def models(fixture_root: Path) -> list[str]:
     return read_answer(fixture_root, 'models.py')
 
 
 @pytest.fixture
-def grouped(configuration_md: Path) -> Dict[str, List[Row]]:
+def grouped(configuration_md: Path) -> dict[str, list[Row]]:
     return group(parse(read_markdown(filename=configuration_md)))
 
 
-def test_enums(grouped: Dict[str, List[Row]], enums: List[str]) -> None:
+def test_enums(grouped: dict[str, list[Row]], enums: list[str]) -> None:
     generated = generate_enums(grouped)
     assert enums == generated
 
 
-def test_fields(grouped: Dict[str, List[Row]], fields: List[str]) -> None:
+def test_fields(grouped: dict[str, list[Row]], fields: list[str]) -> None:
     generated = generate_fields(grouped)
     assert fields == generated
 
 
-def test_models(grouped: Dict[str, List[Row]], models: List[str]) -> None:
+def test_models(grouped: dict[str, list[Row]], models: list[str]) -> None:
     generated = generate_models(grouped)
     # Multiline for builtin
     assert models == '\n'.join(generated).split('\n')

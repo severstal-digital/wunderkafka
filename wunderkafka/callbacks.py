@@ -10,7 +10,7 @@ from wunderkafka.consumers.abc import AbstractConsumer
 
 
 # FixMe (tribunsky.kir): do not mutate consumer from here, try to closure it in consumer itself.
-def reset_partitions(consumer: AbstractConsumer, partitions: List[TopicPartition]) -> None:
+def reset_partitions(consumer: AbstractConsumer, partitions: list[TopicPartition]) -> None:
     """
     Set specific offset for assignment after subscription.
 
@@ -22,7 +22,7 @@ def reset_partitions(consumer: AbstractConsumer, partitions: List[TopicPartition
     new_offsets = consumer.subscription_offsets
     if new_offsets is None:
         logger.warning(
-            '{0}: re-assigned (using auto.offset.reset={1})'.format(consumer, consumer.config.auto_offset_reset),
+            f'{consumer}: re-assigned (using auto.offset.reset={consumer.config.auto_offset_reset})',
         )
         return
     by_offset = []
@@ -34,7 +34,7 @@ def reset_partitions(consumer: AbstractConsumer, partitions: List[TopicPartition
         else:
             partition.offset = new_offset.value
             if isinstance(new_offset, Timestamp):
-                logger.info('Setting {0}...'.format(new_offset))
+                logger.info(f'Setting {new_offset}...')
                 by_ts.append(partition)
             else:
                 by_offset.append(partition)
@@ -42,7 +42,7 @@ def reset_partitions(consumer: AbstractConsumer, partitions: List[TopicPartition
         by_ts = consumer.offsets_for_times(by_ts)
     new_ptns = by_ts + by_offset
     consumer.assign(new_ptns)
-    logger.info('{0} assigned to {1}'.format(consumer, new_ptns))
+    logger.info(f'{consumer} assigned to {new_ptns}')
     consumer.subscription_offsets = None
 
 
@@ -54,9 +54,9 @@ def info_callback(err: Optional[KafkaError], msg: Message) -> None:
     :param msg:             Message to be delivered.
     """
     if err is None:
-        logger.info('Message delivered to {0} partition: {1}'.format(msg.topic(), msg.partition()))
+        logger.info(f'Message delivered to {msg.topic()} partition: {msg.partition()}')
     else:
-        logger.error('Message failed delivery: {0}'.format(err))
+        logger.error(f'Message failed delivery: {err}')
 
 
 def error_callback(err: Optional[KafkaError], _: Message) -> None:
@@ -67,4 +67,4 @@ def error_callback(err: Optional[KafkaError], _: Message) -> None:
     :param _:               Message to be delivered (unused, but needed to not break callback signature).
     """
     if err:
-        logger.error('Message failed delivery: {0}'.format(err))
+        logger.error(f'Message failed delivery: {err}')

@@ -14,42 +14,42 @@ P = ParamSpec('P')
 
 class ConfluentRestClient(Protocol):
 
-    def get(self, url: str, query: Optional[dict] = None) -> Any:
+    def get(self, url: str, query: dict | None = None) -> Any:
         ...
 
-    def post(self, url: str, body: Optional[str], **kwargs: Any) -> Any:
+    def post(self, url: str, body: str | None, **kwargs: Any) -> Any:
         ...
 
     def delete(self, url: str) -> Any:
         ...
 
-    def put(self, url: str, body: Optional[str] = None) -> Any:
+    def put(self, url: str, body: str | None = None) -> Any:
         ...
 
-    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
+    def send_request(self, url: str, method: str, body: str | None = None, query: dict | None = None) -> Any:
         ...
 
     def _close(self) -> None:
         ...
 
 
-class Adapter(object):
+class Adapter:
     def __init__(self, http_client: AbstractHTTPClient) -> None:
         self._client = http_client
 
-    def get(self, url: str, query: Optional[dict] = None) -> Any:
+    def get(self, url: str, query: dict | None = None) -> Any:
         return self._client.make_request(url, query=query)
 
-    def post(self, url: str, body: Optional[str], **_: Any) -> Any:
+    def post(self, url: str, body: str | None, **_: Any) -> Any:
         return self._client.make_request(url, method='POST', body=body)
 
     def delete(self, url: str) -> Any:
         return self._client.make_request(url, method='DELETE')
 
-    def put(self, url: str, body: Optional[str] = None) -> Any:
+    def put(self, url: str, body: str | None = None) -> Any:
         return self._client.make_request(url, method='PUT', body=body)
 
-    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
+    def send_request(self, url: str, method: str, body: str | None = None, query: dict | None = None) -> Any:
         return self._client.make_request(url, method, body=body, query=query)
 
     def _close(self) -> None:
@@ -71,7 +71,7 @@ class ConfluentSRClient(AbstractSchemaRegistry):
     def __init__(
         self,
         http_client: AbstractHTTPClient,
-        _: Optional[SimpleCache] = None,
+        _: SimpleCache | None = None,
         *args: P.args,
         **kwargs: P.kwargs,
     ) -> None:
@@ -83,6 +83,6 @@ class ConfluentSRClient(AbstractSchemaRegistry):
 
     def register_schema(self, topic: str, schema_text: str, schema_type: SchemaType, *, is_key: bool = True) -> SRMeta:
         # FixMe (tribunsky.kir): lack of symmetry here - SchemaMeta knows about different vendors, but not vice versa.
-        subject = '{0}-{1}'.format(topic, 'key' if is_key else 'value')
+        subject = '{}-{}'.format(topic, 'key' if is_key else 'value')
         schema_id = self.client.register_schema(subject, Schema(schema_text, schema_type=schema_type))
         return SRMeta(schema_id, schema_version=None)

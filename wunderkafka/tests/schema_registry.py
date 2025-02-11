@@ -14,9 +14,9 @@ class TestHTTPClient(AbstractHTTPClient):
     def make_request(self, relative_url: str, method: str = 'GET', body: Any = None, query: Any = None) -> Any:
         # ToDo (tribunsky.kir): rise up actual SR, stop using FS here.
         parsed = urlparse(relative_url)
-        filename = self._root / method / '{0}.json'.format(parsed.path)
+        filename = self._root / method / f'{parsed.path}.json'
         if parsed.path == 'schemas':
-            filename = self._root / method / relative_url / body['description'] / '{0}.json'.format(parsed.path)
+            filename = self._root / method / relative_url / body['description'] / f'{parsed.path}.json'
         with open(filename) as fl:
             return json.load(fl)
 

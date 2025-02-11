@@ -12,7 +12,7 @@ from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_typ
 
 A = TypeVar('A', bound=Any)
 
-PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
+PYDANTIC_PROTECTED_FIELDS: Final[frozenset[str]] = frozenset({
     'model_config',
     'model_fields',
     # even the latest ones are properties, we don't want to shadow them either
@@ -22,7 +22,7 @@ PYDANTIC_PROTECTED_FIELDS: Final[FrozenSet[str]] = frozenset({
 })
 
 
-def exclude_pydantic_class(schema: Dict[str, Any]) -> Dict[str, Any]:
+def exclude_pydantic_class(schema: dict[str, Any]) -> dict[str, Any]:
     schema.pop('pydantic-class', None)
     for value in schema.values():
         if isinstance(value, dict):
@@ -34,7 +34,7 @@ def exclude_pydantic_class(schema: Dict[str, Any]) -> Dict[str, Any]:
     return schema
 
 
-def derive_from_pydantic(model_type: Type[object]) -> Optional[Type[AvroBaseModel]]:
+def derive_from_pydantic(model_type: type[object]) -> Optional[type[AvroBaseModel]]:
     if issubclass(model_type, AvroBaseModel):
         return model_type
     if issubclass(model_type, BaseModel):
@@ -62,8 +62,8 @@ def replace_type_in_annotation(annotation: Any) -> Any:
     return create_annotation(origin, new_args)
 
 
-def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
-    attributes: Dict[str, Any] = {}
+def get_model_attributes(model_type: type[BaseModel]) -> dict[str, Any]:
+    attributes: dict[str, Any] = {}
     for field_name, field_info in model_type.model_fields.items():
         # Here we are changing the original model just for schema derivation, so we can override almost everything
         # https://github.com/marcosschroh/dataclasses-avroschema/issues/400
@@ -90,7 +90,7 @@ def get_model_attributes(model_type: Type[BaseModel]) -> Dict[str, Any]:
     return attributes
 
 
-def _check_pydantic_service_fields(model_type: Type[object]) -> None:
+def _check_pydantic_service_fields(model_type: type[object]) -> None:
     if issubclass(model_type, BaseModel):
         all_annotations = set()
         for model in model_type.mro():
@@ -104,14 +104,14 @@ def _check_pydantic_service_fields(model_type: Type[object]) -> None:
         has_protected_fields = all_annotations & PYDANTIC_PROTECTED_FIELDS
         if has_protected_fields:
             msg = ' '.join([
-                'Pydantic model {0} has protected fields {1}.'.format(model_type, has_protected_fields),
+                f'Pydantic model {model_type} has protected fields {has_protected_fields}.',
                 'Please use another name for your field.',
                 'Even if we may derive a schema with such field(s), it would be impossible to instantiate a model',
             ])
             raise ValueError(msg)
 
 
-def _create_model(model_type: Type[BaseModel]) -> Type[AvroBaseModel]:
+def _create_model(model_type: type[BaseModel]) -> type[AvroBaseModel]:
     attributes = get_model_attributes(model_type)
     crafted_model = create_model(model_type.__name__, __base__=(model_type, AvroBaseModel), **attributes)
     assert issubclass(crafted_model, AvroBaseModel)

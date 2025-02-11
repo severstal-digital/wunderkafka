@@ -6,7 +6,7 @@ from confluent_kafka import KafkaError
 from wunderkafka.callbacks import info_callback, error_callback
 
 
-class Message(object):
+class Message:
 
     def topic(self) -> str:
         return 'test'
@@ -19,6 +19,6 @@ class Message(object):
 @pytest.mark.parametrize("callback_args", [(None, Message()), (KafkaError(10), Message())])
 def test_just_print(
     callback: Callable[[Optional[KafkaError], Message], Any],
-    callback_args: Tuple[Optional[KafkaError], Message],
+    callback_args: tuple[Optional[KafkaError], Message],
 ) -> None:
     callback(*callback_args)

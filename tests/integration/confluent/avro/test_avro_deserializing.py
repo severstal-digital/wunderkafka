@@ -42,7 +42,7 @@ def test_consume_moving_parts(sr_root_existing: Path, topic: str, header: bytes)
 
     consumer.subscribe([topic], from_beginning=True)
 
-    events: List[StreamResult] = consumer.consume()
+    events: list[StreamResult] = consumer.consume()
     [event] = events
 
     assert event.payload == SIGNAL_MESSAGE.deserialized

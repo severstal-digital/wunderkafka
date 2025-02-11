@@ -32,7 +32,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         serializer: Optional[AbstractSerializer] = None,
         store: Optional[AbstractDescriptionStore] = None,
         # ToDo: switch mapping to something like consumer's TopicSubscription?
-        mapping: Optional[Dict[TopicName, MessageDescription]] = None,
+        mapping: Optional[dict[TopicName, MessageDescription]] = None,
         value_serializer: Optional[AbstractSerializer] = None,
         key_serializer: Optional[AbstractSerializer] = None,
         *,
@@ -60,7 +60,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
 
         # ToDo (tribunsky.kir): look like wrong place. Maybe it's better to highlight an entity
         #                       of Schema which may be checked or not. Then input mapping may be eliminated (or not).
-        self._checked: Dict[Tuple[str, str, bool], SRMeta] = {}
+        self._checked: dict[tuple[str, str, bool], SRMeta] = {}
 
         self._store = store
         self._sr = schema_registry
@@ -167,7 +167,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
         :return:        Container with schema's ids.
         """
         if self._sr is None:
-            logger.warning('Schema registry is not passed, skipping schema check for {0}'.format(topic))
+            logger.warning(f'Schema registry is not passed, skipping schema check for {topic}')
             return None
         if schema is None:
             raise ValueError("Couldn't check schema from store.")
@@ -194,7 +194,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
 
         schema = store.get(topic, is_key=is_key)
         if schema is None:
-            logger.warning('Missing schema for {0} (key: {1}'.format(topic, is_key))
+            logger.warning(f'Missing schema for {topic} (key: {is_key}')
             return None
         if schema.empty:
             return serializer.serialize(schema.text, obj, None, topic, is_key=is_key)

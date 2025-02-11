@@ -7,7 +7,7 @@ from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.consumers.subscription import TopicSubscription
 
 
-class Message(object):
+class Message:
     def __init__(self, topic: str, value: bytes, key: Optional[bytes] = None, error: Optional[KafkaError] = None):
         self._topic = topic
         self._value = value
@@ -34,12 +34,12 @@ class Message(object):
 
 
 class TestConsumer(BytesConsumer):
-    def __init__(self, msgs: List[Message]) -> None:
+    def __init__(self, msgs: list[Message]) -> None:
         self._msgs = msgs
 
     def subscribe(
         self,
-        topics: List[Union[str, TopicSubscription]],
+        topics: list[Union[str, TopicSubscription]],
         *,
         from_beginning: Optional[bool] = None,
         offset: Optional[int] = None,
@@ -54,5 +54,5 @@ class TestConsumer(BytesConsumer):
         num_messages: int = 1000000,
         *,
         raise_on_lost: bool = False,
-    ) -> List[Message]:
+    ) -> list[Message]:
         return self._msgs

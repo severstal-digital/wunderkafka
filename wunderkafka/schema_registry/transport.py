@@ -70,7 +70,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
         query: Any = None,
     ) -> Any:
         url = "/".join([self._base_url.rstrip('/'), relative_url.lstrip('/')])
-        logger.debug('{0}: {1}'.format(method, url))
+        logger.debug(f'{method}: {url}')
         response = self._session.request(method, url, json=body, params=query)
         # ToDo(aa.perelygin): more informative message when fail
         if response.status_code >= 400:
@@ -83,7 +83,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
 
     def _dump(self, method: str, relative_url: str, response: requests.Response) -> None:
         if self._save_replay:
-            filename = '{0}/{1}.json'.format(method, relative_url)
+            filename = f'{method}/{relative_url}.json'
             dir_name = os.path.dirname(filename)
             os.makedirs(dir_name, exist_ok=True)
             with open(filename, 'w') as fl:

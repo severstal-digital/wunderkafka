@@ -9,7 +9,7 @@ class SchemaLessJSONDeserializer(AbstractDeserializer):
 
     def __init__(self) -> None:
         self.schemaless = True
-        self._cache: Dict[str, JSONDSchemaDeserializer] = {}
+        self._cache: dict[str, JSONDSchemaDeserializer] = {}
 
     def deserialize(self, schema: str, blob: bytes, seek_pos: Optional[int] = None) -> Any:
         return json.loads(blob)

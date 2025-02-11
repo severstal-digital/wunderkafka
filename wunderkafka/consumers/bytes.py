@@ -32,7 +32,7 @@ class BytesConsumer(AbstractConsumer):
         except KafkaException as exc:
             config = challenge_krb_arg(exc, config)
             super().__init__(config.dict())
-        self.subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
+        self.subscription_offsets: Optional[dict[str, HowToSubscribe]] = None
 
         self._config = config
         self._last_poll_ts = time.perf_counter()
@@ -45,7 +45,7 @@ class BytesConsumer(AbstractConsumer):
 
         :return:    string with consumer gid.
         """
-        return '{0}:{1}'.format(self.__class__.__name__, self._config.group_id)
+        return f'{self.__class__.__name__}:{self._config.group_id}'
 
     def batch_poll(  # noqa: D102 # inherited from superclass.
         self,
@@ -53,12 +53,12 @@ class BytesConsumer(AbstractConsumer):
         num_messages: int = 1000000,
         *,
         raise_on_lost: bool = False,
-    ) -> List[Message]:
+    ) -> list[Message]:
 
         # ToDo (tribunsky.kir): naybe it better to use on_lost callback within subscribe()
         dt = int((time.perf_counter() - self._last_poll_ts) * 1000)
         if dt > self._config.max_poll_interval_ms:
-            msg = 'Exceeded max.poll.interval.ms ({0}): {1}'.format(self._config.max_poll_interval_ms, dt)
+            msg = f'Exceeded max.poll.interval.ms ({self._config.max_poll_interval_ms}): {dt}'
 
             if raise_on_lost:
                 # ToDo (tribunsky.kir): resubscribe by ts?
@@ -72,7 +72,7 @@ class BytesConsumer(AbstractConsumer):
     # ToDo (tribunsky.kir): do not override original API and wrap it in superclass
     def subscribe(  # noqa: D102,WPS211  # inherited from superclass.
         self,
-        topics: List[Union[str, TopicSubscription]],
+        topics: list[Union[str, TopicSubscription]],
         *,
         from_beginning: Optional[bool] = None,
         offset: Optional[int] = None,
@@ -112,7 +112,7 @@ def _patched_docstring(method: Callable[..., T], parent_method: Callable[..., T]
     current_doc = method.__doc__
     if not current_doc:
         return None
-    first, *_ = [line for line in current_doc.split('\n') if line]
+    first, *_ = (line for line in current_doc.split('\n') if line)
     spaces = 0
     for ch in first:
         if ch != ' ':
@@ -126,7 +126,7 @@ def _patched_docstring(method: Callable[..., T], parent_method: Callable[..., T]
     ])
     version_notes = [
         disclaimer,
-        "Below is the version rendered for version **{0}**:".format(confluent_kafka.__version__),
+        f"Below is the version rendered for version **{confluent_kafka.__version__}**:",
     ]
     version_note = '\n\n'.join(prefix + note for note in version_notes)
     original_doc = parent_method.__doc__ or ''
@@ -138,8 +138,8 @@ def _patched_docstring(method: Callable[..., T], parent_method: Callable[..., T]
                 intended.append(prefix + line)
             else:
                 intended.append(line)
-        original_doc = '\n\n{0}'.format('\n'.join(intended))
-    return '{0}\n{1}{2}'.format(current_doc, version_note, original_doc)
+        original_doc = '\n\n{}'.format('\n'.join(intended))
+    return f'{current_doc}\n{version_note}{original_doc}'
 
 
 BytesConsumer.subscribe.__doc__ = _patched_docstring(BytesConsumer.subscribe, Consumer.subscribe)

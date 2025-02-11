@@ -126,7 +126,7 @@ class Item(BaseModel):
 
 
 class ItemList(BaseModel):
-    items: Optional[List[Item]] = None
+    items: Optional[list[Item]] = None
 
 
 def test_dataclass() -> None:

@@ -48,7 +48,7 @@ def test_consume_moving_parts(sr_root_existing: Path, topic: str, header: bytes)
 
     consumer.subscribe([topic], from_beginning=True)
 
-    messages: List[Message] = consumer.consume()
+    messages: list[Message] = consumer.consume()
     [message] = messages
 
     assert message.value() == IMAGE_MESSAGE.deserialized

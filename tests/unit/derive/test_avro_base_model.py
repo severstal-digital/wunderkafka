@@ -13,7 +13,7 @@ class AvroNestedClass(AvroBaseModel):
 
 class AvroResultClass(AvroBaseModel):
     id: UUID4
-    nested: List[AvroNestedClass]
+    nested: list[AvroNestedClass]
 
 
 class AvroSimilarImage(AvroBaseModel):

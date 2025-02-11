@@ -58,7 +58,7 @@ class SchemaFSRepo(AbstractDescriptionStore):
 class AvroModelRepo(AbstractDescriptionStore):
 
     # ToDo (tribunsky.kir): change Type[AvroModel] to more general alias + check derivation from python built-ins
-    def add(self, topic: TopicName, value: Type[AvroModel], key: Optional[Type[AvroModel]]) -> None:
+    def add(self, topic: TopicName, value: type[AvroModel], key: Optional[type[AvroModel]]) -> None:
         self._values[topic] = ValueSchemaDescription(text=avromodel.derive(value, topic), type=SchemaType.AVRO)
         if key is not None:
             self._keys[topic] = KeySchemaDescription(
@@ -76,11 +76,11 @@ class JSONRepo(AbstractDescriptionStore):
 
 
 class JSONModelRepo(AbstractDescriptionStore):
-    def __init__(self, schema_generator: Type[GenerateJsonSchema] = JSONClosedModelGenerator) -> None:
+    def __init__(self, schema_generator: type[GenerateJsonSchema] = JSONClosedModelGenerator) -> None:
         super().__init__()
         self._schema_generator = schema_generator
 
-    def add(self, topic: TopicName, value: Type[BaseModel], key: Optional[Type[BaseModel]]) -> None:
+    def add(self, topic: TopicName, value: type[BaseModel], key: Optional[type[BaseModel]]) -> None:
         self._values[topic] = ValueSchemaDescription(
             text=jsonmodel.derive(value, self._schema_generator),
             type=SchemaType.JSON,

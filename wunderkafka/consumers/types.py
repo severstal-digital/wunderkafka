@@ -14,8 +14,8 @@ class PayloadError(BaseModel):
 
 class StreamResult(BaseModel, Generic[M]):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    payload: Optional[Dict[str, Any]] = None
-    error: Optional[PayloadError] = None
+    payload: dict[str, Any] | None = None
+    error: PayloadError | None = None
     msg: M
     t0: float = Field(default_factory=time.perf_counter)
 

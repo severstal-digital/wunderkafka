@@ -32,7 +32,7 @@ def test_simple_base_model() -> None:
 
 class ResultModel(BaseModel):
     id: UUID4
-    nested: List[NestedModel]
+    nested: list[NestedModel]
 
 
 def test_nested_base_model_list() -> None:
@@ -73,7 +73,7 @@ def test_nested_base_model_list() -> None:
 
 
 class HasDictStrSchema(BaseModel):
-    dct: Dict[str, NestedModel]
+    dct: dict[str, NestedModel]
 
 
 def test_nested_base_model_dict_str_key() -> None:
@@ -107,7 +107,7 @@ def test_nested_base_model_dict_str_key() -> None:
 
 
 class HasDictIntSchema(BaseModel):
-    dct: Dict[int, NestedModel]
+    dct: dict[int, NestedModel]
 
 
 def test_nested_base_model_dict_int_key() -> None:

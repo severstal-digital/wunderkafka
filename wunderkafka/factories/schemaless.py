@@ -16,7 +16,7 @@ class SchemaLessJSONStringProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
     ) -> None:
         """
@@ -46,7 +46,7 @@ class SchemaLessJSONModelStringProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
     ) -> None:
         """
