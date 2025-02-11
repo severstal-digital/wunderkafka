@@ -1,6 +1,11 @@
 import sys
 
 if sys.version_info >= (3, 10):
-    pass
+    from typing import ParamSpec
 else:
-    pass
+    from typing_extensions import ParamSpec
+
+
+__all__ = [
+    'ParamSpec',
+]
