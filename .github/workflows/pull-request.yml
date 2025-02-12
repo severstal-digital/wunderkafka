@@ -41,7 +41,7 @@ jobs:
         run: |
           pip install -U mypy==1.10.0
       - name: run mypy
-        run: mypy --config setup.cfg .
+        run: mypy --config pypojrect.toml .
   checks:
     needs: [independent]
     runs-on: ubuntu-latest
