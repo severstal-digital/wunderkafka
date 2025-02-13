@@ -1,12 +1,12 @@
-from typing import Type, Optional
+from typing import Optional
 from pathlib import Path
 
 from pydantic import BaseModel
 
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.tests import TestProducer, TestHTTPClient
 from wunderkafka.serdes.avro import AvroModelSerializer
 from wunderkafka.serdes.store import AvroModelRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 
@@ -24,7 +24,7 @@ class EvolvedEvent(Event):
     info: Optional[str] = 'test'
 
 
-def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_description: Type[Event] = Event) -> None:
+def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_description: type[Event] = Event) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
     producer = HighLevelSerializingProducer(
@@ -51,7 +51,7 @@ def test_avro_producer_create_schema(sr_root_create: Path, topic: str, schema_de
 def test_avro_producer_existing_schema(
     sr_root_existing: Path,
     topic: str,
-    schema_description: Type[Event] = Event,
+    schema_description: type[Event] = Event,
 ) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()
@@ -79,7 +79,7 @@ def test_avro_producer_existing_schema(
 def test_avro_producer_update_schema(
     sr_root_update: Path,
     topic: str,
-    schema_description: Type[EvolvedEvent] = EvolvedEvent,
+    schema_description: type[EvolvedEvent] = EvolvedEvent,
 ) -> None:
     fixed_ts = 1632128298534
     test_producer = TestProducer()

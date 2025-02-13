@@ -1,9 +1,8 @@
 import json
-from typing import Type
 
 from pydantic import BaseModel
-from pydantic.json_schema import GenerateJsonSchema, DEFAULT_REF_TEMPLATE, JsonSchemaMode, JsonSchemaValue
 from pydantic_core import CoreSchema
+from pydantic.json_schema import DEFAULT_REF_TEMPLATE, JsonSchemaMode, JsonSchemaValue, GenerateJsonSchema
 
 
 class JSONClosedModelGenerator(GenerateJsonSchema):
@@ -30,5 +29,5 @@ class JSONClosedModelGenerator(GenerateJsonSchema):
         return json_schema
 
 
-def derive(model_type: Type[BaseModel], schema_generator: Type[GenerateJsonSchema]) -> str:
+def derive(model_type: type[BaseModel], schema_generator: type[GenerateJsonSchema]) -> str:
     return json.dumps(model_type.model_json_schema(schema_generator=schema_generator))

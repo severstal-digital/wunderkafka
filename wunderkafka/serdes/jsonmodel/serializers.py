@@ -1,10 +1,10 @@
 import json
-from typing import Dict, Optional, Any
+from typing import Any, Optional
 
+from pydantic import BaseModel
+from confluent_kafka.serialization import MessageField, SerializationContext
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.json_schema import JSONSerializer
-from confluent_kafka.serialization import SerializationContext, MessageField
-from pydantic import BaseModel
 
 from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
 from wunderkafka.serdes.store import JSONModelRepo
@@ -22,7 +22,7 @@ class JSONModelSerializer(AbstractSerializer):
         schema_registry_client: SchemaRegistryClient,
         store: Optional[AbstractDescriptionStore] = None,
     ) -> None:
-        self._cache: Dict[str, JSONSerializer] = {}
+        self._cache: dict[str, JSONSerializer] = {}
         self._sr_client = schema_registry_client
         self.store = store or JSONModelRepo()
 

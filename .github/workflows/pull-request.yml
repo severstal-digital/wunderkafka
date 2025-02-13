@@ -42,6 +42,10 @@ jobs:
           pip install -U mypy==1.10.0
       - name: run mypy
         run: mypy --config setup.cfg .
+      - name: Install ruff
+        run: pip install ruff
+      - name: Ruff check
+        run: ruff check .
   checks:
     needs: [independent]
     runs-on: ubuntu-latest

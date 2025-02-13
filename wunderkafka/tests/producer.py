@@ -1,4 +1,4 @@
-from typing import Any, List, Union, Optional
+from typing import Any, Union, Optional
 from dataclasses import dataclass
 
 from wunderkafka.types import DeliveryCallback
@@ -7,7 +7,7 @@ from wunderkafka.producers.bytes import BytesProducer
 
 
 @dataclass
-class Message(object):
+class Message:
     topic: str
     value: Optional[Union[str, bytes]]
     key: Optional[Union[str, bytes]]
@@ -16,7 +16,7 @@ class Message(object):
 class TestProducer(BytesProducer):
 
     def __init__(self) -> None:
-        self.sent: List[Message] = []
+        self.sent: list[Message] = []
 
     def send_message(
         self,
