@@ -1,7 +1,18 @@
 # CHANGELOG
 
 
+## v0.19.0-beta.3 (2025-02-13)
+
+
 ## v0.19.0-beta.2 (2025-02-13)
+
+### Bug Fixes
+
+- Minor cleanup
+  ([`bba2b8f`](https://github.com/severstal-digital/wunderkafka/commit/bba2b8ff3592398fc04490e1d993e8712d916511))
+
+- Minor cleanup
+  ([`494490d`](https://github.com/severstal-digital/wunderkafka/commit/494490d441992c395635b768a95bc190320df678))
 
 
 ## v0.19.0-beta.1 (2025-02-13)
