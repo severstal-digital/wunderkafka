@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Some timing boilerplate."""
 
 import time
@@ -30,4 +28,4 @@ def ts2dt(ts: float) -> datetime.datetime:
         return datetime.datetime.fromtimestamp(ts)
     if current_ts_len == ts_str_len_ms:
         return datetime.datetime.fromtimestamp(round(ts/1000))
-    raise ValueError('Invalid timestamp: {0} seems not to be a UNIX-timestamp in seconds or milliseconds'.format(ts))
+    raise ValueError(f'Invalid timestamp: {ts} seems not to be a UNIX-timestamp in seconds or milliseconds')

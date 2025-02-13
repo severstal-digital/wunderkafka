@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
 
-class Mask(object):
+class Mask:
     def __init__(self, value: str):
         self._value = value
-        self.__unpack = '>{0}'.format(self._value)
-        self.__pack = '>b{0}'.format(self._value)
+        self.__unpack = f'>{self._value}'
+        self.__pack = f'>b{self._value}'
 
     @property
     def unpack(self) -> str:
@@ -17,6 +17,6 @@ class Mask(object):
 
 
 @dataclass(frozen=True)
-class Protocol(object):
+class Protocol:
     header_size: int
     mask: Mask

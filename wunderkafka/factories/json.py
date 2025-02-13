@@ -1,21 +1,21 @@
 """This module contains some ready-to-go combinations of the Consumer/Producer."""
 
-from typing import Dict, Type, Union, Optional
+from typing import Union, Optional
 
 from wunderkafka import ConsumerConfig, ProducerConfig
-from wunderkafka.config.krb.rdkafka import config_requires_kerberos
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.serdes.json.deserializers import JSONDeserializer
-from wunderkafka.serdes.json.serializers import JSONSerializer
-from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
-from wunderkafka.structures import SchemaType
 from wunderkafka.types import TopicName, MessageDescription
+from wunderkafka.structures import SchemaType
 from wunderkafka.serdes.store import JSONModelRepo, SchemaTextRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.producers.bytes import BytesProducer
 from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient, KerberizableHTTPClient
+from wunderkafka.config.krb.rdkafka import config_requires_kerberos
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.serdes.json.serializers import JSONSerializer
+from wunderkafka.serdes.json.deserializers import JSONDeserializer
+from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
 from wunderkafka.schema_registry.clients.confluent import ConfluentSRClient
 
 
@@ -26,7 +26,7 @@ class JSONConsumer(HighLevelDeserializingConsumer):
         self,
         config: ConsumerConfig,
         *,
-        sr_client: Optional[Union[Type[ClouderaSRClient], Type[ConfluentSRClient]]] = None,
+        sr_client: Optional[Union[type[ClouderaSRClient], type[ConfluentSRClient]]] = None,
     ) -> None:
         """
         Init consumer from pre-defined blocks.
@@ -45,7 +45,7 @@ class JSONConsumer(HighLevelDeserializingConsumer):
         sr = config.sr
         self._default_timeout: int = 60
         if sr is None:
-            raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
+            raise ValueError(f'Schema registry config is necessary for {self.__class__.__name__}')
         if sr_client is None:
             sr_client = ClouderaSRClient
 
@@ -69,10 +69,10 @@ class JSONProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Optional[Type[ConfluentSRClient]] = None,
+        sr_client: Optional[type[ConfluentSRClient]] = None,
         protocol_id: int = 1
     ) -> None:
         """
@@ -94,7 +94,7 @@ class JSONProducer(HighLevelSerializingProducer):
         """
         sr = config.sr
         if sr is None:
-            raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
+            raise ValueError(f'Schema registry config is necessary for {self.__class__.__name__}')
         if sr_client is None:
             sr_client = ConfluentSRClient
         self._default_timeout: int = 60
@@ -121,10 +121,10 @@ class JSONModelProducer(HighLevelSerializingProducer):
 
     def __init__(
         self,
-        mapping: Optional[Dict[TopicName, MessageDescription]],
+        mapping: Optional[dict[TopicName, MessageDescription]],
         config: ProducerConfig,
         *,
-        sr_client: Optional[Type[ConfluentSRClient]] = None,
+        sr_client: Optional[type[ConfluentSRClient]] = None,
         protocol_id: int = 1
     ) -> None:
         """
@@ -147,7 +147,7 @@ class JSONModelProducer(HighLevelSerializingProducer):
         """
         sr = config.sr
         if sr is None:
-            raise ValueError('Schema registry config is necessary for {0}'.format(self.__class__.__name__))
+            raise ValueError(f'Schema registry config is necessary for {self.__class__.__name__}')
 
         if sr_client is None:
             sr_client = ConfluentSRClient
@@ -182,5 +182,5 @@ class JSONConfluentConsumer(JSONConsumer):
 class JSONModelConfluentProducer(JSONModelProducer):
     """Kafka Confluent Producer client to serialize and send models or dataclasses as messages."""
 
-    def __init__(self, mapping: Optional[Dict[TopicName, MessageDescription]], config: ProducerConfig):
+    def __init__(self, mapping: Optional[dict[TopicName, MessageDescription]], config: ProducerConfig):
         super().__init__(mapping, config, sr_client=ConfluentSRClient, protocol_id=0)

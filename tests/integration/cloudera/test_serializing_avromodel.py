@@ -3,11 +3,11 @@ from pathlib import Path
 import pytest
 from pydantic import Field, BaseModel
 
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.time import now
 from wunderkafka.tests import TestProducer, TestHTTPClient
 from wunderkafka.serdes.avro import AvroModelSerializer
 from wunderkafka.serdes.store import AvroModelRepo
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
 

@@ -7,7 +7,7 @@ Module contains interface-like skeletons for consumer.
 
 import datetime
 from abc import ABC, abstractmethod
-from typing import Dict, List, Union, Optional
+from typing import Union, Optional
 
 from confluent_kafka import Message, Consumer, TopicPartition
 
@@ -21,7 +21,7 @@ class AbstractConsumer(Consumer):
 
     # Why so: https://github.com/python/mypy/issues/4125
     _config: ConsumerConfig
-    subscription_offsets: Optional[Dict[str, HowToSubscribe]] = None
+    subscription_offsets: Optional[dict[str, HowToSubscribe]] = None
 
     @property
     def config(self) -> ConsumerConfig:
@@ -40,7 +40,7 @@ class AbstractConsumer(Consumer):
         num_messages: int = 1000000,
         *,
         raise_on_lost: bool = False,
-    ) -> List[Message]:
+    ) -> list[Message]:
         """
         Consume as many messages as we can for a given timeout.
 
@@ -68,9 +68,9 @@ class AbstractDeserializingConsumer(ABC):
     def commit(
         self,
         message: Optional[Message] = None,
-        offsets: Optional[List[TopicPartition]] = None,
+        offsets: Optional[list[TopicPartition]] = None,
         asynchronous: bool = True,
-    ) -> Optional[List[TopicPartition]]:
+    ) -> Optional[list[TopicPartition]]:
         """
         Commit a message or a list of offsets.
 
@@ -89,7 +89,7 @@ class AbstractDeserializingConsumer(ABC):
     @abstractmethod
     def subscribe(  # noqa: WPS211  # ToDo (tribunsky.kir): reconsider API of 'how'
         self,
-        topics: List[Union[str, TopicSubscription]],
+        topics: list[Union[str, TopicSubscription]],
         *,
         from_beginning: Optional[bool] = None,
         offset: Optional[int] = None,

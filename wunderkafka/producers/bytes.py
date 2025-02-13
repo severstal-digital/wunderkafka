@@ -5,11 +5,11 @@ from typing import Any, Union, Optional
 
 from confluent_kafka import KafkaException
 
-from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 from wunderkafka.types import DeliveryCallback
 from wunderkafka.config import ProducerConfig
 from wunderkafka.callbacks import error_callback
 from wunderkafka.producers.abc import AbstractProducer
+from wunderkafka.config.krb.rdkafka import challenge_krb_arg
 
 
 class BytesProducer(AbstractProducer):

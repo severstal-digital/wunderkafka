@@ -1,6 +1,6 @@
 import pytest
 
-from wunderkafka.hotfixes.watchdog import parse_kinit, KinitParams
+from wunderkafka.hotfixes.watchdog import KinitParams, parse_kinit
 
 USER = 'my.user'
 REALM = 'MYDOMAIN.COM'
@@ -8,8 +8,8 @@ REALM = 'MYDOMAIN.COM'
 
 @pytest.mark.parametrize(
     'keytab',
-    ['{0}.keytab'.format(USER), '/home/{0}@{1}/{0}.keytab'.format(USER, REALM.lower())]
+    [f'{USER}.keytab', '/home/{0}@{1}/{0}.keytab'.format(USER, REALM.lower())]
 )
 def test_parse_kinit(keytab: str) -> None:
-    kinit_cmd = 'kinit {0}@{1} -k -t {2}'.format(USER, REALM, keytab)
+    kinit_cmd = f'kinit {USER}@{REALM} -k -t {keytab}'
     assert parse_kinit(kinit_cmd) == KinitParams(user=USER, realm=REALM, keytab=keytab, cmd=kinit_cmd)

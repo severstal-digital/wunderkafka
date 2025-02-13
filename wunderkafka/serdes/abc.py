@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Union, Optional
+from typing import Any, Union, Optional
 
 from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
 from wunderkafka.structures import SRMeta, ParsedHeader
@@ -51,8 +51,8 @@ class AbstractSerializer(ABC):
 class AbstractDescriptionStore(ABC):
 
     def __init__(self) -> None:
-        self._values: Dict[TopicName, ValueSchemaDescription] = {}
-        self._keys: Dict[TopicName, KeySchemaDescription] = {}
+        self._values: dict[TopicName, ValueSchemaDescription] = {}
+        self._keys: dict[TopicName, KeySchemaDescription] = {}
 
     def get(
         self,
