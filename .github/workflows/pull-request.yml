@@ -85,7 +85,7 @@ jobs:
       run: |
         pip install -U mypy==1.10.0
     - name: run mypy
-      run: mypy --config setup.cfg .
+      run: mypy --config pyproject.toml .
 
   version:
     runs-on: ubuntu-latest
@@ -148,8 +148,8 @@ jobs:
     - name: sed version
       run: |
         echo "Got version from vcs: ${{ needs.version.outputs.tag }}"
-        sed -i 's/version = 0.0.0/version = ${{ needs.version.outputs.tag }}/' setup.cfg
-        cat setup.cfg | grep -i version
+        sed -i 's/version = \"0.0.0\"/version = \"${{ needs.version.outputs.tag }}\"/' pyproject.toml
+        cat pyproject.toml | grep -i version
     - name: Build package
       run: python -m build
     - name: Publish package to TestPyPI

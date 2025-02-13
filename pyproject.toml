@@ -161,8 +161,8 @@ patch_tags = ["fix", "perf"]
 default_bump_level = 0
 [tool.semantic_release.remote]
 name = "origin"
-type = "gitlab"
-token = { env = "GL_TOKEN" }
+type = "github"
+token = { env = "GITHUB_TOKEN" }
 ignore_token_for_push = false
 insecure = true
 [tool.semantic_release.publish]
