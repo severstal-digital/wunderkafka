@@ -17,12 +17,13 @@ classifiers = [
 authors = [{name = "Kirill Tribunsky", email = "tribunsky.kir@yandex.ru"}]
 urls = {"Homepage" = "https://github.com/severstal-digital/wunderkafka", "Bug Tracker" = "https://github.com/severstal-digital/wunderkafka/issues"}
 
-[project.dependencies]
-confluent-kafka = ">=1.9.0"
-avro-python3 = ">=1.10.0"
-dataclasses-avroschema = ">=0.53.0"
-fastavro = ">=1.4.7"
-pydantic-settings = ">2.0"
+dependencies = [
+	"confluent-kafka>=1.9.0",
+	"avro-python3>=1.10.0",
+	"dataclasses-avroschema>=0.53.0",
+	"fastavro>=1.4.7",
+	"pydantic-settings>2.0",
+]
 
 [project.optional-dependencies]
 krb = ["requests-kerberos>=0.13.0", "python-dateutil"]
