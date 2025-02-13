@@ -1,6 +1,6 @@
 import io
 from json import loads
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from fastavro import parse_schema, schemaless_reader
 
@@ -12,7 +12,7 @@ class FastAvroDeserializer(AbstractDeserializer):
     # ToDo (tribunsky.kir): it's better to cache loaded Schema earlier, but then it breaks layers.
 
     def __init__(self) -> None:
-        self._cache: Dict[str, FastAvroParsedSchema] = {}
+        self._cache: dict[str, FastAvroParsedSchema] = {}
 
     def deserialize(self, schema: str, blob: bytes, seek_pos: Optional[int] = None) -> Any:
         if schema not in self._cache:

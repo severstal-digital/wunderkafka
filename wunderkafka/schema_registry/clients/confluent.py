@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from typing import Any, Optional
-from typing_extensions import Protocol
-from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSchemaRegistryClient, Schema
 
-from wunderkafka.schema_registry import SimpleCache
-from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
-from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
+from typing_extensions import Protocol
+from confluent_kafka.schema_registry import Schema
+from confluent_kafka.schema_registry import SchemaRegistryClient as ConfluentSchemaRegistryClient
+
 from wunderkafka.compat import ParamSpec
+from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
+from wunderkafka.schema_registry import SimpleCache
+from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
 
 P = ParamSpec('P')
 
@@ -23,17 +25,17 @@ class ConfluentRestClient(Protocol):
     def delete(self, url: str) -> Any:
         ...
 
-    def put(self, url: str, body: Optional[str] = None) -> Any:
+    def put(self, url: str, body: Optional[str]= None) -> Any:
         ...
 
-    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
+    def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict]= None) -> Any:
         ...
 
     def _close(self) -> None:
         ...
 
 
-class Adapter(object):
+class Adapter:
     def __init__(self, http_client: AbstractHTTPClient) -> None:
         self._client = http_client
 
@@ -46,7 +48,7 @@ class Adapter(object):
     def delete(self, url: str) -> Any:
         return self._client.make_request(url, method='DELETE')
 
-    def put(self, url: str, body: Optional[str] = None) -> Any:
+    def put(self, url: str, body: Optional[str]= None) -> Any:
         return self._client.make_request(url, method='PUT', body=body)
 
     def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
@@ -83,6 +85,6 @@ class ConfluentSRClient(AbstractSchemaRegistry):
 
     def register_schema(self, topic: str, schema_text: str, schema_type: SchemaType, *, is_key: bool = True) -> SRMeta:
         # FixMe (tribunsky.kir): lack of symmetry here - SchemaMeta knows about different vendors, but not vice versa.
-        subject = '{0}-{1}'.format(topic, 'key' if is_key else 'value')
+        subject = '{}-{}'.format(topic, 'key' if is_key else 'value')
         schema_id = self.client.register_schema(subject, Schema(schema_text, schema_type=schema_type))
         return SRMeta(schema_id, schema_version=None)

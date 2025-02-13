@@ -1,8 +1,8 @@
 from confluent_kafka import KafkaError
 
-from wunderkafka.config.generated import enums
-from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.logger import logger
+from wunderkafka.config.rdkafka import RDKafkaConfig
+from wunderkafka.config.generated import enums
 
 
 def exclude_gssapi(builtin_features: str) -> str:
@@ -42,6 +42,6 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
         ]))
         old = config.builtin_features
         new = exclude_gssapi(config.builtin_features)
-        logger.warning('Changing builtin.features: {0} -> {1}'.format(old, new))
+        logger.warning(f'Changing builtin.features: {old} -> {new}')
         config.builtin_features = new
         return config

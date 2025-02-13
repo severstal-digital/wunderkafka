@@ -42,7 +42,7 @@ def choose_offset(
     return None
 
 
-class TopicSubscription(object):
+class TopicSubscription:
     """Allows custom definition of subscription for topic without need to build full TopicPartition list."""
 
     def __init__(  # noqa: WPS211  # ToDo (tribunsky.kir): reconsider API of 'how'

@@ -27,14 +27,14 @@ class ConfluentClouderaHeadersHandler(AbstractProtocolHandler):
 
     def parse(self, blob: bytes) -> ParsedHeader:
         if len(blob) < MIN_HEADER_SIZE:
-            raise DeserializerException("Message is too small to decode: ({!r})".format(blob))
+            raise DeserializerException(f"Message is too small to decode: ({blob!r})")
 
         # 1st byte is magic byte.
         [protocol_id] = struct.unpack('>b', blob[0:1])
 
         protocol = PROTOCOLS.get(protocol_id)
         if protocol is None:
-            raise DeserializerException('Unknown protocol extracted from message: {0}'.format(protocol_id))
+            raise DeserializerException(f'Unknown protocol extracted from message: {protocol_id}')
 
         # already read 1 byte from header as protocol id
         meta = struct.unpack(protocol.mask.unpack, blob[1:1+protocol.header_size])
@@ -58,11 +58,11 @@ class ConfluentClouderaHeadersHandler(AbstractProtocolHandler):
     def pack(self, protocol_id: int, meta: SRMeta) -> bytes:
         protocol = PROTOCOLS.get(protocol_id)
         if protocol is None:
-            raise ValueError('Unknown protocol_id {0}!'.format(protocol_id))
+            raise ValueError(f'Unknown protocol_id {protocol_id}!')
 
         if protocol_id == 1:
             if meta.meta_id is None:
-                err_msg = 'No meta id for protocol_id {0}. Please, check response from Schema Registry.'.format(
+                err_msg = 'No meta id for protocol_id {}. Please, check response from Schema Registry.'.format(
                     protocol_id)
                 raise ValueError(err_msg)
             return struct.pack(protocol.mask.pack, protocol_id, meta.meta_id, meta.schema_version)
