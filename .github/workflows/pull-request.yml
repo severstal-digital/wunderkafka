@@ -97,7 +97,7 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Switch branch
-        run: git checkout $GITHUB_REF_NAME
+        run: git checkout $GITHUB_HEAD_REF
 
       - name: Python Semantic Release
         uses: python-semantic-release/python-semantic-release@v9.19.1
