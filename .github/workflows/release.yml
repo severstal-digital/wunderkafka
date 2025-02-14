@@ -10,33 +10,20 @@ on:
 jobs:
   version:
     runs-on: ubuntu-latest
-    if: ${{ github.ref_type == 'tag' && github.event.base_ref=='refs/heads/master' }}
     outputs:
       tag: ${{ steps.get_tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: '0'
-      - name: Get git tag.
-        id: get_tag
-        run: |
-          get_version () {
-            local VERSION=''
-            local LAST_GIT_TAG=''
-            LAST_GIT_TAG=$(git tag --merged origin/master | sort -V | tail -n 1)
-            VERSION=$(echo "${LAST_GIT_TAG}" | grep -P '^v\d+\.\d+.\d+$' | sed 's/^v//')
-            echo "$VERSION"
-          }
-          
-          VERSION_TAG="$(get_version)"
-          echo "Extracted latest tag from master branch: ${VERSION_TAG}"
-          if [ -z "${VERSION_TAG}" ]; then
-            echo "Couldn't detect any existing revision number. Please, place a tag."
-            exit 1
-          else
-            echo "Got revision number for a current build: ${VERSION_TAG}"
-            echo tag="${VERSION_TAG}" >> $GITHUB_OUTPUT
-          fi
+      - name: Switch branch
+        run: git checkout ${{ github.ref_name }}
+
+      - name: Python Semantic Release
+        uses: python-semantic-release/python-semantic-release@v9.19.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: [version]
@@ -51,8 +38,8 @@ jobs:
     - name: sed version
       run: |
         echo "Got version from vcs: ${{ needs.version.outputs.tag }}"
-        sed -i 's/version = 0.0.0/version = ${{ needs.version.outputs.tag }}/' setup.cfg
-        cat setup.cfg | grep -i version
+        sed -i 's/version = \"0.0.0\"/version = \"${{ needs.version.outputs.tag }}\"/' pyproject.toml
+        cat pyproject.toml | grep -i version
     - name: Build package
       run: python -m build
     - name: Publish package to real PyPI
