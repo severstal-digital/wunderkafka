@@ -58,20 +58,17 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    # - name: Install system dependencies
-    #   run: |
-    #     apt-get update && \
-    #     apt-get install -y librdkafka1 \
-    #                        krb5-user \
-    #                        libsasl2-modules-gssapi-mit \
-    #                        librdkafka-dev \
-    #                        libsasl2-dev \
-    #                        libkrb5-dev \
-    #                        libssl-dev \
-    #                        g++
-    - uses: daaku/gh-action-apt-install@v4
-      with:
-        packages: librdkafka1 krb5-user libsasl2-modules-gssapi-mit librdkafka-dev libsasl2-dev libkrb5-dev libssl-dev g++
+    - name: Install system dependencies
+      run: |
+        apt-get update && \
+        apt-get install -y librdkafka1 \
+                           krb5-user \
+                           libsasl2-modules-gssapi-mit \
+                           librdkafka-dev \
+                           libsasl2-dev \
+                           libkrb5-dev \
+                           libssl-dev \
+                           g++
     - uses: actions/cache@v1
       id: cache
       with:
