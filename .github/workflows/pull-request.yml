@@ -69,10 +69,10 @@ jobs:
                            libkrb5-dev \
                            libssl-dev \
                            g++
-    - uses: actions/cache@v1
+    - uses: actions/cache@v3
       id: cache
       with:
-        path: ~/.cache/pip
+        path: /root/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
         restore-keys: |
           ${{ runner.os }}-pip-
