@@ -57,7 +57,7 @@ jobs:
         confluent-kafka-version: ['~=2.5.3', '']
         disable_krb: ['true', 'false']
     container: python:${{ matrix.python-version }}-slim-bookworm
-    environment:
+    env:
       FORCE_KERBEROS_DISABLE: ${{ matrix.disable_krb }}
     steps:
     - name: Checkout
