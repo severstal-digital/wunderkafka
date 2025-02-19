@@ -53,12 +53,8 @@ jobs:
         pydantic-settings-version: ['~=2.0.0', '']
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0','']
         python-version: ['3.9', '3.10', '3.11', '3.12']
-        requests-kerberos-version: ['==0.13.0']
         confluent-kafka-version: ['~=2.5.3', '']
-        disable_krb: ['true', 'false']
     container: python:${{ matrix.python-version }}-slim-bookworm
-    env:
-      FORCE_KERBEROS_DISABLE: ${{ matrix.disable_krb }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -75,18 +71,20 @@ jobs:
                            g++
     - name: Install testing dependencies
       run: | 
-        if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
-            echo "Installed dependencies simultaneously"     
+        if pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
+            echo "Installed dependencies simultaneously"
         else
             echo "Error resolving dependencies... Installing consequently"
             python -m pip install pytest 
             python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
             python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
-            python -m pip install requests-kerberos${{ matrix.requests-kerberos-version }}
+            python -m pip install requests-kerberos==0.13.0
             python -m pip install confluent-kafka[avro]${{ matrix.confluent-kafka-version }}
         fi
     - name: run pytest
-      run: pytest -s tests/
+      run: |
+        FORCE_KERBEROS_DISABLE=true pytest -s tests/
+        FORCE_KERBEROS_DISABLE=false pytest -s tests/
     - name: Install dependencies
       run: |
         pip install -U mypy==1.10.0
