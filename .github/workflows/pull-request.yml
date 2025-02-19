@@ -6,48 +6,47 @@ on:
       - master
 
 jobs:
-  independent:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        pydantic-settings-version: [ '~=2.0.0', '']
-        # ToDo (tribunsky.kir): make avro extra too but do not forget to require requests in the sake of SRs
-        dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0', '']
-        python-version: ['3.9', '3.10', '3.11', '3.12']
-    container: python:${{ matrix.python-version }}-slim-bookworm
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: install system dependencies
-        run: |
-          apt-get update
-          apt-get install -y librdkafka1
-      - name: install confluent-kafka w/o SASL/SSL support
-        run: |
-          pip install confluent-kafka[avro]~=2.5.3
-      - name: Install testing dependencies
-        run: |
-          if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
-              echo "Installed dependencies simultaneously"
-          else
-              echo "Error resolving dependencies... Installing consequently"
-              python -m pip install pytest 
-              python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
-              python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
-          fi
-      - name: run pytest
-        run: pytest -s tests/
-      - name: Install dependencies
-        run: |
-          pip install -U mypy==1.10.0
-      - name: run mypy
-        run: mypy --config pyproject.toml .
-      - name: Install ruff
-        run: pip install ruff
-      - name: Ruff check
-        run: ruff check .
+  # independent:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       pydantic-settings-version: [ '~=2.0.0', '']
+  #       # ToDo (tribunsky.kir): make avro extra too but do not forget to require requests in the sake of SRs
+  #       dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0', '']
+  #       python-version: ['3.9', '3.10', '3.11', '3.12']
+  #   container: python:${{ matrix.python-version }}-slim-bookworm
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+  #     - name: install system dependencies
+  #       run: |
+  #         apt-get update
+  #         apt-get install -y librdkafka1
+  #     - name: install confluent-kafka w/o SASL/SSL support
+  #       run: |
+  #         pip install confluent-kafka[avro]~=2.5.3
+  #     - name: Install testing dependencies
+  #       run: |
+  #         if pip install pytest pydantic-settings{{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
+  #             echo "Installed dependencies simultaneously"
+  #         else
+  #             echo "Error resolving dependencies... Installing consequently"
+  #             python -m pip install pytest 
+  #             python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
+  #             python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
+  #         fi
+  #     - name: run pytest
+  #       run: pytest -s tests/
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install -U mypy==1.10.0
+  #     - name: run mypy
+  #       run: mypy --config pyproject.toml .
+  #     - name: Install ruff
+  #       run: pip install ruff
+  #     - name: Ruff check
+  #       run: ruff check .
   checks:
-    needs: [independent]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -56,7 +55,10 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         requests-kerberos-version: ['==0.13.0']
         confluent-kafka-version: ['~=2.5.3', '']
+        disable_krb: ['true', 'false']
     container: python:${{ matrix.python-version }}-slim-bookworm
+    environment:
+      FORCE_KERBEROS_DISABLE: ${{ matrix.disable_krb }}
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -90,6 +92,11 @@ jobs:
         pip install -U mypy==1.10.0
     - name: run mypy
       run: mypy --config pyproject.toml .
+    - name: Install ruff
+      run: pip install ruff
+    - name: Ruff check
+      run: ruff check .
+
 
   version:
     runs-on: ubuntu-latest
