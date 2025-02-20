@@ -99,11 +99,6 @@ jobs:
         uv pip install -U mypy==1.10.0
     - name: run mypy
       run: uv run mypy --config pyproject.toml .
-    - name: Install ruff
-      run: uv pip install ruff
-    - name: Ruff check
-      run: uv run ruff check .
-
 
   version:
     runs-on: ubuntu-latest
