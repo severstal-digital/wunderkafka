@@ -58,6 +58,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
     - name: Install system dependencies
       run: |
         apt-get update && \
@@ -79,29 +81,29 @@ jobs:
     - name: Install testing dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: | 
-        if pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
+        if uv pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
             echo "Installed dependencies simultaneously"
         else
             echo "Error resolving dependencies... Installing consequently"
-            python -m pip install pytest 
-            python -m pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
-            python -m pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
-            python -m pip install requests-kerberos==0.13.0
-            python -m pip install confluent-kafka[avro]${{ matrix.confluent-kafka-version }}
+            uv pip install pytest 
+            uv pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
+            uv pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
+            uv pip install requests-kerberos==0.13.0
+            uv pip install confluent-kafka[avro]${{ matrix.confluent-kafka-version }}
         fi
     - name: run pytest
       run: |
-        FORCE_KERBEROS_DISABLE=true pytest -s tests/
-        FORCE_KERBEROS_DISABLE=false pytest -s tests/
+        FORCE_KERBEROS_DISABLE=true uv run pytest -s tests/
+        FORCE_KERBEROS_DISABLE=false uv run pytest -s tests/
     - name: Install dependencies
       run: |
-        pip install -U mypy==1.10.0
+        uv pip install -U mypy==1.10.0
     - name: run mypy
-      run: mypy --config pyproject.toml .
+      run: uv run mypy --config pyproject.toml .
     - name: Install ruff
-      run: pip install ruff
+      run: uv pip install ruff
     - name: Ruff check
-      run: ruff check .
+      run: uv run ruff check .
 
 
   version:
