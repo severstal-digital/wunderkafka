@@ -16,6 +16,7 @@ classifiers = [
 ]
 authors = [{name = "Kirill Tribunsky", email = "tribunsky.kir@yandex.ru"}]
 urls = {"Homepage" = "https://github.com/severstal-digital/wunderkafka", "Bug Tracker" = "https://github.com/severstal-digital/wunderkafka/issues"}
+requires-python = ">=3.9"
 
 dependencies = [
 	"confluent-kafka>=1.9.0",

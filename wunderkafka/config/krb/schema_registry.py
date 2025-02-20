@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from typing import Any
 
@@ -9,7 +10,7 @@ try:
 except ImportError:
     HAS_KERBEROS = False
 else:
-    HAS_KERBEROS = True
+    HAS_KERBEROS = True and os.getenv('FORCE_KERBEROS_DISABLE', 'false') == 'false'
 
 if HAS_KERBEROS:
     class HTTPKerberosMutualAuth(Enum):
