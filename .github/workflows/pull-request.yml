@@ -81,6 +81,7 @@ jobs:
     - name: Install testing dependencies
       if: steps.cache.outputs.cache-hit != 'true'
       run: | 
+        uv venv
         if uv pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
             echo "Installed dependencies simultaneously"
         else
