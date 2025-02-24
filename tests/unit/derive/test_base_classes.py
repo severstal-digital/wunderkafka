@@ -8,29 +8,27 @@ from dataclasses import dataclass
 import pytest
 from pydantic import UUID4, Field, BaseModel, ConfigDict, ValidationError
 from pydantic_settings import BaseSettings
-from dataclasses_avroschema import AvroModel
+from dataclasses_avroschema.pydantic import AvroBaseModel
 
 from wunderkafka.serdes.avromodel import derive
 
 # ToDo (tribunsky.kir): review some tests. As pydantic V2 changes it's behaviour, some tests are useless:
 #                       we still can derive correct model, but we will be unable to actually populate it in runtime.
-# ToDo (tribunsky.kir): switch to derivation of dataclasses-avroschema[pydantic], when it start support v2:
-#                       https://github.com/marcosschroh/dataclasses-avroschema/issues/381
 
 
 @dataclass
-class SomeData(AvroModel):
+class SomeData(AvroBaseModel):
     field1: int
     field2: str
 
 
 @dataclass
-class SomeDefaultData(AvroModel):
+class SomeDefaultData(AvroBaseModel):
     field1: Optional[int] = None
     field2: Optional[str] = None
 
 
-class Metrics(BaseModel):
+class Metrics(AvroBaseModel):
     line_speed: Optional[int]
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
