@@ -42,24 +42,6 @@ class Metric(BaseSettings):
     squad_number: int = 0
 
 
-class MetricV2(BaseSettings):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-
-
-class MetricV21(BaseModel):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-    ml_config: str
-
-    class Config:
-        extra = 'allow'
-
-
 class Event(BaseModel):
     id: Optional[int]
     ts: Optional[int] = None
@@ -339,16 +321,6 @@ def test_pydantic_base_settings_with_defaults() -> None:
             }
         ]
     }
-
-
-def test_pydantic_base_settings_v2_with_defaults() -> None:
-    with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, ml_config='str')  # type: ignore[call-arg]
-
-
-def test_pydantic_base_settings_v21_with_defaults() -> None:
-    # https://github.com/pydantic/pydantic/issues/8469
-    MetricV21(line_speed=2, ml_config='str')  # type: ignore
 
 
 if sys.version_info <= (3, 10):

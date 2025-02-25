@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        pydantic-settings-version: [ '~=2.0.0', '']
+        pydantic-settings-version: [ '~=2.7.0', '']
         # ToDo (tribunsky.kir): make avro extra too but do not forget to require requests in the sake of SRs
         dataclasses-avroschema-version: [ '==0.53.0', '~=0.53.0', '==0.54.0', '~=0.60.0', '']
         python-version: ['3.9', '3.10', '3.11', '3.12']

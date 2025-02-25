@@ -1,6 +1,6 @@
 [project]
 name = "wunderkafka"
-version = "0.19.0-beta.4"
+version = "0.19.0-beta.7"
 description = "librdkafka-powered client for Kafka for python with (hopefully) more handful API"
 readme = "README.md"
 keywords = ["kafka", "cloudera", "confluent"]
@@ -24,6 +24,7 @@ dependencies = [
 	"dataclasses-avroschema[pydantic]>=0.53.0",
 	"fastavro>=1.4.7",
 	"pydantic-settings>2.0",
+	"pydantic>=2.7.0",
 ]
 
 [project.optional-dependencies]
@@ -187,5 +188,6 @@ dev-dependencies = [
     "httpx>=0.28.1",
     "pytest-icdiff>=0.9",
     "pytest>=8.3.4",
+    "pyupgrade>=3.19.1",
     "requests>=2.32.3",
 ]
