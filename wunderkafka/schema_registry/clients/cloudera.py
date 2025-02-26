@@ -76,7 +76,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
             'compatibility': 'BACKWARD',
             'validationLevel': 'ALL',
         }
-        return self._client.get('schemas', method='POST', body=body)
+        return self._client.post('schemas', body=body)
 
     def _create_schema(self, subject: str, schema_text: str) -> int:
         body = {
@@ -86,7 +86,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
             "schemaText": schema_text,
         }
         query = {'branch': 'MASTER'}
-        return self._client.get(f'schemas/{subject}/versions', method='POST', body=body, query=query)
+        return self._client.post(f'schemas/{subject}/versions', body=body, query=query)
 
     def get_schema_text(self, meta: SchemaMeta) -> str:
         # ToDo (tribunsky.kir): arguably, the best key is BINARY header, not dataclass.

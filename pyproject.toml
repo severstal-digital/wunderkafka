@@ -179,3 +179,12 @@ exclude = [
 	"wunderkafka/config/generated/*",
 	"examples/*"
 ]
+
+[tool.uv]
+dev-dependencies = [
+    "attrs>=25.1.0",
+    "cachetools>=5.5.2",
+    "httpx>=0.28.1",
+    "pytest>=8.3.4",
+    "requests>=2.32.3",
+]
