@@ -127,6 +127,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - name: Count Todo
         id: count_todo
         run: grep -riw "todo" wunderkafka tests | wc -l | xargs
@@ -154,7 +156,7 @@ jobs:
       - name: Commit badge
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
-          git switch $GITHUB_HEAD_REF
+          git pull
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add $TODO_COUNT_BADGE_PATH
