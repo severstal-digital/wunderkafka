@@ -10,7 +10,6 @@ env:
 
 jobs:
   independent:
-    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,7 +52,6 @@ jobs:
       - name: run mypy
         run: uv run mypy --config pyproject.toml .
   checks:
-    if: false
     needs: [independent]
     runs-on: ubuntu-latest
     strategy:
@@ -105,7 +103,6 @@ jobs:
       run: uv run mypy --config pyproject.toml .
 
   version:
-    if: false
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.get_tag.outputs.tag }}
@@ -169,7 +166,6 @@ jobs:
           github_token: ${{ secrets.github_token }}
           branch: ${{ github.head_ref }}
   deploy:
-    if: false
     needs: [checks, version]
     runs-on: ubuntu-latest
     environment: test-release
