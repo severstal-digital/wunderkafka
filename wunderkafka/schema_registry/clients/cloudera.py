@@ -63,7 +63,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
         return self._requests_count
 
     def _send_request_for_schema(self, meta: SchemaMeta) -> Any:
-        versions = self._client.make_request(f'schemas/{meta.subject}/versions')
+        versions = self._client.get(f'schemas/{meta.subject}/versions')
         self._requests_count += 1
         return versions
 
@@ -76,7 +76,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
             'compatibility': 'BACKWARD',
             'validationLevel': 'ALL',
         }
-        return self._client.make_request('schemas', method='POST', body=body)
+        return self._client.get('schemas', method='POST', body=body)
 
     def _create_schema(self, subject: str, schema_text: str) -> int:
         body = {
@@ -86,7 +86,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
             "schemaText": schema_text,
         }
         query = {'branch': 'MASTER'}
-        return self._client.make_request(f'schemas/{subject}/versions', method='POST', body=body, query=query)
+        return self._client.get(f'schemas/{subject}/versions', method='POST', body=body, query=query)
 
     def get_schema_text(self, meta: SchemaMeta) -> str:
         # ToDo (tribunsky.kir): arguably, the best key is BINARY header, not dataclass.
@@ -121,7 +121,7 @@ class ClouderaSRClient(AbstractSchemaRegistry):
             #                       e.g. to skip last query (we do not need id always)
             meta_id = self._create_meta(subject)
             schema_version = self._create_schema(subject, schema_text)
-            versions = self._client.make_request(f'schemas/{subject}/versions')
+            versions = self._client.get(f'schemas/{subject}/versions')
             for mt in versions['entities']:
                 if mt['schemaMetadataId'] == meta_id and mt['version'] == schema_version:
                     meta = SRMeta(
