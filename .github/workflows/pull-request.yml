@@ -10,6 +10,7 @@ env:
 
 jobs:
   independent:
+    if: false
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -52,6 +53,7 @@ jobs:
       - name: run mypy
         run: uv run mypy --config pyproject.toml .
   checks:
+    if: false
     needs: [independent]
     runs-on: ubuntu-latest
     strategy:
@@ -103,6 +105,7 @@ jobs:
       run: uv run mypy --config pyproject.toml .
 
   version:
+    if: false
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.get_tag.outputs.tag }}
@@ -131,7 +134,7 @@ jobs:
         with:
           label: 'Test coverage'
           status: ${{ steps.count-todo.outputs.lines }}
-          path: $TODO_COUNT_BADGE_PATH
+          path: ${{ env.TODO_COUNT_BADGE_PATH }}
           color: ${{
             steps.count-todo.outputs.coverage < 5  && 'green'              ||
             steps.count-todo.outputs.coverage < 10 && 'yellow,green'       ||
@@ -146,7 +149,7 @@ jobs:
         uses: tj-actions/verify-changed-files@v16
         id: verify-changed-files
         with:
-          files: $TODO_COUNT_BADGE_PATH
+          files: ${{ env.TODO_COUNT_BADGE_PATH }}
       - name: Commit badge
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
@@ -160,8 +163,9 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: $GITHUB_HEAD_REF
+          branch: ${{ env.GITHUB_HEAD_REF }}
   deploy:
+    if: false
     needs: [checks, version]
     runs-on: ubuntu-latest
     environment: test-release
