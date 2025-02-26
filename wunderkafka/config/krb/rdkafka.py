@@ -1,8 +1,8 @@
 from confluent_kafka import KafkaError
 
-from wunderkafka.logger import logger
-from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.config.generated import enums
+from wunderkafka.config.rdkafka import RDKafkaConfig
+from wunderkafka.logger import logger
 
 
 def exclude_gssapi(builtin_features: str) -> str:

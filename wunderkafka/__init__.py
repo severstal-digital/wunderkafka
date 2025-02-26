@@ -10,31 +10,30 @@ Module contains handful re-imports (public API) from the package.
 from confluent_kafka import Message
 
 from wunderkafka.config import ConsumerConfig, ProducerConfig
-from wunderkafka.protocols import AnyConsumer, AnyProducer
-from wunderkafka.factories.avro import (
-    AvroConsumer,
-    AvroProducer,
-    AvroModelProducer,
-    AvroClouderaConsumer,
-    AvroConfluentConsumer,
-    AvroModelClouderaProducer,
-    AvroModelConfluentProducer,
-)
-from wunderkafka.consumers.bytes import BytesConsumer
-from wunderkafka.producers.bytes import BytesProducer
 from wunderkafka.config.generated.enums import (
-    IsolationLevel,
     AutoOffsetReset,
-    CompressionType,
-    QueuingStrategy,
-    CompressionCodec,
-    SecurityProtocol,
     BrokerAddressFamily,
+    CompressionCodec,
+    CompressionType,
+    IsolationLevel,
+    QueuingStrategy,
+    SecurityProtocol,
     SslEndpointIdentificationAlgorithm,
 )
 from wunderkafka.config.schema_registry import SRConfig
+from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.consumers.subscription import TopicSubscription
-
+from wunderkafka.factories.avro import (
+    AvroClouderaConsumer,
+    AvroConfluentConsumer,
+    AvroConsumer,
+    AvroModelClouderaProducer,
+    AvroModelConfluentProducer,
+    AvroModelProducer,
+    AvroProducer,
+)
+from wunderkafka.producers.bytes import BytesProducer
+from wunderkafka.protocols import AnyConsumer, AnyProducer
 
 __all__ = [
     'Message',

@@ -1,11 +1,11 @@
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
 from wunderkafka.errors import SchemaRegistryLookupException
 from wunderkafka.logger import logger
-from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType, ParsedHeader
-from wunderkafka.serdes.headers import PROTOCOLS
 from wunderkafka.schema_registry.abc import AbstractHTTPClient, AbstractSchemaRegistry
-from wunderkafka.schema_registry.cache import SimpleCache, AlwaysEmptyCache
+from wunderkafka.schema_registry.cache import AlwaysEmptyCache, SimpleCache
+from wunderkafka.serdes.headers import PROTOCOLS
+from wunderkafka.structures import ParsedHeader, SchemaMeta, SchemaType, SRMeta
 
 
 def prepare_schemas_for_caching(

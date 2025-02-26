@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from fastavro import parse_schema, schemaless_writer
 
-from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
+from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
 from wunderkafka.serdes.avro.types import FastAvroParsedSchema
 
 

@@ -4,12 +4,12 @@ import pytest
 
 from wunderkafka.config.generate import (
     Row,
-    group,
-    parse,
-    read_markdown,
     generate_enums,
     generate_fields,
     generate_models,
+    group,
+    parse,
+    read_markdown,
 )
 
 

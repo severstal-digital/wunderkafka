@@ -1,5 +1,5 @@
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 import pytest
 from pydantic import UUID4, BaseModel
@@ -8,13 +8,13 @@ from wunderkafka.serdes.json import HAS_JSON_SCHEMA
 
 if not HAS_JSON_SCHEMA:
     pytest.skip("skipping json-schema-only tests", allow_module_level=True)
-from wunderkafka.tests import TestConsumer, TestHTTPClient
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.tests.consumer import Message
-from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
-from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
 from tests.integration.confluent.conftest import Msg
+from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
+from wunderkafka.schema_registry import ConfluentSRClient, SimpleCache
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.serdes.json.deserializers import JSONDeserializer
+from wunderkafka.tests import TestConsumer, TestHTTPClient
+from wunderkafka.tests.consumer import Message
 
 
 class Image(BaseModel):

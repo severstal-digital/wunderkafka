@@ -1,11 +1,11 @@
 import json
-from typing import Any
 from pathlib import Path
+from typing import Any
 
 import pytest
 
-from wunderkafka.structures import SchemaType
 from wunderkafka.serdes.store import SchemaFSRepo
+from wunderkafka.structures import SchemaType
 
 
 @pytest.fixture

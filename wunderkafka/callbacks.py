@@ -2,11 +2,11 @@
 
 from typing import Optional
 
-from confluent_kafka import Message, KafkaError, TopicPartition
+from confluent_kafka import KafkaError, Message, TopicPartition
 
+from wunderkafka.consumers.abc import AbstractConsumer
 from wunderkafka.logger import logger
 from wunderkafka.structures import Timestamp
-from wunderkafka.consumers.abc import AbstractConsumer
 
 
 # FixMe (tribunsky.kir): do not mutate consumer from here, try to closure it in consumer itself.

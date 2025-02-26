@@ -1,15 +1,15 @@
 """This module contains implementation of extended confluent-kafka Producer's API."""
 
 import atexit
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
 from confluent_kafka import KafkaException
 
-from wunderkafka.types import DeliveryCallback
-from wunderkafka.config import ProducerConfig
 from wunderkafka.callbacks import error_callback
-from wunderkafka.producers.abc import AbstractProducer
+from wunderkafka.config import ProducerConfig
 from wunderkafka.config.krb.rdkafka import challenge_krb_arg
+from wunderkafka.producers.abc import AbstractProducer
+from wunderkafka.types import DeliveryCallback
 
 
 class BytesProducer(AbstractProducer):

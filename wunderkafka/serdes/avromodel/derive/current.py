@@ -1,7 +1,7 @@
-import re
 import json
-from typing import Any
+import re
 from dataclasses import is_dataclass
+from typing import Any
 
 from dataclasses_avroschema import AvroModel
 

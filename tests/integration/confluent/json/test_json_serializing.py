@@ -6,12 +6,12 @@ from wunderkafka.serdes.json import HAS_JSON_SCHEMA
 
 if not HAS_JSON_SCHEMA:
     pytest.skip("skipping json-schema-only tests", allow_module_level=True)
-from wunderkafka.tests import TestProducer, TestHTTPClient
-from wunderkafka.serdes.store import JSONRepo
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.schema_registry import ConfluentSRClient, SimpleCache
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.serdes.json.serializers import JSONSerializer
+from wunderkafka.serdes.store import JSONRepo
+from wunderkafka.tests import TestHTTPClient, TestProducer
 
 
 def test_json_producer_create_schema(sr_root_existing: Path) -> None:

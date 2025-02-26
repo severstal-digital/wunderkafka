@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
-from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
-from wunderkafka.structures import SRMeta, ParsedHeader
+from wunderkafka.structures import ParsedHeader, SRMeta
+from wunderkafka.types import KeySchemaDescription, TopicName, ValueSchemaDescription
 
 
 class AbstractProtocolHandler(ABC):

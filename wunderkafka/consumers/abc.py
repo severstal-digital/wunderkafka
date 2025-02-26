@@ -7,13 +7,13 @@ Module contains interface-like skeletons for consumer.
 
 import datetime
 from abc import ABC, abstractmethod
-from typing import Union, Optional
+from typing import Optional, Union
 
-from confluent_kafka import Message, Consumer, TopicPartition
+from confluent_kafka import Consumer, Message, TopicPartition
 
-from wunderkafka.types import HowToSubscribe
 from wunderkafka.config import ConsumerConfig
 from wunderkafka.consumers.subscription import TopicSubscription
+from wunderkafka.types import HowToSubscribe
 
 
 class AbstractConsumer(Consumer):

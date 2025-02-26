@@ -1,12 +1,12 @@
 import json
 from typing import Any, Optional
 
-from pydantic import BaseModel
-from confluent_kafka.serialization import MessageField, SerializationContext
 from confluent_kafka.schema_registry import SchemaRegistryClient
 from confluent_kafka.schema_registry.json_schema import JSONSerializer
+from confluent_kafka.serialization import MessageField, SerializationContext
+from pydantic import BaseModel
 
-from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
+from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
 from wunderkafka.serdes.store import JSONModelRepo
 
 

@@ -1,14 +1,15 @@
 import datetime
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
 from confluent_kafka import Message, TopicPartition
 from typing_extensions import Protocol
 
+from wunderkafka.consumers.subscription import TopicSubscription
+
 # ToDo (tribunsky.kir): subject to change. It's not obvious how to merge together
 #                       python-kafka/confluent-kafka and out own API, so currently
 #                       it's just API of (de)serializing producer/consumer with the nested 'real' producer/consumer.
-from wunderkafka.types import MsgKey, MsgValue, DeliveryCallback
-from wunderkafka.consumers.subscription import TopicSubscription
+from wunderkafka.types import DeliveryCallback, MsgKey, MsgValue
 
 
 class AnyConsumer(Protocol):

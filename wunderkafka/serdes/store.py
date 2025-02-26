@@ -1,15 +1,15 @@
-from typing import Union, Optional
 from pathlib import Path
+from typing import Optional, Union
 
+from dataclasses_avroschema import AvroModel
 from pydantic import BaseModel
 from pydantic.json_schema import GenerateJsonSchema
-from dataclasses_avroschema import AvroModel
 
-from wunderkafka.types import TopicName, KeySchemaDescription, ValueSchemaDescription
 from wunderkafka.serdes import avromodel, jsonmodel
 from wunderkafka.serdes.abc import AbstractDescriptionStore
-from wunderkafka.structures import SchemaType
 from wunderkafka.serdes.jsonmodel.derive import JSONClosedModelGenerator
+from wunderkafka.structures import SchemaType
+from wunderkafka.types import KeySchemaDescription, TopicName, ValueSchemaDescription
 
 
 class SchemaTextRepo(AbstractDescriptionStore):

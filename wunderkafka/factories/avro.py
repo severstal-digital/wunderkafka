@@ -1,20 +1,20 @@
 """This module contains some ready-to-go combinations of the Consumer/Producer."""
 
-from typing import Union, Optional
+from typing import Optional, Union
 
 from wunderkafka import ConsumerConfig, ProducerConfig
-from wunderkafka.types import TopicName, MessageDescription
-from wunderkafka.structures import SchemaType
-from wunderkafka.serdes.avro import FastAvroSerializer, AvroModelSerializer, FastAvroDeserializer
-from wunderkafka.serdes.store import AvroModelRepo, SchemaTextRepo
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.consumers.bytes import BytesConsumer
-from wunderkafka.producers.bytes import BytesProducer
-from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient, KerberizableHTTPClient
 from wunderkafka.config.krb.rdkafka import config_requires_kerberos
+from wunderkafka.consumers.bytes import BytesConsumer
 from wunderkafka.consumers.constructor import HighLevelDeserializingConsumer
+from wunderkafka.producers.bytes import BytesProducer
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.schema_registry import ClouderaSRClient, KerberizableHTTPClient, SimpleCache
 from wunderkafka.schema_registry.clients.confluent import ConfluentSRClient
+from wunderkafka.serdes.avro import AvroModelSerializer, FastAvroDeserializer, FastAvroSerializer
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.store import AvroModelRepo, SchemaTextRepo
+from wunderkafka.structures import SchemaType
+from wunderkafka.types import MessageDescription, TopicName
 
 
 class AvroConsumer(HighLevelDeserializingConsumer):

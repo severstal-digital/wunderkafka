@@ -1,15 +1,15 @@
 from pathlib import Path
 
 import pytest
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
-from wunderkafka.time import now
-from wunderkafka.tests import TestProducer, TestHTTPClient
-from wunderkafka.serdes.avro import AvroModelSerializer
-from wunderkafka.serdes.store import AvroModelRepo
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.schema_registry import ClouderaSRClient, SimpleCache
+from wunderkafka.serdes.avro import AvroModelSerializer
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
+from wunderkafka.serdes.store import AvroModelRepo
+from wunderkafka.tests import TestHTTPClient, TestProducer
+from wunderkafka.time import now
 
 
 class Signal(BaseModel):

@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from confluent_kafka.serialization import StringSerializer as _StringSerializer
 
-from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
+from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
 from wunderkafka.serdes.store import StringRepo
 
 

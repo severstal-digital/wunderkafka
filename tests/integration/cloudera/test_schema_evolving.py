@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from wunderkafka.tests import TestHTTPClient
 from wunderkafka.errors import SchemaRegistryLookupException
-from wunderkafka.structures import SchemaMeta, ParsedHeader
-from wunderkafka.schema_registry import SimpleCache, ClouderaSRClient
+from wunderkafka.schema_registry import ClouderaSRClient, SimpleCache
+from wunderkafka.structures import ParsedHeader, SchemaMeta
+from wunderkafka.tests import TestHTTPClient
 
 
 @pytest.fixture
