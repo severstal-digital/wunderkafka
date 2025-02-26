@@ -131,12 +131,12 @@ jobs:
           ref: ${{ github.head_ref }}
       - name: Count Todo
         id: count_todo
-        run: grep -riw "todo" wunderkafka tests | wc -l | xargs
+        run: echo "todo-num=$(grep -riw "todo" wunderkafka tests | wc -l | xargs)" >> $GITHUB_OUTPUT
       - name: Generate the badge SVG image
         uses: emibcn/badge-action@v1
         with:
           label: 'TODOs'
-          status: ${{ steps.count_todo.outputs.stdout }}
+          status: ${{ steps.count_todo.outputs.todo-num }}
           path: ${{ env.TODO_COUNT_BADGE_PATH }}
           color: ${{
             steps.count_todo.outputs.stdout < 5  && 'green'              ||
