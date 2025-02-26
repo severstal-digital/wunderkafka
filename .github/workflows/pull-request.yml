@@ -128,22 +128,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Count Todo
+        id: count_todo
         run: grep -riw "todo" wunderkafka tests | wc -l | xargs
       - name: Generate the badge SVG image
         uses: emibcn/badge-action@v1
         with:
           label: 'Test coverage'
-          status: ${{ steps.todo_counter.outputs.lines }}
+          status: ${{ steps.count_todo.outputs.coverage }}
           path: ${{ env.TODO_COUNT_BADGE_PATH }}
           color: ${{
-            steps.todo_counter.outputs.coverage < 5  && 'green'              ||
-            steps.todo_counter.outputs.coverage < 10 && 'yellow,green'       ||
-            steps.todo_counter.outputs.coverage < 15 && 'yellow'             ||
-            steps.todo_counter.outputs.coverage < 20 && 'orange,yellow'      ||
-            steps.todo_counter.outputs.coverage < 25 && 'orange'             ||
-            steps.todo_counter.outputs.coverage < 30 && 'red,orange'         ||
-            steps.todo_counter.outputs.coverage < 35 && 'red,red,orange'     ||
-            steps.todo_counter.outputs.coverage < 40 && 'red,red,red,orange' ||
+            steps.count_todo.outputs.coverage < 5  && 'green'              ||
+            steps.count_todo.outputs.coverage < 10 && 'yellow,green'       ||
+            steps.count_todo.outputs.coverage < 15 && 'yellow'             ||
+            steps.count_todo.outputs.coverage < 20 && 'orange,yellow'      ||
+            steps.count_todo.outputs.coverage < 25 && 'orange'             ||
+            steps.count_todo.outputs.coverage < 30 && 'red,orange'         ||
+            steps.count_todo.outputs.coverage < 35 && 'red,red,orange'     ||
+            steps.count_todo.outputs.coverage < 40 && 'red,red,red,orange' ||
             'red' }}
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
