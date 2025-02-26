@@ -154,7 +154,7 @@ jobs:
       - name: Commit badge
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
-          git pull
+          git checkout $GITHUB_HEAD_REF
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add $TODO_COUNT_BADGE_PATH
