@@ -4,8 +4,8 @@ from typing import Any, Optional
 
 import requests
 
+from wunderkafka.config.krb.rdkafka import init_kerberos
 from wunderkafka.logger import logger
-from wunderkafka.hotfixes.watchdog import parse_kinit, init_kerberos
 from wunderkafka.schema_registry.abc import AbstractHTTPClient
 from wunderkafka.config.schema_registry import SRConfig
 from wunderkafka.config.krb.schema_registry import HTTPKerberosAuth
@@ -23,8 +23,7 @@ class KerberizableHTTPClient(AbstractHTTPClient):
     ) -> None:
         s = requests.Session()
         if requires_kerberos and cmd_kinit is not None:
-            params = parse_kinit(cmd_kinit)
-            init_kerberos(params, krb_timeout)
+            init_kerberos(cmd_kinit, krb_timeout)
             s.auth = HTTPKerberosAuth(
                 principal=config.sasl_username,
                 mutual_authentication=config.mutual_auth,
