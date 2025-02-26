@@ -161,12 +161,13 @@ jobs:
           git config --local user.name "GitHub Action"
           git add $TODO_COUNT_BADGE_PATH
           git commit -m "chore: update todo-counter badge"
+
       - name: Push badge commit
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ env.GITHUB_HEAD_REF }}
+          github_token: ${{ secrets.github_token }}
+          branch: ${{ github.head_ref }}
   deploy:
     if: false
     needs: [checks, version]
