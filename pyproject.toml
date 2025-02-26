@@ -1,6 +1,6 @@
 [project]
 name = "wunderkafka"
-version = "0.19.0-beta.9"
+version = "0.19.0-beta.10"
 description = "librdkafka-powered client for Kafka for python with (hopefully) more handful API"
 readme = "README.md"
 keywords = ["kafka", "cloudera", "confluent"]
@@ -40,23 +40,8 @@ exclude = ["tests"]
 
 # TODO: flake8 will be replaced with ruff
 
-# [tool.flake8]
-# max-line-length = 120
-# max-complexity = 15
-# exclude = ["wunderkafka/config/generated"]
-# per-file-ignores = {
-#     "wunderkafka/__init__.py" = "F401",
-#     "wunderkafka/config/__init__.py" = "F401",
-#     "wunderkafka/config/generated/enums.py" = "F811,E303",
-#     "wunderkafka/config/generated/models.py" = "F811,E303,WPS432",
-#     "wunderkafka/schema_registry/__init__.py" = "F401",
-#     "wunderkafka/schema_registry/clients/compat.py" = "F401",
-#     "wunderkafka/serdes/avro/__init__.py" = "F401",
-#     "wunderkafka/serdes/avromodel/__init__.py" = "F401",
-#     "wunderkafka/serdes/json/__init__.py" = "F401",
-#     "wunderkafka/serdes/jsonmodel/__init__.py" = "F401",
-#     "wunderkafka/tests/__init__.py" = "F401"
-# }
+
+[tool.ruff.lint.per-file-ignores]
 
 [tool.isort]
 multi_line_output = 3
