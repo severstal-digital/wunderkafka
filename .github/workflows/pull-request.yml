@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  TODO_COUNT_BADGE_PATH: ./github/assets/todo-count-badge.svg 
+  TODO_COUNT_BADGE_PATH: ./github/assets/todo-count-badge.svg
 
 jobs:
   independent:
@@ -121,7 +121,7 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v9.19.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-  count-todo:
+  todo_counter:
     runs-on: ubuntu-latest
     name: Generate todo-counter Badge
     steps:
@@ -133,17 +133,17 @@ jobs:
         uses: emibcn/badge-action@v1
         with:
           label: 'Test coverage'
-          status: ${{ steps.count-todo.outputs.lines }}
+          status: ${{ steps.todo_counter.outputs.lines }}
           path: ${{ env.TODO_COUNT_BADGE_PATH }}
           color: ${{
-            steps.count-todo.outputs.coverage < 5  && 'green'              ||
-            steps.count-todo.outputs.coverage < 10 && 'yellow,green'       ||
-            steps.count-todo.outputs.coverage < 15 && 'yellow'             ||
-            steps.count-todo.outputs.coverage < 20 && 'orange,yellow'      ||
-            steps.count-todo.outputs.coverage < 25 && 'orange'             ||
-            steps.count-todo.outputs.coverage < 30 && 'red,orange'         ||
-            steps.count-todo.outputs.coverage < 35 && 'red,red,orange'     ||
-            steps.count-todo.outputs.coverage < 40 && 'red,red,red,orange' ||
+            steps.todo_counter.outputs.coverage < 5  && 'green'              ||
+            steps.todo_counter.outputs.coverage < 10 && 'yellow,green'       ||
+            steps.todo_counter.outputs.coverage < 15 && 'yellow'             ||
+            steps.todo_counter.outputs.coverage < 20 && 'orange,yellow'      ||
+            steps.todo_counter.outputs.coverage < 25 && 'orange'             ||
+            steps.todo_counter.outputs.coverage < 30 && 'red,orange'         ||
+            steps.todo_counter.outputs.coverage < 35 && 'red,red,orange'     ||
+            steps.todo_counter.outputs.coverage < 40 && 'red,red,red,orange' ||
             'red' }}
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
