@@ -13,7 +13,7 @@ from wunderkafka.types import MsgKey, MsgValue, TopicName, HeaderPacker, Deliver
 from wunderkafka.logger import logger
 from wunderkafka.callbacks import error_callback
 from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
-from wunderkafka.structures import SRMeta, SchemaDescription
+from wunderkafka.structures import DeserializerSchemaDescription, SRMeta
 from wunderkafka.producers.abc import AbstractProducer, AbstractSerializingProducer
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
 
@@ -149,7 +149,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
     def _check_schema(
         self,
         topic: str,
-        schema: Optional[SchemaDescription],
+        schema: Optional[DeserializerSchemaDescription],
         *,
         is_key: bool = False,
         force: bool = False,

@@ -1,6 +1,6 @@
 [project]
 name = "wunderkafka"
-version = "0.19.0-beta.4"
+version = "0.19.0-beta.6"
 description = "librdkafka-powered client for Kafka for python with (hopefully) more handful API"
 readme = "README.md"
 keywords = ["kafka", "cloudera", "confluent"]
@@ -177,4 +177,13 @@ target-version="py39"
 exclude = [
 	"wunderkafka/config/generated/*",
 	"examples/*"
+]
+
+[tool.uv]
+dev-dependencies = [
+    "attrs>=25.1.0",
+    "cachetools>=5.5.2",
+    "httpx>=0.28.1",
+    "pytest>=8.3.4",
+    "requests>=2.32.3",
 ]

@@ -16,7 +16,7 @@ from confluent_kafka.serialization import SerializationError
 from wunderkafka.types import HeaderParser
 from wunderkafka.logger import logger
 from wunderkafka.serdes.abc import AbstractDeserializer
-from wunderkafka.structures import SchemaMeta, SchemaDescription
+from wunderkafka.structures import SchemaMeta, SerializerSchemaDescription
 from wunderkafka.consumers.abc import AbstractConsumer, AbstractDeserializingConsumer
 from wunderkafka.consumers.types import PayloadError, StreamResult
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
@@ -206,7 +206,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             header=parsed_header,
         )
         schema_text = self._registry.get_schema_text(schema_meta)
-        schema = SchemaDescription(text=schema_text)
+        schema = SerializerSchemaDescription(text=schema_text)
         # performance tradeoff: a message may be long, and we don't want to:
         # - copy the whole tail
         # - have implicit offset as if we read buffer when extracting header
