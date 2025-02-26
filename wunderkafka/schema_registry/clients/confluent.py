@@ -35,21 +35,25 @@ class ConfluentRestClient(Protocol):
         ...
 
 
-class Adapter:
+class SchemaRegistryHttpClientAdapter:
+    """
+    Adapter for AbstractHTTPClient and confluent kafka's _RestClient. Though
+    AbstractHTTPClient supports all methods signatures are a bit different.
+    """
     def __init__(self, http_client: AbstractHTTPClient) -> None:
         self._client = http_client
 
     def get(self, url: str, query: Optional[dict] = None) -> Any:
-        return self._client.make_request(url, query=query)
+        return self._client.get(url, query=query)
 
     def post(self, url: str, body: Optional[str], **_: Any) -> Any:
-        return self._client.make_request(url, method='POST', body=body)
+        return self._client.post(url, body=body)
 
     def delete(self, url: str) -> Any:
-        return self._client.make_request(url, method='DELETE')
+        return self._client.delete(url)
 
     def put(self, url: str, body: Optional[str]= None) -> Any:
-        return self._client.make_request(url, method='PUT', body=body)
+        return self._client.put(url, body=body)
 
     def send_request(self, url: str, method: str, body: Optional[str] = None, query: Optional[dict] = None) -> Any:
         return self._client.make_request(url, method, body=body, query=query)
@@ -64,7 +68,7 @@ class SchemaRegistryClient(ConfluentSchemaRegistryClient):
     def from_client(cls, http_client: AbstractHTTPClient, *args: P.args, **kwargs: P.kwargs) -> SchemaRegistryClient:
         # Minimal initialization as we will override a client with our own
         client = cls({'url': http_client.base_url, **kwargs})
-        client._rest_client = Adapter(http_client)
+        client._rest_client = SchemaRegistryHttpClientAdapter(http_client)
         return client
 
 
