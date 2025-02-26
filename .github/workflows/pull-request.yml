@@ -139,14 +139,14 @@ jobs:
           status: ${{ steps.count_todo.outputs.todo-num }}
           path: ${{ env.TODO_COUNT_BADGE_PATH }}
           color: ${{
-            steps.count_todo.outputs.stdout < 5  && 'green'              ||
-            steps.count_todo.outputs.stdout < 10 && 'yellow,green'       ||
-            steps.count_todo.outputs.stdout < 15 && 'yellow'             ||
-            steps.count_todo.outputs.stdout < 20 && 'orange,yellow'      ||
-            steps.count_todo.outputs.stdout < 25 && 'orange'             ||
-            steps.count_todo.outputs.stdout < 30 && 'red,orange'         ||
-            steps.count_todo.outputs.stdout < 35 && 'red,red,orange'     ||
-            steps.count_todo.outputs.stdout < 40 && 'red,red,red,orange' ||
+            steps.count_todo.outputs.todo-num < 5  && 'green'              ||
+            steps.count_todo.outputs.todo-num < 10 && 'yellow,green'       ||
+            steps.count_todo.outputs.todo-num < 15 && 'yellow'             ||
+            steps.count_todo.outputs.todo-num < 20 && 'orange,yellow'      ||
+            steps.count_todo.outputs.todo-num < 25 && 'orange'             ||
+            steps.count_todo.outputs.todo-num < 40 && 'red,orange'         ||
+            steps.count_todo.outputs.todo-num < 50 && 'red,red,orange'     ||
+            steps.count_todo.outputs.todo-num < 60 && 'red,red,red,orange' ||
             'red' }}
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v16
