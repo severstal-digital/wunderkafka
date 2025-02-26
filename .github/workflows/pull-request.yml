@@ -22,8 +22,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: Set up uv venv
         run: |
-          uv venv
-          uv pip install attrs cachetools httpx requests
+          uv sync --only-dev
       - name: install system dependencies
         run: |
           apt-get update
@@ -37,17 +36,17 @@ jobs:
               echo "Installed dependencies simultaneously"
           else
               echo "Error resolving dependencies... Installing consequently"
-              uv pip install pytest 
               uv pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
               uv pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
           fi
+      - name: run ruff
+        run: uv run ruff check wunerkafka/ tests/
       - name: run pytest
         run: uv run pytest -s tests/
-      - name: Install dependencies
-        run: |
-          uv pip install -U mypy==1.10.0
       - name: run mypy
         run: uv run mypy --config pyproject.toml .
+      - name: run ruff 
+        run: uv run ruff check wunderkafka tests
   checks:
     needs: [independent]
     runs-on: ubuntu-latest
@@ -66,8 +65,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
     - name: Set up uv venv
       run: |
-        uv venv
-        uv pip install attrs cachetools httpx requests    
+        uv sync --only-dev
     - name: Install system dependencies
       run: |
         apt-get update && \
@@ -85,7 +83,6 @@ jobs:
             echo "Installed dependencies simultaneously"
         else
             echo "Error resolving dependencies... Installing consequently"
-            uv pip install pytest
             uv pip install pydantic-settings${{ matrix.pydantic-settings-version }}
             uv pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
             uv pip install requests-kerberos${{ matrix.requests-kerberos-version }}
@@ -93,9 +90,6 @@ jobs:
         fi
     - name: run pytest
       run: uv run pytest -s tests/
-    - name: Install dependencies
-      run: |
-        uv pip install -U mypy==1.10.0
     - name: run mypy
       run: uv run mypy --config pyproject.toml .
 

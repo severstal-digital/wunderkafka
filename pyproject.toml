@@ -1,6 +1,6 @@
 [project]
 name = "wunderkafka"
-version = "0.19.0-beta.4"
+version = "0.19.0-beta.12"
 description = "librdkafka-powered client for Kafka for python with (hopefully) more handful API"
 readme = "README.md"
 keywords = ["kafka", "cloudera", "confluent"]
@@ -161,34 +161,23 @@ exclude = [
 	"examples/*"
 ]
 
-
 [tool.ruff.lint]
 select = ["I"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
 [tool.ruff.format]
 quote-style = "single"
 
-# [tool.flake8]
-# max-complexity = 15
-# exclude = ["wunderkafka/config/generated"]
-# per-file-ignores = {
-#     "wunderkafka/__init__.py" = "F401",
-#     "wunderkafka/config/__init__.py" = "F401",
-#     "wunderkafka/config/generated/enums.py" = "F811,E303",
-#     "wunderkafka/config/generated/models.py" = "F811,E303,WPS432",
-#     "wunderkafka/schema_registry/__init__.py" = "F401",
-#     "wunderkafka/schema_registry/clients/compat.py" = "F401",
-#     "wunderkafka/serdes/avro/__init__.py" = "F401",
-#     "wunderkafka/serdes/avromodel/__init__.py" = "F401",
-#     "wunderkafka/serdes/json/__init__.py" = "F401",
-#     "wunderkafka/serdes/jsonmodel/__init__.py" = "F401",
-#     "wunderkafka/tests/__init__.py" = "F401"
-# }
+
 
 [tool.uv]
 dev-dependencies = [
     "attrs>=25.1.0",
     "cachetools>=5.5.2",
     "httpx>=0.28.1",
+    "mypy==1.10.0",
     "pytest>=8.3.4",
     "requests>=2.32.3",
     "ruff>=0.9.7",
