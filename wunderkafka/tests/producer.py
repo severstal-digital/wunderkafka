@@ -1,9 +1,9 @@
-from typing import Any, Union, Optional
 from dataclasses import dataclass
+from typing import Any, Optional, Union
 
-from wunderkafka.types import DeliveryCallback
 from wunderkafka.callbacks import error_callback
 from wunderkafka.producers.bytes import BytesProducer
+from wunderkafka.types import DeliveryCallback
 
 
 @dataclass

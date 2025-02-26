@@ -1,15 +1,15 @@
 import os
-import time
 import subprocess
-from typing import Any
+import time
 from dataclasses import dataclass
+from typing import Any
 
 from confluent_kafka import libversion
 
-from wunderkafka.logger import logger
-from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.config.generated import enums
+from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.hotfixes.watchdog.types import Watchdog
+from wunderkafka.logger import logger
 
 REQUIRES_KERBEROS = frozenset([enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext])
 

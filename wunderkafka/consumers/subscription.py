@@ -1,9 +1,9 @@
 """This module contains subscription helpers."""
 
 import datetime
-from typing import Union, Optional
+from typing import Optional, Union
 
-from confluent_kafka import OFFSET_END, OFFSET_BEGINNING
+from confluent_kafka import OFFSET_BEGINNING, OFFSET_END
 
 from wunderkafka.structures import Offset, Timestamp
 

@@ -1,6 +1,6 @@
-from uuid import UUID
-from typing import Optional
 from pathlib import Path
+from typing import Optional
+from uuid import UUID
 
 import pytest
 from pydantic import UUID4, BaseModel
@@ -10,11 +10,11 @@ from wunderkafka.serdes.store import JSONModelRepo
 
 if not HAS_JSON_SCHEMA:
     pytest.skip("skipping json-schema-only tests", allow_module_level=True)
-from wunderkafka.tests import TestProducer, TestHTTPClient
-from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
-from wunderkafka.schema_registry import SimpleCache, ConfluentSRClient
 from wunderkafka.producers.constructor import HighLevelSerializingProducer
+from wunderkafka.schema_registry import ConfluentSRClient, SimpleCache
+from wunderkafka.serdes.headers import ConfluentClouderaHeadersHandler
 from wunderkafka.serdes.jsonmodel.serializers import JSONModelSerializer
+from wunderkafka.tests import TestHTTPClient, TestProducer
 
 
 class Image(BaseModel):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
+from wunderkafka.structures import SchemaMeta, SchemaType, SRMeta
 
 
 class AbstractHTTPClient(ABC):

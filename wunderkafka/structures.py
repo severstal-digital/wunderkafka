@@ -1,7 +1,7 @@
 """This module contains common datastructures which is used in the package."""
+from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
-from dataclasses import dataclass
 
 from wunderkafka.time import ts2dt
 

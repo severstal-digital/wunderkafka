@@ -1,11 +1,11 @@
-import uuid
+import datetime
 import random
 import string
-import datetime
+import uuid
 from uuid import UUID
 
 import pytest
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 from wunderkafka.serdes.schemaless.json.serializers import SchemaLessJSONSerializer
 from wunderkafka.serdes.schemaless.jsonmodel.serializers import SchemaLessJSONModelSerializer

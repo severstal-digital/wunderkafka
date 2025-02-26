@@ -1,14 +1,14 @@
-import os
 import json
+import os
 from typing import Any, Optional
 
 import requests
 
-from wunderkafka.logger import logger
-from wunderkafka.hotfixes.watchdog import parse_kinit, init_kerberos
-from wunderkafka.schema_registry.abc import AbstractHTTPClient
-from wunderkafka.config.schema_registry import SRConfig
 from wunderkafka.config.krb.schema_registry import HTTPKerberosAuth
+from wunderkafka.config.schema_registry import SRConfig
+from wunderkafka.hotfixes.watchdog import init_kerberos, parse_kinit
+from wunderkafka.logger import logger
+from wunderkafka.schema_registry.abc import AbstractHTTPClient
 
 
 class KerberizableHTTPClient(AbstractHTTPClient):

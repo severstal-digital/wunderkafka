@@ -1,8 +1,8 @@
-import sys
 import json
+import sys
 from typing import Optional
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
 from wunderkafka.serdes.avromodel import derive
 
