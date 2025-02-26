@@ -135,21 +135,21 @@ jobs:
       - name: Generate the badge SVG image
         uses: emibcn/badge-action@v1
         with:
-          label: 'Test coverage'
-          status: ${{ steps.count_todo.outputs.coverage }}
+          label: 'TODOs'
+          status: ${{ steps.count_todo.outputs.stdout }}
           path: ${{ env.TODO_COUNT_BADGE_PATH }}
           color: ${{
-            steps.count_todo.outputs.coverage < 5  && 'green'              ||
-            steps.count_todo.outputs.coverage < 10 && 'yellow,green'       ||
-            steps.count_todo.outputs.coverage < 15 && 'yellow'             ||
-            steps.count_todo.outputs.coverage < 20 && 'orange,yellow'      ||
-            steps.count_todo.outputs.coverage < 25 && 'orange'             ||
-            steps.count_todo.outputs.coverage < 30 && 'red,orange'         ||
-            steps.count_todo.outputs.coverage < 35 && 'red,red,orange'     ||
-            steps.count_todo.outputs.coverage < 40 && 'red,red,red,orange' ||
+            steps.count_todo.outputs.stdout < 5  && 'green'              ||
+            steps.count_todo.outputs.stdout < 10 && 'yellow,green'       ||
+            steps.count_todo.outputs.stdout < 15 && 'yellow'             ||
+            steps.count_todo.outputs.stdout < 20 && 'orange,yellow'      ||
+            steps.count_todo.outputs.stdout < 25 && 'orange'             ||
+            steps.count_todo.outputs.stdout < 30 && 'red,orange'         ||
+            steps.count_todo.outputs.stdout < 35 && 'red,red,orange'     ||
+            steps.count_todo.outputs.stdout < 40 && 'red,red,red,orange' ||
             'red' }}
       - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v16
+        uses: tj-actions/verify-changed-files@v16) >> $GITHUB_OUTPUT
         id: verify-changed-files
         with:
           files: ${{ env.TODO_COUNT_BADGE_PATH }}
