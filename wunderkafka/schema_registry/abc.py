@@ -1,8 +1,16 @@
-from http import HTTPMethod
 from abc import ABC, abstractmethod
 from typing import Any
 
 from wunderkafka.structures import SRMeta, SchemaMeta, SchemaType
+
+
+# TODO: replace with http.HTTPMethod when we drop python 3.10
+class HTTPMethod:
+    GET = 'GET'
+    POST = 'POST'
+    PUT = 'PUT'
+    PATCH = 'PATCH'
+    DELETE = 'DELETE'
 
 
 class AbstractHTTPClient(ABC):
