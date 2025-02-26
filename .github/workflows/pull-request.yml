@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  TODO_COUNT_BADGE_PATH: ./github/assets/todo-count-badge.svg
+  TODO_COUNT_BADGE_PATH: .github/assets/todo-count-badge.svg
 
 jobs:
   independent:
