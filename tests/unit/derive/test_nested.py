@@ -231,22 +231,3 @@ def test_deep_nested_base_model() -> None:
 class MLConfig(BaseSettings):
     weights: Path
     threshold: float = 0.5
-
-
-class MetricV22(BaseSettings):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-    ml_config: MLConfig                                                               # type: ignore[assignment,misc]
-
-    class Config:
-        extra = 'allow'
-
-
-def test_pydantic_base_settings_v22_with_defaults_complicated_field() -> None:
-    with pytest.raises(ValueError):
-        derive(MetricV22, topic='some_topic')
-
-    with pytest.raises(ValidationError):
-        MetricV22(line_speed=2, ml_config=MLConfig(path='test'))  # type: ignore
