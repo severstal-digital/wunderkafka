@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  TODO_COUNT_BADGE_PATH: ./github/assets/todo-count-badge.svg 
+
 jobs:
   independent:
     runs-on: ubuntu-latest
@@ -115,7 +118,49 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v9.19.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
+  count-todo:
+    runs-on: ubuntu-latest
+    name: Generate todo-counter Badge
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Count Todo
+        run: grep -riw "todo" wunderkafka tests | wc -l | xargs
+      - name: Generate the badge SVG image
+        uses: emibcn/badge-action@v1
+        with:
+          label: 'Test coverage'
+          status: ${{ steps.count-todo.outputs.lines }}
+          path: $TODO_COUNT_BADGE_PATH
+          color: ${{
+            steps.count-todo.outputs.coverage < 5  && 'green'              ||
+            steps.count-todo.outputs.coverage < 10 && 'yellow,green'       ||
+            steps.count-todo.outputs.coverage < 15 && 'yellow'             ||
+            steps.count-todo.outputs.coverage < 20 && 'orange,yellow'      ||
+            steps.count-todo.outputs.coverage < 25 && 'orange'             ||
+            steps.count-todo.outputs.coverage < 30 && 'red,orange'         ||
+            steps.count-todo.outputs.coverage < 35 && 'red,red,orange'     ||
+            steps.count-todo.outputs.coverage < 40 && 'red,red,red,orange' ||
+            'red' }}
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        id: verify-changed-files
+        with:
+          files: $TODO_COUNT_BADGE_PATH
+      - name: Commit badge
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          git pull
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $TODO_COUNT_BADGE_PATH
+          git commit -m "chore: update todo-counter badge"
+      - name: Push badge commit
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: $GITHUB_HEAD_REF
   deploy:
     needs: [checks, version]
     runs-on: ubuntu-latest
