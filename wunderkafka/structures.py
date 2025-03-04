@@ -73,17 +73,14 @@ class SRMeta:
 
 
 @dataclass(frozen=True)
-class SchemaDescription:
+class SerializerSchemaDescription:
     """
-    Class to allow a contract extension between moving parts of (de)serialization.
+    Class to allow a contract extension between moving parts of serialization.
 
     Usually schema is represented by text, but separate class adds abstraction.
     """
 
     text: str
-    # None - is for deserializers
-    # ToDo (tribunsky.kir): split it to separate schemas for deserializer and serialized?
-    type: Optional[SchemaType] = None
 
     @property
     def empty(self) -> bool:
@@ -93,3 +90,15 @@ class SchemaDescription:
         Some serializers (e.g., confluent StringSerializer) practically don't have an effective schema.
         """
         return self.text == ''
+
+
+@dataclass(frozen=True)
+class DeserializerSchemaDescription(SerializerSchemaDescription):
+    """
+    Class to allow a contract extension between moving parts of deserialization.
+
+    Usually schema is represented by text, but separate class adds abstraction.
+    """
+
+    text: str
+    type: SchemaType
