@@ -5,7 +5,7 @@ from typing import Any, Union, Callable, Optional
 
 from confluent_kafka import Message, KafkaError
 
-from wunderkafka.structures import Offset, SRMeta, Timestamp, ParsedHeader, SchemaDescription
+from wunderkafka.structures import Offset, SRMeta, Timestamp, ParsedHeader, DeserializerSchemaDescription
 
 # ToDo (tribunsky.kir): add symmetry and generalize this part
 HeaderParser = Callable[[bytes], ParsedHeader]
@@ -16,8 +16,8 @@ DeliveryCallback = Callable[[Optional[KafkaError], Message], None]
 MsgValue = Any
 MsgKey = Any
 
-KeySchemaDescription = SchemaDescription
-ValueSchemaDescription = SchemaDescription
+KeySchemaDescription = DeserializerSchemaDescription
+ValueSchemaDescription = DeserializerSchemaDescription
 
 MessageDescription = Union[str, tuple[str, str], type, tuple[type, type]]
 TopicName = str
