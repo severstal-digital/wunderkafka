@@ -50,6 +50,9 @@ jobs:
           uv pip install -U mypy==1.10.0
       - name: run mypy
         run: uv run mypy --config pyproject.toml .
+      - name: run ruff
+        run: uv run ruff check wunderkafka tests
+
   checks:
     needs: [independent]
     runs-on: ubuntu-latest

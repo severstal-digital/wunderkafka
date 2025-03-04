@@ -1,4 +1,4 @@
-from typing import Any, Final, Union, TypeVar, Optional, get_args
+from typing import Any, Final, Optional, TypeVar, Union, get_args
 
 try:
     from dataclasses_avroschema.avrodantic import AvroBaseModel
@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict, create_model
 from pydantic_settings import BaseSettings
 
 from wunderkafka.serdes.avromodel.typing import is_generic_type
-from wunderkafka.serdes.avromodel.typing.compat import get_generic, is_union_type, create_annotation
+from wunderkafka.serdes.avromodel.typing.compat import create_annotation, get_generic, is_union_type
 
 A = TypeVar('A', bound=Any)
 

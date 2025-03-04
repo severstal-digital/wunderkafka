@@ -7,11 +7,11 @@ Module contains interface-like skeletons for producer.
 
 
 from abc import ABC, abstractmethod
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
 from confluent_kafka import Producer
 
-from wunderkafka.types import MsgKey, MsgValue, DeliveryCallback
+from wunderkafka.types import DeliveryCallback, MsgKey, MsgValue
 
 
 class AbstractProducer(Producer):

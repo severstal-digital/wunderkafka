@@ -9,13 +9,13 @@ All moving parts should be interchangeable in terms of schema, header and serial
 
 from typing import Any, Optional
 
-from wunderkafka.types import MsgKey, MsgValue, TopicName, HeaderPacker, DeliveryCallback, MessageDescription
-from wunderkafka.logger import logger
 from wunderkafka.callbacks import error_callback
-from wunderkafka.serdes.abc import AbstractSerializer, AbstractDescriptionStore
-from wunderkafka.structures import DeserializerSchemaDescription, SRMeta
+from wunderkafka.logger import logger
 from wunderkafka.producers.abc import AbstractProducer, AbstractSerializingProducer
 from wunderkafka.schema_registry.abc import AbstractSchemaRegistry
+from wunderkafka.serdes.abc import AbstractDescriptionStore, AbstractSerializer
+from wunderkafka.structures import DeserializerSchemaDescription, SRMeta
+from wunderkafka.types import DeliveryCallback, HeaderPacker, MessageDescription, MsgKey, MsgValue, TopicName
 
 
 class HighLevelSerializingProducer(AbstractSerializingProducer):
