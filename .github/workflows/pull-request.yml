@@ -33,13 +33,13 @@ jobs:
           uv pip install confluent-kafka[avro]~=2.5.3
       - name: Install testing dependencies
         run: |
-          if uv pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}; then
+          if uv pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema[pydantic]${{ matrix.dataclasses-avroschema-version }}; then
               echo "Installed dependencies simultaneously"
           else
               echo "Error resolving dependencies... Installing consequently"
               uv pip install pytest 
               uv pip install pydantic-settings${{ matrix.pydantic-settings-version }} 
-              uv pip install dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }}
+              uv pip install dataclasses-avroschema[pydantic]${{ matrix.dataclasses-avroschema-version }}
           fi
       - name: run pytest
         run: uv run pytest -s tests/
