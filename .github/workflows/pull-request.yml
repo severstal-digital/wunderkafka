@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+env:
+  TODO_COUNT_BADGE_PATH: .github/assets/todo-count-badge.svg
+
 jobs:
   independent:
     runs-on: ubuntu-latest
@@ -113,7 +116,53 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v9.19.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+  todo_counter:
+    runs-on: ubuntu-latest
+    name: Generate todo-counter Badge
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Count Todo
+        id: count_todo
+        run: echo "todo-num=$(grep -riw "todo" wunderkafka tests | wc -l | xargs)" >> $GITHUB_OUTPUT
+      - name: Generate the badge SVG image
+        uses: emibcn/badge-action@v1
+        with:
+          label: 'TODOs'
+          status: ${{ steps.count_todo.outputs.todo-num }}
+          path: ${{ env.TODO_COUNT_BADGE_PATH }}
+          color: ${{
+            steps.count_todo.outputs.todo-num < 5  && 'green'              ||
+            steps.count_todo.outputs.todo-num < 10 && 'yellow,green'       ||
+            steps.count_todo.outputs.todo-num < 15 && 'yellow'             ||
+            steps.count_todo.outputs.todo-num < 20 && 'orange,yellow'      ||
+            steps.count_todo.outputs.todo-num < 25 && 'orange'             ||
+            steps.count_todo.outputs.todo-num < 40 && 'red,orange'         ||
+            steps.count_todo.outputs.todo-num < 50 && 'red,red,orange'     ||
+            steps.count_todo.outputs.todo-num < 60 && 'red,red,red,orange' ||
+            'red' }}
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v16
+        id: verify-changed-files
+        with:
+          files: ${{ env.TODO_COUNT_BADGE_PATH }}
+      - name: Commit badge
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          git pull
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $TODO_COUNT_BADGE_PATH
+          git commit -m "chore: update todo-counter badge"
 
+      - name: Push badge commit
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          branch: ${{ github.head_ref }}
   deploy:
     needs: [checks, version]
     runs-on: ubuntu-latest
