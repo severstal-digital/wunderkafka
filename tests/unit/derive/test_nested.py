@@ -1,6 +1,6 @@
 import json
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 import pytest
 from pydantic import UUID4, BaseModel, ValidationError

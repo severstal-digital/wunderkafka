@@ -1,11 +1,11 @@
+import subprocess
+import time
+
 from confluent_kafka import KafkaError
 
-from wunderkafka.logger import logger
-from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.config.generated import enums
-
-import time
-import subprocess
+from wunderkafka.config.rdkafka import RDKafkaConfig
+from wunderkafka.logger import logger
 
 REQUIRES_KERBEROS = frozenset([enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext])
 

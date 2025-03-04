@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Union, Optional
+from typing import Any, Optional, Union
 
 from confluent_kafka import KafkaError
 

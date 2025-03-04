@@ -3,8 +3,8 @@ from types import MappingProxyType
 
 from wunderkafka.errors import DeserializerException
 from wunderkafka.serdes.abc import AbstractProtocolHandler
-from wunderkafka.structures import SRMeta, ParsedHeader
 from wunderkafka.serdes.structures import Mask, Protocol
+from wunderkafka.structures import ParsedHeader, SRMeta
 
 # FixMe (tribunsky.kir): Get rid of AbstractProtocolHandler?
 

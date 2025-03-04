@@ -1,13 +1,13 @@
 import os
+from collections.abc import Mapping
 from enum import Enum
 from types import MappingProxyType
-from typing import Any, Union, TypeVar, Optional
-from collections.abc import Mapping
+from typing import Any, Optional, TypeVar, Union
 
-from wunderkafka.logger import logger
-from wunderkafka.config.schema_registry import SRConfig
 from wunderkafka.config.generated.fields import COMMON_FIELDS, CONSUMER_FIELDS, PRODUCER_FIELDS
 from wunderkafka.config.generated.models import RDConsumerConfig, RDProducerConfig
+from wunderkafka.config.schema_registry import SRConfig
+from wunderkafka.logger import logger
 
 CONF_CONSUMER_FIELDS = MappingProxyType({
     field_name.replace('.', '_'): field_name for field_name in (*COMMON_FIELDS, *CONSUMER_FIELDS)
