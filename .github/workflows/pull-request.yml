@@ -22,7 +22,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: Set up uv venv
         run: |
-          uv sync --dev-only
+          uv sync --only-dev
       - name: install system dependencies
         run: |
           apt-get update
@@ -65,7 +65,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
     - name: Set up uv venv
       run: |
-        uv sync --dev-only
+        uv sync --only-dev
     - name: Install system dependencies
       run: |
         apt-get update && \
