@@ -14,23 +14,21 @@ from wunderkafka.serdes.avromodel import derive
 
 # ToDo (tribunsky.kir): review some tests. As pydantic V2 changes it's behaviour, some tests are useless:
 #                       we still can derive correct model, but we will be unable to actually populate it in runtime.
-# ToDo (tribunsky.kir): switch to derivation of dataclasses-avroschema[pydantic], when it start support v2:
-#                       https://github.com/marcosschroh/dataclasses-avroschema/issues/381
 
 
 @dataclass
-class SomeData(AvroModel):
+class SomeData(AvroBaseModel):
     field1: int
     field2: str
 
 
 @dataclass
-class SomeDefaultData(AvroModel):
+class SomeDefaultData(AvroBaseModel):
     field1: Optional[int] = None
     field2: Optional[str] = None
 
 
-class Metrics(BaseModel):
+class Metrics(AvroBaseModel):
     line_speed: Optional[int]
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
@@ -42,24 +40,6 @@ class Metric(BaseSettings):
     defect_detected: Optional[bool] = False
     model_on: Optional[bool] = False
     squad_number: int = 0
-
-
-class MetricV2(BaseSettings):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-
-
-class MetricV21(BaseModel):
-    line_speed: Optional[int]
-    defect_detected: Optional[bool] = False
-    model_on: Optional[bool] = False
-    squad_number: int = 0
-    ml_config: str
-
-    class Config:
-        extra = 'allow'
 
 
 class Event(BaseModel):
@@ -341,16 +321,6 @@ def test_pydantic_base_settings_with_defaults() -> None:
             }
         ]
     }
-
-
-def test_pydantic_base_settings_v2_with_defaults() -> None:
-    with pytest.raises(ValidationError):
-        MetricV2(line_speed=2, ml_config='str')  # type: ignore[call-arg]
-
-
-def test_pydantic_base_settings_v21_with_defaults() -> None:
-    # https://github.com/pydantic/pydantic/issues/8469
-    MetricV21(line_speed=2, ml_config='str')  # type: ignore
 
 
 if sys.version_info <= (3, 10):

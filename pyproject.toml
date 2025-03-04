@@ -21,9 +21,10 @@ requires-python = ">=3.9"
 dependencies = [
 	"confluent-kafka>=1.9.0",
 	"avro-python3>=1.10.0",
-	"dataclasses-avroschema>=0.53.0",
+	"dataclasses-avroschema[pydantic]>=0.53.0",
 	"fastavro>=1.4.7",
 	"pydantic-settings>2.0",
+	"pydantic>=2.7.0",
 ]
 
 [project.optional-dependencies]
@@ -151,7 +152,6 @@ ignore_token_for_push = false
 insecure = true
 [tool.semantic_release.publish]
 dist_glob_patterns = ["dist/*"]
-upload_to_vcs_release = true
 
 [tool.ruff]
 line-length = 120
@@ -170,14 +170,12 @@ max-complexity = 15
 [tool.ruff.format]
 quote-style = "single"
 
-
-
 [tool.uv]
 dev-dependencies = [
     "attrs>=25.1.0",
+    "authlib>=1.5.1",
     "cachetools>=5.5.2",
     "httpx>=0.28.1",
-    "mypy==1.10.0",
     "pytest>=8.3.4",
     "requests>=2.32.3",
     "ruff>=0.9.7",

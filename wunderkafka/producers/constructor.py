@@ -149,7 +149,7 @@ class HighLevelSerializingProducer(AbstractSerializingProducer):
     def _check_schema(
         self,
         topic: str,
-        schema: Optional[SchemaDescription],
+        schema: Optional[DeserializerSchemaDescription],
         *,
         is_key: bool = False,
         force: bool = False,

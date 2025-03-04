@@ -206,7 +206,7 @@ class HighLevelDeserializingConsumer(AbstractDeserializingConsumer):
             header=parsed_header,
         )
         schema_text = self._registry.get_schema_text(schema_meta)
-        schema = SchemaDescription(text=schema_text)
+        schema = SerializerSchemaDescription(text=schema_text)
         # performance tradeoff: a message may be long, and we don't want to:
         # - copy the whole tail
         # - have implicit offset as if we read buffer when extracting header
