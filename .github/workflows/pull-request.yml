@@ -22,8 +22,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: Set up uv venv
         run: |
-          uv venv
-          uv pip install attrs cachetools httpx requests
+          uv sync --dev-only
       - name: install system dependencies
         run: |
           apt-get update
@@ -66,8 +65,7 @@ jobs:
       uses: astral-sh/setup-uv@v5
     - name: Set up uv venv
       run: |
-        uv venv
-        uv pip install attrs cachetools httpx requests    
+        uv sync --dev-only
     - name: Install system dependencies
       run: |
         apt-get update && \
@@ -81,7 +79,7 @@ jobs:
                            g++
     - name: Install testing dependencies
       run: |
-        if uv pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
+        if uv pip install pytest pydantic-settings${{ matrix.pydantic-settings-version }} dataclasses-avroschema[pydantic]${{ matrix.dataclasses-avroschema-version }} requests-kerberos${{ matrix.requests-kerberos-version }} confluent-kafka[avro]${{ matrix.confluent-kafka-version }}; then
             echo "Installed dependencies simultaneously"
         else
             echo "Error resolving dependencies... Installing consequently"
