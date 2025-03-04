@@ -4,6 +4,11 @@ from wunderkafka.logger import logger
 from wunderkafka.config.rdkafka import RDKafkaConfig
 from wunderkafka.config.generated import enums
 
+import time
+import subprocess
+
+REQUIRES_KERBEROS = frozenset([enums.SecurityProtocol.sasl_ssl, enums.SecurityProtocol.sasl_plaintext])
+
 
 def exclude_gssapi(builtin_features: str) -> str:
     features = [feature.strip() for feature in builtin_features.split(',') if feature.strip() != 'sasl_gssapi']
@@ -45,3 +50,21 @@ def challenge_krb_arg(exc: KafkaError, config: RDKafkaConfig) -> RDKafkaConfig:
         logger.warning(f'Changing builtin.features: {old} -> {new}')
         config.builtin_features = new
         return config
+
+
+def init_kerberos(kinit_cmd: str, timeout: int = 60) -> None:
+    t0 = time.perf_counter()
+    refresh_cmd = kinit_cmd.split()
+    try:
+        subprocess.run(refresh_cmd, timeout=timeout, stdout=subprocess.PIPE, check=True)
+    # Will retry shortly
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+        logger.error(exc.output)
+        logger.error(exc.stdout)
+        logger.error(exc.stderr)
+        logger.error(f'Command: {refresh_cmd} exit error: {str(exc)}')
+        logger.warning("Krb not refreshed!")
+    else:
+        duration = int(1000 * (time.perf_counter() - t0))
+        logger.info(f'Refreshed! ({duration} ms)')
+
