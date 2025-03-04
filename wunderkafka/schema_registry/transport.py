@@ -60,7 +60,6 @@ class KerberizableHTTPClient(AbstractHTTPClient):
     def close(self) -> None:
         self._session.close()
 
-    # ToDo (tribunsky.kir): make method enum
     def make_request(
         self,
         relative_url: str,
